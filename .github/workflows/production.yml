@@ -1,0 +1,81 @@
+name: Devminjeong-eum-Backend-Production
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+  CODE_DEPLOYMENT_APPLICATION_NAME: ${{ secrets.CODE_DEPLOYMENT_APPLICATION_NAME }}
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: ${{ secrets.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
+
+jobs:
+  build-project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Environment Variable Setting
+        run: |
+          echo "PROD_MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+          echo "CLOUDFRONT_URL=${{ secrets.CLOUDFRONT_URL }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_ID=${{ secrets.AWS_SECRET_ACCESS_ID }}" >> .env
+
+      - name: Make zip file
+        run: zip -qq -r ./$GITHUB_SHA.zip . -x "node_modules/*"
+        shell: bash
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/server/$GITHUB_SHA.zip
+
+      - name: Code Deploy
+        run: |
+          aws deploy create-deployment \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --application-name ${{ env.CODE_DEPLOYMENT_APPLICATION_NAME }} \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=server/$GITHUB_SHA.zip
