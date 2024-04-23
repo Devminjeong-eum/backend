@@ -80,9 +80,9 @@ jobs:
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          IS_RUNNING = $(sudo docker ps -a | grep backend)
+          IS_RUNNING = $(sudo docker ps -af "status=running" | grep backend)
 
-          if [ ! $IS_RUNNING ]; then
+          if [ ! -z "$IS_RUNNING" ]; then
             sudo docker stop backend
             sudo docker rm backend
           fi
