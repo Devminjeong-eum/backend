@@ -1,8 +1,8 @@
 import { WinstonModule, utilities } from 'nest-winston';
-import {format, transports } from 'winston';
+import { format, transports } from 'winston';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const { combine, timestamp, simple } = format;
+const { combine, timestamp, simple, ms } = format;
 
 export const winstonLogger = WinstonModule.createLogger({
 	transports: [
@@ -12,7 +12,8 @@ export const winstonLogger = WinstonModule.createLogger({
 				? simple()
 				: combine(
 						timestamp({ format: 'isoDateTime' }),
-						utilities.format.nestLike('dev-minjeong-eom', {
+						ms(),
+						utilities.format.nestLike('dev-malssami', {
 							colors: true,
 							prettyPrint: true,
 						}),
