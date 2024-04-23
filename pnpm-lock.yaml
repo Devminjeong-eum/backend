@@ -43,6 +43,9 @@ devDependencies:
   '@nestjs/cli':
     specifier: ^10.0.0
     version: 10.3.2
+  '@nestjs/config':
+    specifier: ^3.2.2
+    version: 3.2.2(@nestjs/common@10.3.7)(rxjs@7.8.1)
   '@nestjs/schematics':
     specifier: ^10.0.0
     version: 10.1.1(typescript@5.4.5)
@@ -969,6 +972,20 @@ packages:
       rxjs: 7.8.1
       tslib: 2.6.2
       uid: 2.0.2
+
+  /@nestjs/config@3.2.2(@nestjs/common@10.3.7)(rxjs@7.8.1):
+    resolution: {integrity: sha512-vGICPOui5vE6kPz1iwQ7oCnp3qWgqxldPmBQ9onkVoKlBtyc83KJCr7CjuVtf4OdovMAVcux1d8Q6jglU2ZphA==}
+    peerDependencies:
+      '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0
+      rxjs: ^7.1.0
+    dependencies:
+      '@nestjs/common': 10.3.7(reflect-metadata@0.2.2)(rxjs@7.8.1)
+      dotenv: 16.4.5
+      dotenv-expand: 10.0.0
+      lodash: 4.17.21
+      rxjs: 7.8.1
+      uuid: 9.0.1
+    dev: true
 
   /@nestjs/core@10.3.7(@nestjs/common@10.3.7)(@nestjs/platform-express@10.3.7)(reflect-metadata@0.2.2)(rxjs@7.8.1):
     resolution: {integrity: sha512-hsdlnfiQ3kgqHL5k7js3CU0PV7hBJVi+LfFMgCkoagRxNMf67z0GFGeOV2jk5d65ssB19qdYsDa1MGVuEaoUpg==}
@@ -2440,10 +2457,14 @@ packages:
       esutils: 2.0.3
     dev: true
 
+  /dotenv-expand@10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
+    engines: {node: '>=12'}
+    dev: true
+
   /dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
-    dev: false
 
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -5362,7 +5383,6 @@ packages:
   /uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
-    dev: false
 
   /v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
