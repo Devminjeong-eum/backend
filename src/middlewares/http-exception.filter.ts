@@ -23,19 +23,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
 			method: request.method,
 		};
 
-        switch (statusCode) {
-            case HttpStatus.INTERNAL_SERVER_ERROR: {
-                Logger.error('SERVER Error', JSON.stringify(errorResponse), exception.stack)
-            };
-            default: {
-                Logger.warn('HTTP Error', JSON.stringify(errorResponse));
-            }
-        }
-        
+		switch (statusCode) {
+			case HttpStatus.INTERNAL_SERVER_ERROR: {
+				Logger.error(
+					'SERVER Error',
+					JSON.stringify(errorResponse),
+					exception.stack,
+				);
+			}
+			default: {
+				Logger.warn('HTTP Error', JSON.stringify(errorResponse));
+			}
+		}
+
 		response.status(statusCode).json(errorResponse);
 	}
 }
 
 export const setupExceptionFilter = (app: INestApplication) => {
-    app.useGlobalFilters(new HttpExceptionFilter());
-}
+	app.useGlobalFilters(new HttpExceptionFilter());
+};
