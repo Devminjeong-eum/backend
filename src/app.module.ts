@@ -8,8 +8,8 @@ import {
 import { GlobalConfigModule } from '#/configs/setup.config';
 import { GlobalTypeOrmModule } from '#/configs/typeorm.configs';
 import { LoggerMiddleware } from '#/middlewares/logger.middleware';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from '#/app.controller';
+import { AppService } from '#/app.service';
 
 @Module({
 	imports: [GlobalConfigModule, GlobalTypeOrmModule],

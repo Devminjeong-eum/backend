@@ -5,6 +5,9 @@ import { TypeOrmModule, TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nes
 @Injectable()
 export class TypeOrmConfig implements TypeOrmOptionsFactory {
 	constructor(private readonly configService: ConfigService) {}
+
+	private isDev = this.configService.get('NODE_ENV') === 'development'
+
 	createTypeOrmOptions(): TypeOrmModuleOptions {
 		return {
 			type: 'postgres',
@@ -13,10 +16,10 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
 			username: this.configService.get('DB_USERNAME'),
 			password: this.configService.get('DB_PASSWORD'),
 			database: this.configService.get('DB_DATABASE'),
-			synchronize: true,
-			dropSchema: false,
-			logging: true,
+            synchronize: this.isDev,
+            logging: this.isDev,
 			entities: [__dirname, '/../**/*.entity.ts'],
+			autoLoadEntities: true
 		};
 	}
 }
