@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-export function setupSwagger(app: INestApplication): void {
+export function setupSwaggerModule(app: INestApplication): void {
 	const config = new DocumentBuilder()
 		.setTitle('Devminjeong-eum')
 		.setDescription('데브말ㅆㆍ미 | 개발 용어 발음 사전')

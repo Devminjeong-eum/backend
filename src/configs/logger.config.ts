@@ -1,43 +1,23 @@
-import { LoggerService } from '@nestjs/common';
+import { WinstonModule, utilities } from 'nest-winston';
+import { format, transports } from 'winston';
 
-import { utilities } from 'nest-winston';
-import * as winston from 'winston';
+const isProduction = process.env.NODE_ENV === 'production';
+const { combine, timestamp, simple, ms } = format;
 
-const { combine, timestamp } = winston.format;
-
-export class WinstonLoggerService implements LoggerService {
-	private logger: winston.Logger;
-
-	constructor(service: string) {
-		this.logger = winston.createLogger({
-			transports: [
-				new winston.transports.Console({
-					level: 'debug',
-					format: combine(
+export const winstonLogger = WinstonModule.createLogger({
+	transports: [
+		new transports.Console({
+			level: isProduction ? 'http' : 'debug',
+			format: isProduction
+				? simple()
+				: combine(
 						timestamp({ format: 'isoDateTime' }),
-						utilities.format.nestLike(service, {
-							prettyPrint: true,
+						ms(),
+						utilities.format.nestLike('dev-malssami', {
 							colors: true,
+							prettyPrint: true,
 						}),
 					),
-				}),
-			],
-		});
-	}
-
-	log(message: string) {
-		this.logger.log({ level: 'info', message });
-	}
-
-	error(message: string, errorStackTrace: string) {
-		this.logger.error(message, errorStackTrace);
-	}
-
-	warn(message: string) {
-		this.logger.warning(message);
-	}
-
-	info(message: string) {
-		this.logger.info(message);
-	}
-}
+		}),
+	],
+});
