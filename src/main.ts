@@ -3,9 +3,9 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 
 import { winstonLogger } from '#/configs/logger.config';
 import { setupSwaggerModule } from '#/configs/swagger.config';
-import { setupExceptionFilter } from '#/middlewares/http-exception.filter';
+import { setupValidationPipe } from '#/configs/validation.config';
 import { setupApiResponseInterceptor } from '#/middlewares/api-response.interceptor';
-
+import { setupExceptionFilter } from '#/middlewares/http-exception.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -17,6 +17,7 @@ async function bootstrap() {
 	setupSwaggerModule(app);
 	setupExceptionFilter(app);
 	setupApiResponseInterceptor(app);
+	setupValidationPipe(app);
 
 	await app.listen(8080);
 }
