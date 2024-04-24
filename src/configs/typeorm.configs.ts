@@ -20,7 +20,7 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
 			username: this.configService.get('DB_USERNAME'),
 			password: this.configService.get('DB_PASSWORD'),
 			database: this.configService.get('DB_DATABASE'),
-			synchronize: this.isDev,
+			synchronize: this.isDev, // NOTE : Production 모드에서는 사용 금지
 			logging: this.isDev,
 			entities: ['../databases/entities/*.entity.ts'],
 			autoLoadEntities: true,
