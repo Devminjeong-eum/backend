@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 
@@ -13,12 +14,15 @@ async function bootstrap() {
 		bufferLogs: true,
 		logger: winstonLogger,
 	});
+	
+	const configService = app.get(ConfigService);
+	const port = configService.get<number>('SERVER_PORT') || 3000;
 
 	setupSwaggerModule(app);
 	setupExceptionFilter(app);
 	setupApiResponseInterceptor(app);
 	setupValidationPipe(app);
 
-	await app.listen(8080);
+	await app.listen(port);
 }
 bootstrap();
