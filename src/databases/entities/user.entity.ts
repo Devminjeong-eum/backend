@@ -15,6 +15,9 @@ export class User {
 	@Column({ type: 'varchar' })
 	public name!: string;
 
+	@Column({ type: 'varchar', unique: true })
+	public email!: string;
+
 	@Column({
 		type: 'enum',
 		enum: ['kakao'],

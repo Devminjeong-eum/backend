@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from '#/databases/entities/user.entity';
+import { RequestOAuthLoginDto } from '#/user/dto/oauth-login.dto';
 
 @Injectable()
 export class UserRepository {
@@ -12,10 +13,8 @@ export class UserRepository {
 		private userRepository: Repository<User>,
 	) {}
 
-	async create(userDto: User) {
-		const user = this.userRepository.create(userDto);
-		await this.userRepository.save(user);
-		return user;
+	async create(userDto: RequestOAuthLoginDto) {
+		return this.userRepository.create(userDto);
 	}
 
 	findById(id: string) {
@@ -24,6 +23,10 @@ export class UserRepository {
 
 	findByName(name: string) {
 		return this.userRepository.findOneBy({ name });
+	}
+
+	findByEmail(email: string) {
+		return this.userRepository.findOneBy({ email });
 	}
 
 	updateName(id: string, name: string) {
