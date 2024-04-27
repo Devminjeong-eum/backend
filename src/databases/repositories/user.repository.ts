@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from '#/databases/entities/user.entity';
-import { RequestOAuthLoginDto } from '#/user/dto/oauth-login.dto';
+import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -13,8 +13,8 @@ export class UserRepository {
 		private userRepository: Repository<User>,
 	) {}
 
-	async create(userDto: RequestOAuthLoginDto) {
-		return this.userRepository.create(userDto);
+	async create(user: RequestCreateUserDto) {
+		return this.userRepository.create(user);
 	}
 
 	findById(id: string) {

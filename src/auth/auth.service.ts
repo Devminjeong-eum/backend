@@ -21,12 +21,13 @@ export class AuthService {
 		return { accessToken, refreshToken };
 	}
 
-	async kakaoLogin(loginUserDto: RequestLoginUserDto) {
-		const { email } = loginUserDto;
+	async kakaoLogin({ email, profileImage, nickname }: RequestLoginUserDto) {
 		let user = await this.userRepository.findByEmail(email);
 
 		if (!user) {
-			user = await this.userRepository.create(loginUserDto);
+			user = await this.userRepository.create({
+				email, profileImage, name: nickname, socialType: 'kakao'
+			});
 		}
 
 		return this.getAuthenticateToken(user.id);

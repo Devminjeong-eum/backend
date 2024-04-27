@@ -2,32 +2,20 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserRepository } from '#/databases/repositories/user.repository';
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
-import { RequestOAuthLoginDto } from './dto/oauth-login.dto';
+import { RequestCreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
-	async oAuthLogin({
-		email,
-		profileImage,
-		nickname,
-	}: RequestOAuthLoginDto) {
-		let user = await this.userRepository.findByEmail(email);
+	async registerUser(createUserDto: RequestCreateUserDto) {
+		let user = await this.userRepository.findByEmail(createUserDto.email);
 
 		if (!user) {
-			user = await this.userRepository.create({
-				email,
-				profileImage,
-				nickname,
-			});
+			user = await this.userRepository.create(createUserDto);
 		}
 
-		return await this.userRepository.create({
-			email,
-			profileImage,
-			nickname,
-		});
+		return user;
 	}
 
 	async getUserInformation(userId: string) {

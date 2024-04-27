@@ -13,23 +13,26 @@ export class User {
 	id!: string;
 
 	@Column({ type: 'varchar' })
-	public name!: string;
+	name: string;
 
 	@Column({ type: 'varchar', unique: true })
-	public email!: string;
+	email: string;
+
+	@Column({ type: 'varchar' })
+	profileImage: string;
 
 	@Column({
 		type: 'enum',
 		enum: ['kakao'],
 	})
-	public socialType!: string;
+	socialType: string;
 
 	@CreateDateColumn({ type: 'timestamp' })
-	public createdAt!: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: 'timestamp' })
-	public updatedAt!: Date;
+	updatedAt?: Date;
 
 	@DeleteDateColumn({ type: 'timestamp' })
-	public deletedAt?: Date;
+	deletedAt?: Date;
 }

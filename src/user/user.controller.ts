@@ -1,5 +1,8 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 
+import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
+import { AuthenticationGuard } from '#/auth/guard/auth.guard';
+import { User } from '#/databases/entities/user.entity';
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
 import { UserService } from './user.service';
 
@@ -7,8 +10,17 @@ import { UserService } from './user.service';
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
+	@Get()
+	@UseGuards(AuthenticationGuard)
+	getOwnInformation(@AuthenticatedUser() user: User) {
+		const { id: userId } = user;
+		console.log(user);
+		return this.userService.getUserInformation(userId);
+	}
+
 	@Get(':userId')
-	findOne(@Param('userId') userId: string) {
+	@UseGuards(AuthenticationGuard)
+	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation(userId);
 	}
 

@@ -19,10 +19,18 @@ export class AuthenticationGuard implements CanActivate {
 		private readonly userRepository: UserRepository,
 	) {}
 
+	private cookieOption = {
+		secure: true,
+		sameSite: 'none',
+		path: '/',
+	} as const;
+
 	async canActivate(context: ExecutionContext) {
 		const request = context.switchToHttp().getRequest<Request>();
 		const response = context.switchToHttp().getResponse<Response>();
 		const { accessToken, refreshToken } = request.cookies;
+
+		console.log(accessToken, refreshToken);
 
 		if (!accessToken || !refreshToken) {
 			throw new UnauthorizedException(
@@ -59,6 +67,8 @@ export class AuthenticationGuard implements CanActivate {
 			);
 		}
 
+		console.log('GUARD', userId);
+
 		const user = await this.userRepository.findById(userId);
 
 		if (!user) {
@@ -76,31 +86,23 @@ export class AuthenticationGuard implements CanActivate {
 		refreshToken: string,
 	) {
 		response.cookie('accessToken', accessToken, {
-			secure: true,
+			...this.cookieOption,
 			maxAge: 5 * 60 * 1000,
-			sameSite: 'none',
-			path: '/',
 		});
 		response.cookie('refreshToken', refreshToken, {
-			secure: true,
+			...this.cookieOption,
 			maxAge: 7 * 24 * 60 * 60 * 1000,
-			sameSite: 'none',
-			path: '/',
 		});
 	}
 
 	private removeAuthenticateCookie(response: Response) {
 		response.cookie('accessToken', '', {
-			secure: true,
+			...this.cookieOption,
 			maxAge: 0,
-			sameSite: 'none',
-			path: '/',
 		});
 		response.cookie('refreshToken', '', {
-			secure: true,
+			...this.cookieOption,
 			maxAge: 0,
-			sameSite: 'none',
-			path: '/',
 		});
 	}
 }
