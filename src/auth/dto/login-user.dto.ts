@@ -1,12 +1,12 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
 export class RequestLoginUserDto {
-    @IsNotEmpty()
-    email: string;
+	@IsNotEmpty()
+	email: string;
 
-    @IsNotEmpty()
-    nickname: string;
+	@IsNotEmpty()
+	nickname: string;
 
-    @IsNotEmpty()
-    profileImage: string;
+	@IsNotEmpty()
+	profileImage: string;
 }

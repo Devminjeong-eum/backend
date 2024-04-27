@@ -41,7 +41,7 @@ export class AuthenticationGuard implements CanActivate {
 
 		let userId: string;
 
-		console.log(this.jwtService)
+		console.log(this.jwtService);
 
 		try {
 			userId = await this.jwtService

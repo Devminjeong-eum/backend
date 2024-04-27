@@ -26,7 +26,7 @@ export class UserService {
 		}
 		return userInformation;
 	}
-	
+
 	async changeUserNickname(changeNickNameDto: RequestChangeNicknameDto) {
 		const { userId, nickname } = changeNickNameDto;
 		const userInformation = await this.userRepository.findById(userId);

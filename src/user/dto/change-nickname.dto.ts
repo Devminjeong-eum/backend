@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class RequestChangeNicknameDto {
-    @IsUUID()
-    userId: string;
+	@IsUUID()
+	userId: string;
 
-    @IsNotEmpty()
-    nickname: string;
+	@IsNotEmpty()
+	nickname: string;
 }

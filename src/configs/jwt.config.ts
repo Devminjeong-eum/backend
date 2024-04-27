@@ -11,7 +11,7 @@ export class JwtConfig implements JwtOptionsFactory {
 			signOptions: {
 				algorithm: 'HS256',
 			},
-		}
+		};
 	}
 }
 

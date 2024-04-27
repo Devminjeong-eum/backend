@@ -3,9 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-	constructor(
-		private readonly jwtService: JwtService,
-	) {}
+	constructor(private readonly jwtService: JwtService) {}
 
 	getAuthenticateToken(userId: string) {
 		const payload = { id: userId };

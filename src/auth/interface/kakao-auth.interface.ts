@@ -1,5 +1,5 @@
 export interface KakaoAuthUser {
-    id: string;
-    nickname: string;
-    profileImage: string;
+	id: string;
+	nickname: string;
+	profileImage: string;
 }

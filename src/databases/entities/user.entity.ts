@@ -15,7 +15,6 @@ export class User {
 	@Column({ type: 'varchar' })
 	name: string;
 
-
 	@Column({ type: 'varchar' })
 	profileImage: string;
 

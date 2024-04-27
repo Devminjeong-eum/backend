@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
 import { User } from '#/databases/entities/user.entity';
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
-import { UserService } from './user.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseUserInformationDto } from './dto/user-information.dto';
+import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
@@ -19,8 +19,8 @@ export class UserController {
 	@ApiResponse({
 		status: 200,
 		description: '요청 성공 시 받을 응답',
-		type: ResponseUserInformationDto
-	  })
+		type: ResponseUserInformationDto,
+	})
 	@Get()
 	@UseGuards(AuthenticationGuard)
 	getOwnInformation(@AuthenticatedUser() user: User) {
