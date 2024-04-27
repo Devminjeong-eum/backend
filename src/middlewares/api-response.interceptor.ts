@@ -1,7 +1,6 @@
 import {
 	type CallHandler,
 	type ExecutionContext,
-	type INestApplication,
 	Injectable,
 	type NestInterceptor,
 } from '@nestjs/common';
@@ -19,7 +18,3 @@ export class ApiResponseInterceptor implements NestInterceptor {
 			.pipe(map((value) => ({ status: statusCode, data: value })));
 	}
 }
-
-export const setupApiResponseInterceptor = (app: INestApplication) => {
-	app.useGlobalInterceptors(new ApiResponseInterceptor());
-};

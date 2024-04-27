@@ -3,30 +3,33 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 	Entity,
-	PrimaryGeneratedColumn,
+	PrimaryColumn,
 	UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class User {
-	@PrimaryGeneratedColumn('uuid')
-	id!: string;
+	@PrimaryColumn({ type: 'varchar', unique: true })
+	id: string;
 
 	@Column({ type: 'varchar' })
-	public name!: string;
+	name: string;
+
+	@Column({ type: 'varchar' })
+	profileImage: string;
 
 	@Column({
 		type: 'enum',
 		enum: ['kakao'],
 	})
-	public socialType!: string;
+	socialType: string;
 
 	@CreateDateColumn({ type: 'timestamp' })
-	public createdAt!: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: 'timestamp' })
-	public updatedAt!: Date;
+	updatedAt?: Date;
 
 	@DeleteDateColumn({ type: 'timestamp' })
-	public deletedAt?: Date;
+	deletedAt?: Date;
 }
