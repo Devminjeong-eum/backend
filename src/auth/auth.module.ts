@@ -4,11 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { JsonWebTokenModule } from '#/configs/jwt.config';
 import { User } from '#/databases/entities/user.entity';
-import { UserRepository } from '#/databases/repositories/user.repository';
 import { UserModule } from '#/user/user.module';
-import { UserService } from '#/user/user.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoStrategy } from './strategies/kakao-auth.strategy';
 
 @Module({
@@ -22,11 +21,11 @@ import { KakaoStrategy } from './strategies/kakao-auth.strategy';
 	providers: [
 		// Service
 		AuthService,
-		UserService,
 		// Strategy
 		KakaoStrategy,
-		// Repository
-		UserRepository,
+		// Guard
+		AuthenticationGuard,
 	],
+	exports: [JsonWebTokenModule, AuthService, AuthenticationGuard],
 })
 export class AuthModule {}

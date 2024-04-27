@@ -33,13 +33,15 @@ export class AuthenticationGuard implements CanActivate {
 
 		const { accessToken, refreshToken } = request.cookies ?? {};
 
-		if (!accessToken || !refreshToken) {
-			throw new UnauthorizedException(
-				'요청에 계정 정보가 존재하지 않습니다.',
-			);
-		}
+		// if (!accessToken || !refreshToken) {
+		// 	throw new UnauthorizedException(
+		// 		'요청에 계정 정보가 존재하지 않습니다.',
+		// 	);
+		// }
 
 		let userId: string;
+
+		console.log(this.jwtService)
 
 		try {
 			userId = await this.jwtService
@@ -49,7 +51,8 @@ export class AuthenticationGuard implements CanActivate {
 			userId = await this.jwtService
 				.verifyAsync<JwtPayload>(refreshToken)
 				.then((payload) => payload.id)
-				.catch(() => {
+				.catch((error) => {
+					console.log(error);
 					this.removeAuthenticateCookie(response);
 					throw new UnauthorizedException(
 						'토큰이 만료되었습니다. 다시 로그인해주세요.',

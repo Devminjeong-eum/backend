@@ -10,8 +10,8 @@ import { AppService } from '#/app.service';
 import { GlobalConfigModule } from '#/configs/setup.config';
 import { GlobalTypeOrmModule } from '#/configs/typeorm.configs';
 import { LoggerMiddleware } from '#/middlewares/logger.middleware';
-import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
 	imports: [GlobalConfigModule, GlobalTypeOrmModule, UserModule, AuthModule],
