@@ -2,7 +2,6 @@ import {
 	type ArgumentsHost,
 	type ExceptionFilter,
 	HttpException,
-	INestApplication,
 	Logger,
 } from '@nestjs/common';
 
@@ -21,6 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 			timestamp: new Date().toISOString(),
 			path: request.url,
 			method: request.method,
+			message: exception.message
 		};
 
 		switch (true) {
@@ -40,7 +40,3 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		return response.status(statusCode).json(errorResponse);
 	}
 }
-
-export const setupExceptionFilter = (app: INestApplication) => {
-	app.useGlobalFilters(new HttpExceptionFilter());
-};
