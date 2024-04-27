@@ -1,15 +1,19 @@
-import { Controller, Get, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import type { Response } from 'express';
 
+import { UserService } from '#/user/user.service';
 import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private readonly authService: AuthService) {}
+	constructor(
+		private readonly authService: AuthService,
+		private readonly userService: UserService,
+	) {}
 
 	@Get('kakao')
 	@UseGuards(AuthGuard('kakao'))
@@ -17,22 +21,32 @@ export class AuthController {
 		@AuthenticatedUser() authenticatedUser: KakaoAuthUser,
 		@Res({ passthrough: true }) response: Response,
 	) {
+		const { nickname, profileImage, email } = authenticatedUser;
+		const user = await this.userService.registerUser({
+			name: nickname,
+			profileImage,
+			email,
+			socialType: 'kakao',
+		});
+
 		const { accessToken, refreshToken } =
-			await this.authService.kakaoLogin(authenticatedUser);
+			this.authService.getAuthenticateToken(user.id);
+
+		const cookieOption = {
+			secure: true,
+			sameSite: 'none',
+			path: '/',
+		} as const;
 
 		response.cookie('accessToken', accessToken, {
-			secure: true,
+			...cookieOption,
 			maxAge: 5 * 60 * 1000,
-			sameSite: 'none',
-			path: '/',
 		});
 		response.cookie('refreshToken', refreshToken, {
-			secure: true,
+			...cookieOption,
 			maxAge: 7 * 24 * 60 * 60 * 1000,
-			sameSite: 'none',
-			path: '/',
 		});
 
-		response.redirect('/');
+		return user;
 	}
 }
