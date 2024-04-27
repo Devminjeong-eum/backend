@@ -3,7 +3,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
-import { User } from '#/databases/entities/user.entity';
+import { User } from '#databases/entities/user.entity';
+
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
 import { ResponseUserInformationDto } from './dto/user-information.dto';
 import { UserService } from './user.service';

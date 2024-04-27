@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { UserRepository } from '#/databases/repositories/user.repository';
+import { UserRepository } from '#databases/repositories/user.repository';
+
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
 import { RequestCreateUserDto } from './dto/create-user.dto';
 

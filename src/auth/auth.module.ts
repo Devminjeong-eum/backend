@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { JsonWebTokenModule } from '#/configs/jwt.config';
-import { User } from '#/databases/entities/user.entity';
 import { UserModule } from '#/user/user.module';
+import { JsonWebTokenModule } from '#configs/jwt.config';
+import { User } from '#databases/entities/user.entity';
+
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationGuard } from './guard/auth.guard';

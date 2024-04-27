@@ -14,7 +14,10 @@
     "incremental": true,
     "baseUrl": "./",
     "paths": {
-      "#/*": ["src/*"]
+      "#/*": ["src/*"],
+      "#configs/*": ["src/common/configs/*"],
+      "#databases/*": ["src/common/databases/*"],
+      "#middlewares/*": ["src/common/middlewares/*"]
     }
   }
 }

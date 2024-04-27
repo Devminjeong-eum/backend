@@ -5,10 +5,11 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 
 import * as cookieParser from 'cookie-parser';
 
-import { winstonLogger } from '#/configs/logger.config';
-import { setupSwaggerModule } from '#/configs/swagger.config';
-import { ApiResponseInterceptor } from '#/middlewares/api-response.interceptor';
-import { HttpExceptionFilter } from '#/middlewares/http-exception.filter';
+import { winstonLogger } from '#configs/logger.config';
+import { setupSwaggerModule } from '#configs/swagger.config';
+import { ApiResponseInterceptor } from '#middlewares/api-response.interceptor';
+import { HttpExceptionFilter } from '#middlewares/http-exception.filter';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {

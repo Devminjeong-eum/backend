@@ -2,9 +2,10 @@ import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '#/auth/auth.module';
-import { JsonWebTokenModule } from '#/configs/jwt.config';
-import { User } from '#/databases/entities/user.entity';
-import { UserRepository } from '#/databases/repositories/user.repository';
+import { JsonWebTokenModule } from '#configs/jwt.config';
+import { User } from '#databases/entities/user.entity';
+import { UserRepository } from '#databases/repositories/user.repository';
+
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 

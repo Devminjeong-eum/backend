@@ -6,6 +6,7 @@ import type { Response } from 'express';
 
 import { ResponseUserInformationDto } from '#/user/dto/user-information.dto';
 import { UserService } from '#/user/user.service';
+
 import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
