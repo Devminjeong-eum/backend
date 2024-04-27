@@ -1,6 +1,7 @@
 import {
 	CanActivate,
 	ExecutionContext,
+	Injectable,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +13,7 @@ import { JwtPayload } from '../interface/jwt-auth.interface';
 
 import { UserRepository } from '#/databases/repositories/user.repository';
 
+@Injectable()
 export class AuthenticationGuard implements CanActivate {
 	constructor(
 		private readonly jwtService: JwtService,
@@ -28,9 +30,8 @@ export class AuthenticationGuard implements CanActivate {
 	async canActivate(context: ExecutionContext) {
 		const request = context.switchToHttp().getRequest<Request>();
 		const response = context.switchToHttp().getResponse<Response>();
-		const { accessToken, refreshToken } = request.cookies;
 
-		console.log(accessToken, refreshToken);
+		const { accessToken, refreshToken } = request.cookies ?? {};
 
 		if (!accessToken || !refreshToken) {
 			throw new UnauthorizedException(
@@ -66,8 +67,6 @@ export class AuthenticationGuard implements CanActivate {
 				reIssueRefreshToken,
 			);
 		}
-
-		console.log('GUARD', userId);
 
 		const user = await this.userRepository.findById(userId);
 
