@@ -3,20 +3,18 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 	Entity,
-	PrimaryGeneratedColumn,
+	PrimaryColumn,
 	UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class User {
-	@PrimaryGeneratedColumn('uuid')
-	id!: string;
+	@PrimaryColumn({ type: 'varchar', unique: true })
+	id: string;
 
 	@Column({ type: 'varchar' })
 	name: string;
 
-	@Column({ type: 'varchar', unique: true })
-	email: string;
 
 	@Column({ type: 'varchar' })
 	profileImage: string;

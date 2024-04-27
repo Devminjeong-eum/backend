@@ -20,12 +20,14 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
 		refreshToken: string,
 		profile: Profile,
 	) {
-		const { email, profile_nickname, profile_image } =
-			profile._json.kakao_account;
+		const {
+			id,
+			properties: { nickname, profile_image },
+		} = profile._json;
 
 		return {
-			email,
-			nickname: profile_nickname,
+			id,
+			nickname,
 			profileImage: profile_image,
 		};
 	}
