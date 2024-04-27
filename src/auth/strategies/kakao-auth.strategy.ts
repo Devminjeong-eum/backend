@@ -20,7 +20,6 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
 		refreshToken: string,
 		profile: Profile,
 	) {
-		console.log(profile._json);
 		const { email, profile_nickname, profile_image } =
 			profile._json.kakao_account;
 
