@@ -11,9 +11,10 @@ import { GlobalConfigModule } from '#/configs/setup.config';
 import { GlobalTypeOrmModule } from '#/configs/typeorm.configs';
 import { LoggerMiddleware } from '#/middlewares/logger.middleware';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-	imports: [GlobalConfigModule, GlobalTypeOrmModule, UserModule],
+	imports: [GlobalConfigModule, GlobalTypeOrmModule, UserModule, AuthModule],
 	controllers: [AppController],
 	providers: [AppService, Logger],
 })
