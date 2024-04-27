@@ -14,19 +14,16 @@ export class UserController {
 	@UseGuards(AuthenticationGuard)
 	getOwnInformation(@AuthenticatedUser() user: User) {
 		const { id: userId } = user;
-		console.log(user);
 		return this.userService.getUserInformation(userId);
 	}
 
 	@Get(':userId')
-	@UseGuards(AuthenticationGuard)
 	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation(userId);
 	}
 
-	@Patch(':id')
-	update(
-		@Param('id') id: string,
+	@Patch(':userId')
+	patchChangeNickname(
 		@Body() requestChangeNicknameDto: RequestChangeNicknameDto,
 	) {
 		return this.userService.changeUserNickname(requestChangeNicknameDto);

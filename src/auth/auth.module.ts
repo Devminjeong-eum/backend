@@ -19,6 +19,14 @@ import { KakaoStrategy } from './strategies/kakao-auth.strategy';
 		UserModule,
 	],
 	controllers: [AuthController],
-	providers: [AuthService, UserService, KakaoStrategy, UserRepository],
+	providers: [
+		// Service
+		AuthService,
+		UserService,
+		// Strategy
+		KakaoStrategy,
+		// Repository
+		UserRepository,
+	],
 })
 export class AuthModule {}

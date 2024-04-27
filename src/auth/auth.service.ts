@@ -1,9 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { UserRepository } from '../databases/repositories/user.repository';
-
-import { RequestLoginUserDto } from './dto/login-user.dto';
+import { UserRepository } from '#/databases/repositories/user.repository';
 import { JwtPayload } from './interface/jwt-auth.interface';
 
 @Injectable()
@@ -21,23 +19,11 @@ export class AuthService {
 		return { accessToken, refreshToken };
 	}
 
-	async kakaoLogin({ email, profileImage, nickname }: RequestLoginUserDto) {
-		let user = await this.userRepository.findByEmail(email);
+	async validateAuthenticateToken(payload: JwtPayload) {
+		const user = await this.userRepository.findById(payload.id);
 
 		if (!user) {
-			user = await this.userRepository.create({
-				email, profileImage, name: nickname, socialType: 'kakao'
-			});
+			throw new UnauthorizedException('유효하지 않은 계정 정보입니다.');
 		}
-
-		return this.getAuthenticateToken(user.id);
 	}
-
-	async validateAuthenticateToken(payload: JwtPayload) {
-        const user = await this.userRepository.findById(payload.id);
-
-        if (!user) {
-            throw new UnauthorizedException('유효하지 않은 계정 정보입니다.');
-        }
-    }
 }

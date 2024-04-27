@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import type { Response } from 'express';
@@ -21,11 +21,11 @@ export class AuthController {
 		@AuthenticatedUser() authenticatedUser: KakaoAuthUser,
 		@Res({ passthrough: true }) response: Response,
 	) {
-		const { nickname, profileImage, email } = authenticatedUser;
+		const { nickname, profileImage, id } = authenticatedUser;
 		const user = await this.userService.registerUser({
 			name: nickname,
+			id: `kakao_${id}`,
 			profileImage,
-			email,
 			socialType: 'kakao',
 		});
 

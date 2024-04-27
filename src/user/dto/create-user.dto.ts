@@ -1,8 +1,8 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 export class RequestCreateUserDto {
-    @IsEmail()
-    email: string;
+    @IsNotEmpty()
+    id: string;
 
     @IsNotEmpty()
     profileImage: string;

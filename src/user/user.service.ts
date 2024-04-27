@@ -9,7 +9,7 @@ export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	async registerUser(createUserDto: RequestCreateUserDto) {
-		let user = await this.userRepository.findByEmail(createUserDto.email);
+		let user = await this.userRepository.findById(createUserDto.id);
 
 		if (!user) {
 			user = await this.userRepository.create(createUserDto);
@@ -26,16 +26,7 @@ export class UserService {
 		}
 		return userInformation;
 	}
-
-	async getUserByEmail(email: string) {
-		const userInformation = await this.userRepository.findByEmail(email);
-
-		if (!userInformation) {
-			throw new BadRequestException('존재하지 않는 유저입니다');
-		}
-		return userInformation;
-	}
-
+	
 	async changeUserNickname(changeNickNameDto: RequestChangeNicknameDto) {
 		const { userId, nickname } = changeNickNameDto;
 		const userInformation = await this.userRepository.findById(userId);
