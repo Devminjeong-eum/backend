@@ -8,7 +8,7 @@ module.exports = {
   importOrder: [
       "^@nestjs(?!$)",
       "<THIRD_PARTY_MODULES>",
-      "^@(?=.*)(?!$)",
+      "^#(?=.*)",
       "^../(?=.*)(?!$)",
       "^./(?=.*)(?!$)|^./?$"
   ],
