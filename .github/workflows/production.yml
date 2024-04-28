@@ -69,16 +69,6 @@ jobs:
           push: true
           # platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
-          secrets: |
-            "DB_HOST=${{ secrets.DB_HOST }}"
-            "DB_PORT=${{ secrets.DB_PORT }}"
-            "DB_USERNAME=${{ secrets.DB_USERNAME }}"
-            "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
-            "DB_DATABASE=${{ secrets.DB_DATABASE }}"
-            "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}"
-            "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}"
-            "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}"
-            "SERVER_PORT=${{ secrets.SERVER_PORT }}"
 
   deploy:
     needs: docker-image
@@ -96,7 +86,18 @@ jobs:
             sudo docker rm $(sudo docker ps -aq)
           fi
 
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.production
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.production
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.production
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.production
+          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env.production
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.production
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.production
+          echo "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}" >> .env.production
+          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env.production
+
           sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
           sudo docker run -p 8080:8080 \
           --name backend \
+          --env-file ./.env.production \
           -d ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
