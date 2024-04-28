@@ -31,6 +31,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 					JSON.stringify({ ...errorResponse, statusCode }),
 					exception.stack,
 				);
+				break;
 			}
 			default: {
 				Logger.warn('HTTP Error', JSON.stringify(errorResponse));
