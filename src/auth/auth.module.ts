@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoStrategy } from './strategies/kakao-auth.strategy';
+import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 
 @Module({
 	imports: [
@@ -26,6 +27,7 @@ import { KakaoStrategy } from './strategies/kakao-auth.strategy';
 		KakaoStrategy,
 		// Guard
 		AuthenticationGuard,
+		KakaoAuthGuard,
 	],
 	exports: [JsonWebTokenModule, AuthService, AuthenticationGuard],
 })

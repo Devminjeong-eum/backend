@@ -9,7 +9,7 @@ import { RequestCreateUserDto } from './dto/create-user.dto';
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
-	async registerUser(createUserDto: RequestCreateUserDto) {
+	async oAuthLogin(createUserDto: RequestCreateUserDto) {
 		let user = await this.userRepository.findById(createUserDto.id);
 
 		if (!user) {
