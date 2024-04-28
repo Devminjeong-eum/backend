@@ -45,6 +45,7 @@ jobs:
       - name: Run Eslint
         run: pnpm lint
 
+
   docker-image:
     needs: check-lint
     runs-on: ubuntu-latest
@@ -68,6 +69,16 @@ jobs:
           push: true
           # platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
+          secrets: |
+            "DB_HOST=${{ secrets.DB_HOST }}"
+            "DB_PORT=${{ secrets.DB_PORT }}"
+            "DB_USERNAME=${{ secrets.DB_USERNAME }}"
+            "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+            "DB_DATABASE=${{ secrets.DB_DATABASE }}"
+            "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}"
+            "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}"
+            "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}"
+            "SERVER_PORT=${{ secrets.SERVER_PORT }}"
 
   deploy:
     needs: docker-image
@@ -80,11 +91,9 @@ jobs:
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          IS_RUNNING = $(sudo docker ps -af "status=running" | grep backend)
-
-          if [ ! -z "$IS_RUNNING" ]; then
-            sudo docker stop backend
-            sudo docker rm backend
+          if [ "$(sudo docker ps -aq)" ]; then
+            sudo docker stop $(sudo docker ps -aq)
+            sudo docker rm $(sudo docker ps -aq)
           fi
 
           sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
