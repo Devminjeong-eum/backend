@@ -28,6 +28,7 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/typeorm": "^10.0.2",
     "cookie-parser": "^1.4.6",
+    "ky": "^1.2.4",
     "nanoid": "^5.0.7",
     "nest-winston": "^1.9.4",
     "passport": "^0.7.0",
