@@ -26,15 +26,22 @@ export class KakaoAuthGuard implements CanActivate {
 	async canActivate(context: ExecutionContext) {
 		const request = context.switchToHttp().getRequest<Request>();
 
-		const { code } = request.params;
+		const { code } = request.query;
 
-		if (!code) {
+		if (typeof code !== 'string') {
 			throw new UnauthorizedException(
-				'Kakao 측에서 인계 받은 Code 가 요청에 없습니다.',
+				'Kakao 측에서 인계 받은 Code 가 유효하지 않습니다.',
 			);
 		}
 
-		const redirectUri = `${request.protocol}://${request.get('Host')}/auth/kakao`;
+		const redirectUri =
+			this.configService.get<string>('KAKAO_REDIRECT_URI');
+
+		if (!redirectUri) {
+			throw new InternalServerErrorException(
+				'서버에서 세팅된 redirect_uri 정보가 없습니다.',
+			);
+		}
 
 		try {
 			const accessToken = await this.getKakaoAccessToken(
@@ -42,10 +49,7 @@ export class KakaoAuthGuard implements CanActivate {
 				redirectUri,
 			);
 
-			const { id, nickname, profileImage } =
-				await this.getKakaoUserProfile(accessToken);
-
-			request.user = { id, nickname, profileImage };
+			request.user = await this.getKakaoUserProfile(accessToken);
 			return true;
 		} catch (error) {
 			throw new InternalServerErrorException(
@@ -59,7 +63,7 @@ export class KakaoAuthGuard implements CanActivate {
 			KAKAO_TOKEN_URL,
 			null,
 			{
-				searchParams: {
+				params: {
 					grant_type: 'authorization_code',
 					client_id:
 						this.configService.get<string>('KAKAO_CLIENT_ID')!,
