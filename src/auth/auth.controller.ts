@@ -1,5 +1,4 @@
 import { Controller, Get, Res, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import type { Response } from 'express';
@@ -9,6 +8,7 @@ import { UserService } from '#/user/user.service';
 
 import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
+import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
 
 @ApiTags('Auth')
@@ -28,13 +28,13 @@ export class AuthController {
 		type: ResponseUserInformationDto,
 	})
 	@Get('kakao')
-	@UseGuards(AuthGuard('kakao'))
+	@UseGuards(KakaoAuthGuard)
 	async kakaoLogin(
 		@AuthenticatedUser() authenticatedUser: KakaoAuthUser,
 		@Res({ passthrough: true }) response: Response,
 	) {
 		const { nickname, profileImage, id } = authenticatedUser;
-		const user = await this.userService.registerUser({
+		const user = await this.userService.oAuthLogin({
 			name: nickname,
 			id: `kakao_${id}`,
 			profileImage,

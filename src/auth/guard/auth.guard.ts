@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 
 import { UserRepository } from '#databases/repositories/user.repository';
 
@@ -28,20 +28,18 @@ export class AuthenticationGuard implements CanActivate {
 	} as const;
 
 	async canActivate(context: ExecutionContext) {
-		const request = context.switchToHttp().getRequest<Request>();
+		const request = context.switchToHttp().getRequest();
 		const response = context.switchToHttp().getResponse<Response>();
 
 		const { accessToken, refreshToken } = request.cookies ?? {};
 
-		// if (!accessToken || !refreshToken) {
-		// 	throw new UnauthorizedException(
-		// 		'요청에 계정 정보가 존재하지 않습니다.',
-		// 	);
-		// }
+		if (!accessToken || !refreshToken) {
+			throw new UnauthorizedException(
+				'요청에 계정 정보가 존재하지 않습니다.',
+			);
+		}
 
 		let userId: string;
-
-		console.log(this.jwtService);
 
 		try {
 			userId = await this.jwtService

@@ -19,11 +19,31 @@ export class UserRepository {
 	}
 
 	findById(id: string) {
-		return this.userRepository.findOneBy({ id });
+		return this.userRepository.findOne({
+			where: {
+				id,
+			},
+			select: {
+				id: true,
+				profileImage: true,
+				name: true,
+				socialType: true,
+			},
+		});
 	}
 
 	findByName(name: string) {
-		return this.userRepository.findOneBy({ name });
+		return this.userRepository.findOne({
+			where: {
+				name,
+			},
+			select: {
+				id: true,
+				profileImage: true,
+				name: true,
+				socialType: true,
+			},
+		});
 	}
 
 	updateName(id: string, name: string) {
