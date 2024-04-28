@@ -7,8 +7,6 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import type { Request } from 'express';
-
 import { getAsync, postAsync } from '#/common/apis';
 
 import {
@@ -24,7 +22,7 @@ export class KakaoAuthGuard implements CanActivate {
 	constructor(private readonly configService: ConfigService) {}
 
 	async canActivate(context: ExecutionContext) {
-		const request = context.switchToHttp().getRequest<Request>();
+		const request = context.switchToHttp().getRequest();
 
 		const { code } = request.query;
 
@@ -34,21 +32,8 @@ export class KakaoAuthGuard implements CanActivate {
 			);
 		}
 
-		const redirectUri =
-			this.configService.get<string>('KAKAO_REDIRECT_URI');
-
-		if (!redirectUri) {
-			throw new InternalServerErrorException(
-				'서버에서 세팅된 redirect_uri 정보가 없습니다.',
-			);
-		}
-
 		try {
-			const accessToken = await this.getKakaoAccessToken(
-				code,
-				redirectUri,
-			);
-
+			const accessToken = await this.getKakaoAccessToken(code);
 			request.user = await this.getKakaoUserProfile(accessToken);
 			return true;
 		} catch (error) {
@@ -58,7 +43,16 @@ export class KakaoAuthGuard implements CanActivate {
 		}
 	}
 
-	private async getKakaoAccessToken(code: string, redirectUri: string) {
+	private async getKakaoAccessToken(code: string) {
+		const redirectUri =
+			this.configService.get<string>('KAKAO_REDIRECT_URI');
+
+		if (!redirectUri) {
+			throw new InternalServerErrorException(
+				'서버에서 세팅된 redirect_uri 정보가 없습니다.',
+			);
+		}
+
 		const { access_token } = await postAsync<KakaoOauthResponse>(
 			KAKAO_TOKEN_URL,
 			null,
