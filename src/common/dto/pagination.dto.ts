@@ -22,6 +22,10 @@ export class PaginationDto<T> {
 	@IsBoolean()
 	isLast: boolean;
 
+    @IsInt()
+	@Min(1)
+    pageSize: number;
+
 	@IsInt()
 	@Min(0)
 	totalCount: number;
@@ -35,7 +39,11 @@ export class PaginationMetaDto {
 
 	limit: number;
 
+    skip: number;
+
 	totalCount: number;
+
+    pageSize: number;
 
 	isLast: boolean;
 
@@ -48,7 +56,9 @@ export class PaginationMetaDto {
 	}) {
 		this.page = paginationOption.page;
 		this.limit = paginationOption.limit;
+        this.skip = paginationOption.page * paginationOption.limit;
 		this.totalCount = totalCount;
+        this.pageSize = Math.ceil(totalCount / paginationOption.limit);
 		this.isLast = this.page * this.limit >= totalCount;
 	}
 }
