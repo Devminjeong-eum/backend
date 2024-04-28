@@ -5,13 +5,13 @@ export interface KakaoAuthUser {
 }
 
 export interface KakaoOauthResponse {
-	access_token: string
+	access_token: string;
 }
 
 export interface KakaoProfileResponse {
 	id: string;
-    properties: {
+	properties: {
 		nickname: string;
 		profile_image: string;
-    };
+	};
 }

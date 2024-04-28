@@ -1,14 +1,11 @@
-import axios, {
-    type AxiosRequestConfig,
-    type AxiosResponse,
-} from 'axios';
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 /**
  * API 요청에서 범용적으로 사용할 Axios Instance 생성
  * baseURL, responseType 같은 공용 속성을 일괄적으로 적용
  */
 const API = axios.create({
-    withCredentials: true,
+	withCredentials: true,
 });
 
 /**
@@ -20,10 +17,10 @@ const API = axios.create({
  * @returns API 요청 성공 시 받을 객체 (T)
  */
 export async function getAsync<T>(url: string, config?: AxiosRequestConfig) {
-    const response = await API.get<T, AxiosResponse<T, unknown>, unknown>(url, {
-        ...config,
-    });
-    return response.data;
+	const response = await API.get<T, AxiosResponse<T, unknown>, unknown>(url, {
+		...config,
+	});
+	return response.data;
 }
 
 /**
@@ -37,14 +34,14 @@ export async function getAsync<T>(url: string, config?: AxiosRequestConfig) {
  * @returnsAPI 요청 성공 시 받을 객체 (T)
  */
 export async function postAsync<T, D = unknown>(
-    url: string,
-    data: D,
-    config?: AxiosRequestConfig,
+	url: string,
+	data: D,
+	config?: AxiosRequestConfig,
 ) {
-    const response = await API.post<T, AxiosResponse<T, D>, D>(url, data, {
-        ...config,
-    });
-    return response.data;
+	const response = await API.post<T, AxiosResponse<T, D>, D>(url, data, {
+		...config,
+	});
+	return response.data;
 }
 
 /**
@@ -58,15 +55,15 @@ export async function postAsync<T, D = unknown>(
  * @returns API 요청 성공 시 받을 객체 (T)
  */
 export async function patchAsync<T, D>(
-    url: string,
-    data: D,
-    config?: AxiosRequestConfig,
+	url: string,
+	data: D,
+	config?: AxiosRequestConfig,
 ) {
-    const response = await API.patch<T, AxiosResponse<T, D>, D>(url, data, {
-        ...config,
-    });
+	const response = await API.patch<T, AxiosResponse<T, D>, D>(url, data, {
+		...config,
+	});
 
-    return response.data;
+	return response.data;
 }
 
 /**
@@ -80,15 +77,15 @@ export async function patchAsync<T, D>(
  * @returns API 요청 성공 시 받을 객체 (T)
  */
 export async function putAsync<T, D>(
-    url: string,
-    data: D,
-    config?: AxiosRequestConfig,
+	url: string,
+	data: D,
+	config?: AxiosRequestConfig,
 ) {
-    const response = await API.patch<T, AxiosResponse<T, D>, D>(url, data, {
-        ...config,
-    });
+	const response = await API.patch<T, AxiosResponse<T, D>, D>(url, data, {
+		...config,
+	});
 
-    return response.data;
+	return response.data;
 }
 
 /**
@@ -101,17 +98,17 @@ export async function putAsync<T, D>(
  * @returns API 요청 성공 시 받을 객체 (T)
  */
 export async function deleteAsync<T, D>(
-    url: string,
-    data?: D,
-    config?: AxiosRequestConfig,
+	url: string,
+	data?: D,
+	config?: AxiosRequestConfig,
 ) {
-    const response = await API.delete<T, AxiosResponse<T, unknown>, unknown>(
-        url,
-        {
-            ...config,
-            data,
-        },
-    );
+	const response = await API.delete<T, AxiosResponse<T, unknown>, unknown>(
+		url,
+		{
+			...config,
+			data,
+		},
+	);
 
-    return response.data;
+	return response.data;
 }

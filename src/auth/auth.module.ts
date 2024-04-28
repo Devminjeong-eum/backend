@@ -11,11 +11,7 @@ import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 
 @Module({
-	imports: [
-		TypeOrmModule.forFeature([User]),
-		JsonWebTokenModule,
-		UserModule,
-	],
+	imports: [TypeOrmModule.forFeature([User]), JsonWebTokenModule, UserModule],
 	controllers: [AuthController],
 	providers: [
 		// Service
