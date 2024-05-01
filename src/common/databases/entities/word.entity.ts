@@ -20,13 +20,13 @@ export class Word {
     @Column({ type: 'varchar' })
     diacritic: string;
 
-    @Column({ type: 'varchar', array: true })
-    pronunciation: string[];
+    @Column({ type: 'varchar' })
+    pronunciation: string;
 
     @Column({ type: 'varchar', array: true })
     wrongPronunciations: string[];
 
-    @Column({ type: 'text' })
+    @Column({ type: 'text', array: true })
     exampleSentence: string;
 
 	@CreateDateColumn({ type: 'timestamp' })
