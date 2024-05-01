@@ -15,4 +15,9 @@ export class WordController {
 			await this.wordService.getWordList(paginationOptionDto);
 		return wordList;
 	}
+
+	@Get('/spread-sheet')
+	async getSpeadSheet() {
+		return await this.wordService.getWordSpreadSheet();
+	}
 }
