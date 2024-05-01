@@ -7,7 +7,7 @@ import {
 	PaginationDto,
 	PaginationMetaDto,
 	PaginationOptionDto,
-} from '#/common/dto/Pagination.dto';
+} from '#/common/dto/pagination.dto';
 import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class WordRepository {
 				'word.description',
 			]);
 
-		const { entities } = await queryBuilder.getRawAndEntities();
+		const entities = await queryBuilder.getMany();
 
 		return new PaginationDto(entities, paginationMeta);
 	}

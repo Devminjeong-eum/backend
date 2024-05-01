@@ -4,7 +4,7 @@ import { IsArray, IsBoolean, IsInt, Max, Min } from 'class-validator';
 export class PaginationDto<T> {
 	constructor(data: T[], meta: PaginationMetaDto) {
 		this.data = data;
-		this.page = meta.limit;
+		this.page = meta.page;
 		this.limit = meta.limit;
 		this.isLast = meta.isLast;
 		this.totalCount = meta.totalCount;
@@ -22,9 +22,9 @@ export class PaginationDto<T> {
 	@IsBoolean()
 	isLast: boolean;
 
-    @IsInt()
+	@IsInt()
 	@Min(1)
-    pageSize: number;
+	pageSize: number;
 
 	@IsInt()
 	@Min(0)
@@ -39,11 +39,11 @@ export class PaginationMetaDto {
 
 	limit: number;
 
-    skip: number;
+	skip: number;
 
 	totalCount: number;
 
-    pageSize: number;
+	pageSize: number;
 
 	isLast: boolean;
 
@@ -56,9 +56,9 @@ export class PaginationMetaDto {
 	}) {
 		this.page = paginationOption.page;
 		this.limit = paginationOption.limit;
-        this.skip = paginationOption.page * paginationOption.limit;
+		this.skip = paginationOption.page * paginationOption.limit;
 		this.totalCount = totalCount;
-        this.pageSize = Math.ceil(totalCount / paginationOption.limit);
+		this.pageSize = Math.ceil(totalCount / paginationOption.limit);
 		this.isLast = this.page * this.limit >= totalCount;
 	}
 }
