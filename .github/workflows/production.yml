@@ -80,9 +80,9 @@ jobs:
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          if [ "$(sudo docker ps -aq)" ]; then
-            sudo docker stop $(sudo docker ps -aq)
-            sudo docker rm $(sudo docker ps -aq)
+          if [ "$(sudo docker ps | grep backend)" ]; then
+            sudo docker stop backend
+            sudo docker rm backend
           fi
 
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.production
