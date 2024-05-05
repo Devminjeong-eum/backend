@@ -5,7 +5,10 @@ import {
 	NestModule,
 } from '@nestjs/common';
 
-import { GlobalConfigModule } from '#configs/setup.config';
+import {
+	GlobalConfigModule,
+	GlobalScheduleModule,
+} from '#configs/setup.config';
 import { GlobalTypeOrmModule } from '#configs/typeorm.configs';
 import { LoggerMiddleware } from '#middlewares/logger.middleware';
 
@@ -16,7 +19,14 @@ import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
 
 @Module({
-	imports: [GlobalConfigModule, GlobalTypeOrmModule, UserModule, AuthModule, WordModule],
+	imports: [
+		GlobalConfigModule,
+		GlobalTypeOrmModule,
+		GlobalScheduleModule,
+		UserModule,
+		AuthModule,
+		WordModule,
+	],
 	controllers: [AppController],
 	providers: [AppService, Logger],
 })
