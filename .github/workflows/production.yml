@@ -91,6 +91,7 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.production
           echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env.production
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.production
+          echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> .env.production
           echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.production
           echo "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}" >> .env.production
           echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env.production

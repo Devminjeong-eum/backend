@@ -24,6 +24,7 @@ async function bootstrap() {
 	setupSwaggerModule(app);
 
 	app.use(cookieParser());
+	app.enableCors({ origin: true, credentials: true });
 	app.useGlobalPipes(new ValidationPipe());
 	app.useGlobalFilters(new HttpExceptionFilter());
 	app.useGlobalInterceptors(new ApiResponseInterceptor());
