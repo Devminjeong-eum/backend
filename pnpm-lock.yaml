@@ -105,6 +105,9 @@ importers:
       eslint-config-prettier:
         specifier: ^9.0.0
         version: 9.1.0(eslint@8.57.0)
+      google-auth-library:
+        specifier: ^9.9.0
+        version: 9.9.0
       jest:
         specifier: ^29.5.0
         version: 29.7.0(@types/node@20.12.7)(ts-node@10.9.2(@types/node@20.12.7)(typescript@5.4.5))
