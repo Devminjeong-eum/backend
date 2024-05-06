@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Expose, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsInt, Max, Min } from 'class-validator';
 
@@ -16,9 +17,9 @@ export class PaginationDto<T> {
 		type: Number,
 		required: false,
 		default: 1,
-		minimum: 1
+		minimum: 1,
 	})
-    @Expose()
+	@Expose()
 	@IsInt()
 	@Min(1)
 	page: number;
@@ -28,9 +29,9 @@ export class PaginationDto<T> {
 		type: Number,
 		required: false,
 		default: 1,
-		minimum: 1
+		minimum: 1,
 	})
-    @Expose()
+	@Expose()
 	@IsInt()
 	@Min(1)
 	@Max(50)
@@ -40,7 +41,7 @@ export class PaginationDto<T> {
 		description: '현재 요청한 페이지가 마지막인지를 판별하는 Flag',
 		type: Boolean,
 	})
-    @Expose()
+	@Expose()
 	@IsBoolean()
 	isLast: boolean;
 
@@ -48,7 +49,7 @@ export class PaginationDto<T> {
 		description: '요청 가능한 페이지의 사이즈',
 		type: Number,
 	})
-    @Expose()
+	@Expose()
 	@IsInt()
 	@Min(1)
 	pageSize: number;
@@ -57,7 +58,7 @@ export class PaginationDto<T> {
 		description: '제공 가능한 데이터의 총합',
 		type: Number,
 	})
-    @Expose()
+	@Expose()
 	@IsInt()
 	@Min(0)
 	totalCount: number;
@@ -66,7 +67,7 @@ export class PaginationDto<T> {
 		type: 'generic',
 		isArray: true,
 	})
-    @Expose()
+	@Expose()
 	@IsArray()
 	data: T[];
 }
@@ -106,7 +107,7 @@ export class PaginationOptionDto {
 		type: Number,
 		required: false,
 		default: 1,
-		minimum: 1
+		minimum: 1,
 	})
 	@Expose()
 	@Type(() => Number)
@@ -120,13 +121,13 @@ export class PaginationOptionDto {
 		required: false,
 		default: 1,
 		minimum: 1,
-		maximum: 50
+		maximum: 50,
 	})
 	@Expose()
 	@Type(() => Number)
 	@IsInt()
 	@Min(1)
-	@Max(50) 
+	@Max(50)
 	limit: number = 10;
 
 	getSkip() {

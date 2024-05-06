@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
 
+import { Expose } from 'class-transformer';
 import {
 	Column,
 	CreateDateColumn,
@@ -15,51 +15,50 @@ export class Word {
 		description: '단어 별 고유 UUID 입니다.',
 		type: String,
 	})
-    @Expose()
+	@Expose()
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-    @ApiProperty({
+	@ApiProperty({
 		description: '단어의 이름입니다.',
 		type: String,
 	})
-    @Expose()
+	@Expose()
 	@Column({ type: 'varchar', unique: true })
 	name: string;
 
-    @ApiProperty({
+	@ApiProperty({
 		description: '단어에 대한 설명입니다.',
 		type: String,
 	})
-    @Expose()
+	@Expose()
 	@Column({ type: 'text' })
 	description: string;
 
-    @ApiProperty({
+	@ApiProperty({
 		description: '단어의 발음 기호 목록입니다.',
 		type: Array<string>,
 	})
-    @Expose()
+	@Expose()
 	@Column({ type: 'varchar', array: true })
 	diacritic: string[];
 
-    @ApiProperty({
+	@ApiProperty({
 		description: '단어의 올바른 발음 예시 목록입니다.',
 		type: Array<string>,
 	})
-    @Expose()
+	@Expose()
 	@Column({ type: 'varchar', array: true })
 	pronunciation: string[];
 
-    @ApiProperty({
+	@ApiProperty({
 		description: '단어의 잘못된 발음 예시 목록입니다.',
 		type: Array<string>,
 	})
 	@Column({ type: 'varchar', array: true })
 	wrongPronunciations: string[];
 
-    
-    @ApiProperty({
+	@ApiProperty({
 		description: '단어 사용 예문입니다.',
 		type: String,
 	})

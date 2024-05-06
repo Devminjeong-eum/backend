@@ -40,8 +40,7 @@ export class SpreadSheetService {
 			range: `${process.env.NODE_ENV}!A2:Z`,
 		});
 
-		const rangeCellValues: string[][] =
-			rangeCells.data.values ?? [];
+		const rangeCellValues: string[][] = rangeCells.data.values ?? [];
 
 		return rangeCellValues;
 	}

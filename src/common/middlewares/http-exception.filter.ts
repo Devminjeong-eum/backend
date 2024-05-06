@@ -4,8 +4,8 @@ import {
 	HttpException,
 	Logger,
 } from '@nestjs/common';
-import { ValidationError } from 'class-validator';
 
+import { ValidationError } from 'class-validator';
 import type { Request, Response } from 'express';
 
 export class HttpExceptionFilter implements ExceptionFilter {
