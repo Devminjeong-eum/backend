@@ -1,4 +1,5 @@
-import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsInt, Max, Min } from 'class-validator';
 
 export class PaginationDto<T> {
@@ -10,26 +11,62 @@ export class PaginationDto<T> {
 		this.totalCount = meta.totalCount;
 	}
 
+	@ApiProperty({
+		description: '조회할 페이지',
+		type: Number,
+		required: false,
+		default: 1,
+		minimum: 1
+	})
+    @Expose()
 	@IsInt()
 	@Min(1)
 	page: number;
 
+	@ApiProperty({
+		description: '페이지 당 제공할 데이터 수량',
+		type: Number,
+		required: false,
+		default: 1,
+		minimum: 1
+	})
+    @Expose()
 	@IsInt()
 	@Min(1)
 	@Max(50)
 	limit: number;
 
+	@ApiProperty({
+		description: '현재 요청한 페이지가 마지막인지를 판별하는 Flag',
+		type: Boolean,
+	})
+    @Expose()
 	@IsBoolean()
 	isLast: boolean;
 
+	@ApiProperty({
+		description: '요청 가능한 페이지의 사이즈',
+		type: Number,
+	})
+    @Expose()
 	@IsInt()
 	@Min(1)
 	pageSize: number;
 
+	@ApiProperty({
+		description: '제공 가능한 데이터의 총합',
+		type: Number,
+	})
+    @Expose()
 	@IsInt()
 	@Min(0)
 	totalCount: number;
 
+	@ApiProperty({
+		type: 'generic',
+		isArray: true,
+	})
+    @Expose()
 	@IsArray()
 	data: T[];
 }
@@ -64,11 +101,28 @@ export class PaginationMetaDto {
 }
 
 export class PaginationOptionDto {
+	@ApiProperty({
+		description: '조회할 페이지',
+		type: Number,
+		required: false,
+		default: 1,
+		minimum: 1
+	})
+	@Expose()
 	@Type(() => Number)
 	@IsInt()
 	@Min(1)
 	page: number = 1;
 
+	@ApiProperty({
+		description: '페이지 당 제공할 데이터 수량',
+		type: Number,
+		required: false,
+		default: 1,
+		minimum: 1,
+		maximum: 50
+	})
+	@Expose()
 	@Type(() => Number)
 	@IsInt()
 	@Min(1)

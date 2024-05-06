@@ -13,7 +13,6 @@ import { GlobalTypeOrmModule } from '#configs/typeorm.configs';
 import { LoggerMiddleware } from '#middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
@@ -28,7 +27,7 @@ import { WordModule } from './word/word.module';
 		WordModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, Logger],
+	providers: [Logger],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
