@@ -17,9 +17,24 @@ export class WordRepository {
 		private wordRepository: Repository<Word>,
 	) {}
 
-	async create(user: Omit<Word, 'createdAt' | 'updatedAt' | 'id'>) {
-		const registeredUser = this.wordRepository.create(user);
+	async create(word: Omit<Word, 'createdAt' | 'updatedAt' | 'id'>) {
+		const registeredUser = this.wordRepository.create(word);
 		return await this.wordRepository.save(registeredUser);
+	}
+
+	async update(
+		id: string,
+		updatedFieldData: Partial<Omit<Word, 'createdAt' | 'updatedAt' | 'id'>>,
+	) {
+		const result = await this.wordRepository.update(
+			{ id },
+			{ ...updatedFieldData },
+		);
+		return result.raw as Word;
+	}
+
+	findByName(name: string) {
+		return this.wordRepository.findOneBy({ name });
 	}
 
 	findById(id: string) {
@@ -41,7 +56,7 @@ export class WordRepository {
 			.skip(paginationMeta.skip)
 			.take(paginationMeta.limit)
 			.select([
-                'word.id',
+				'word.id',
 				'word.name',
 				'word.pronunciation',
 				'word.diacritic',

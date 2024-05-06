@@ -17,16 +17,16 @@ export class Word {
     @Column({ type: 'text' })
     description: string;
 
-    @Column({ type: 'varchar' })
-    diacritic: string;
+    @Column({ type: 'varchar', array: true })
+    diacritic: string[];
 
-    @Column({ type: 'varchar' })
-    pronunciation: string;
+    @Column({ type: 'varchar', array: true })
+    pronunciation: string[];
 
     @Column({ type: 'varchar', array: true })
     wrongPronunciations: string[];
 
-    @Column({ type: 'text', array: true })
+    @Column({ type: 'text' })
     exampleSentence: string;
 
 	@CreateDateColumn({ type: 'timestamp' })
