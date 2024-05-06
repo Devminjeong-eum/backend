@@ -97,8 +97,8 @@ export class WordService {
 		return await this.updateWordList();
 	}
 
-	async getWordList(paginationOptionDto: PaginationOptionDto) {
-		return await this.wordRepository.findWithList(paginationOptionDto);
+	async getWordList(paginationOption: PaginationOptionDto) {
+		return await this.wordRepository.findWithList(paginationOption);
 	}
 
 	async getWordById(wordId: string) {
@@ -109,5 +109,15 @@ export class WordService {
 				`${wordId} id 를 가진 Word 가 존재하지 않습니다.`,
 			);
 		return word;
+	}
+
+	async getWordByKeyword(
+		keyword: string,
+		paginationOption: PaginationOptionDto,
+	) {
+		return await this.wordRepository.findBySearchWord(
+			keyword,
+			paginationOption,
+		);
 	}
 }

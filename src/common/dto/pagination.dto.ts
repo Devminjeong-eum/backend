@@ -56,10 +56,10 @@ export class PaginationMetaDto {
 	}) {
 		this.page = paginationOption.page;
 		this.limit = paginationOption.limit;
-		this.skip = paginationOption.page * paginationOption.limit;
+		this.skip = (this.page - 1) * this.limit;
 		this.totalCount = totalCount;
 		this.pageSize = Math.ceil(totalCount / paginationOption.limit);
-		this.isLast = this.page * this.limit >= totalCount;
+		this.isLast = (this.page + 1) * this.limit >= totalCount;
 	}
 }
 
@@ -72,6 +72,10 @@ export class PaginationOptionDto {
 	@Type(() => Number)
 	@IsInt()
 	@Min(1)
-	@Max(50)
+	@Max(50) 
 	limit: number = 10;
+
+	getSkip() {
+		return (this.page - 1) * this.limit;
+	}
 }
