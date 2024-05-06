@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 
@@ -10,14 +10,16 @@ export class WordController {
 
 	@Get()
 	async findAll(@Query() paginationOptionDto: PaginationOptionDto) {
-		console.log(paginationOptionDto);
-    const wordList =
-			await this.wordService.getWordList(paginationOptionDto);
-		return wordList;
+		return await this.wordService.getWordList(paginationOptionDto);
 	}
 
-	@Get('/spread-sheet')
-	async getSpeadSheet() {
-		return await this.wordService.getWordSpreadSheet();
+	@Get(':wordId')
+	async findById(@Param('wordId') wordId: string) {
+		return await this.wordService.getWordById(wordId);
+	}
+
+	@Patch('/spread-sheet')
+	async patchUpdateSpreadSheet() {
+		return await this.wordService.updateWordList();
 	}
 }
