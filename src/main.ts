@@ -25,7 +25,12 @@ async function bootstrap() {
 
 	app.use(cookieParser());
 	app.enableCors({ origin: true, credentials: true });
-	app.useGlobalPipes(new ValidationPipe());
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			transformOptions: { enableImplicitConversion: true },
+		}),
+	);
 	app.useGlobalFilters(new HttpExceptionFilter());
 	app.useGlobalInterceptors(new ApiResponseInterceptor());
 
