@@ -41,6 +41,36 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id });
 	}
 
+	async findBySearchWord(
+		keyword: string,
+		paginationOption: PaginationOptionDto,
+	) {
+		const queryBuilder = this.wordRepository.createQueryBuilder('word');
+		const skip = (paginationOption.page - 1) * paginationOption.limit;
+
+		queryBuilder
+			.orderBy('word.createdAt', 'ASC')
+			.where('word.name like :keyword', { keyword: `${keyword}%` })
+			.skip(skip)
+			.take(paginationOption.limit)
+			.select([
+				'word.id',
+				'word.name',
+				'word.pronunciation',
+				'word.diacritic',
+				'word.description',
+			]);
+
+		const [entities, totalCount] = await queryBuilder.getManyAndCount();
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption,
+			totalCount,
+		});
+
+		return new PaginationDto(entities, paginationMeta);
+	}
+
 	async findWithList(paginationOption: PaginationOptionDto) {
 		const totalCount = await this.wordRepository.countBy({});
 
