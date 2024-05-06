@@ -5,6 +5,7 @@ import {
 	Logger,
 } from '@nestjs/common';
 
+import { ValidationError } from 'class-validator';
 import type { Request, Response } from 'express';
 
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -24,17 +25,26 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		};
 
 		switch (true) {
+			case exception instanceof ValidationError: {
+				statusCode = 400;
+				Logger.error(
+					'Validation Error',
+					JSON.stringify({ ...errorResponse, statusCode }),
+					exception.stack,
+				);
+				break;
+			}
 			case exception instanceof HttpException: {
 				statusCode = exception.getStatus();
 				Logger.error(
-					'SERVER Error',
+					'HTTP Error',
 					JSON.stringify({ ...errorResponse, statusCode }),
 					exception.stack,
 				);
 				break;
 			}
 			default: {
-				Logger.warn('HTTP Error', JSON.stringify(errorResponse));
+				Logger.warn('Server Error', JSON.stringify(errorResponse));
 			}
 		}
 

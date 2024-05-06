@@ -29,12 +29,26 @@ export class UserController {
 		return this.userService.getUserInformation(userId);
 	}
 
+	@ApiOperation({
+		summary: '특정 ID 를 가진 유저 정보를 조회합니다',
+	})
+	@ApiResponse({
+		status: 200,
+		description: '요청 성공 시 받을 응답',
+	})
 	@Get(':userId')
 	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation(userId);
 	}
 
-	@Patch(':userId')
+	@ApiOperation({
+		summary: '특정 ID 를 가진 유저의 닉네임을 수정합니다',
+	})
+	@ApiResponse({
+		status: 200,
+		description: '요청 성공 시 받을 응답',
+	})
+	@Patch('/nickname')
 	patchChangeNickname(
 		@Body() requestChangeNicknameDto: RequestChangeNicknameDto,
 	) {

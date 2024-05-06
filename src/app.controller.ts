@@ -1,13 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
-
-import { AppService } from './app.service';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
-	constructor(private readonly appService: AppService) {}
+	constructor() {}
 
+	@ApiOperation({
+		summary: '서버 Ping 조회용',
+	})
+	@ApiResponse({
+		status: 200,
+		description: '요청 성공시',
+	})
 	@Get()
 	getHello(): string {
-		return this.appService.getHello();
+		return 'Pong!';
 	}
 }

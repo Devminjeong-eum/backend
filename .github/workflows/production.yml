@@ -94,6 +94,9 @@ jobs:
           echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> .env.production
           echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.production
           echo "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}" >> .env.production
+          echo "GOOGLE_API_EMAIL=${{ secrets.GOOGLE_API_EMAIL }}" >> .env.production
+          echo "GOOGLE_PRIVATE_KEY=${{ secrets.GOOGLE_PRIVATE_KEY }}" >> .env.production
+          echo "GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}" >> .env.production
           echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env.production
 
           sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
