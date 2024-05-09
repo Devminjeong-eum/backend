@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtModule, JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
+import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
 
 @Injectable()
 export class JwtConfig implements JwtOptionsFactory {
@@ -14,7 +14,3 @@ export class JwtConfig implements JwtOptionsFactory {
 		};
 	}
 }
-
-export const JsonWebTokenModule = JwtModule.registerAsync({
-	useClass: JwtConfig,
-});

@@ -16,15 +16,13 @@ export class LoggerMiddleware implements NestMiddleware {
 		const { method, url, query, body } = request;
 		const { statusCode } = response;
 
-		this.logger.log(
-			JSON.stringify({
-				statusCode,
-				method,
-				url,
-				query,
-				body,
-			}),
-		);
+		this.logger.log({
+			statusCode,
+			method,
+			url,
+			query,
+			body,
+		});
 
 		next();
 	}

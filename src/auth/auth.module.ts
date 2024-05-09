@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserModule } from '#/user/user.module';
-import { JsonWebTokenModule } from '#configs/jwt.config';
+import { JwtConfig } from '#configs/jwt.config';
 import { User } from '#databases/entities/user.entity';
 
 import { AuthController } from './auth.controller';
@@ -11,7 +12,13 @@ import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User]), JsonWebTokenModule, UserModule],
+	imports: [
+		TypeOrmModule.forFeature([User]),
+		JwtModule.registerAsync({
+			useClass: JwtConfig,
+		}),
+		UserModule,
+	],
 	controllers: [AuthController],
 	providers: [
 		// Service
@@ -20,6 +27,6 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 		AuthenticationGuard,
 		KakaoAuthGuard,
 	],
-	exports: [JsonWebTokenModule, AuthService, AuthenticationGuard],
+	exports: [AuthService, AuthenticationGuard],
 })
 export class AuthModule {}
