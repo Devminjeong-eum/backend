@@ -5,9 +5,11 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+import { Like } from './like.entity';
 
 @Entity()
 export class Word {
@@ -64,6 +66,9 @@ export class Word {
 	})
 	@Column({ type: 'text' })
 	exampleSentence: string;
+
+	@OneToMany(() => Like, (like) => like.word)
+	likes: Like[]
 
 	@CreateDateColumn({ type: 'timestamp' })
 	createdAt?: Date;

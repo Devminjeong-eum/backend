@@ -3,9 +3,12 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 	Entity,
+	OneToMany,
 	PrimaryColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+
+import { Like } from './like.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -23,6 +26,9 @@ export class User {
 		enum: ['kakao'],
 	})
 	socialType: string;
+
+	@OneToMany(() => Like, (like) => like.user)
+	likes: Like[];
 
 	@CreateDateColumn({ type: 'timestamp' })
 	createdAt?: Date;
