@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
+import { OptionalAuthGuard } from './guard/optional-auth.guard';
 
 @Module({
 	imports: [
@@ -25,8 +26,9 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 		AuthService,
 		// Guard
 		AuthenticationGuard,
+		OptionalAuthGuard,
 		KakaoAuthGuard,
 	],
-	exports: [AuthService, AuthenticationGuard],
+	exports: [AuthService, AuthenticationGuard, OptionalAuthGuard],
 })
 export class AuthModule {}
