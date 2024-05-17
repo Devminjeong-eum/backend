@@ -3,15 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
-import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
-
 import {
 	PaginationDto,
 	PaginationMetaDto,
 	PaginationOptionDto,
 } from '#/common/dto/pagination.dto';
-import { Word } from '#databases/entities/word.entity';
+import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
+import { RequestWordListDto } from '#/word/dto/word-list.dto';
+import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
 export class WordRepository {
@@ -25,14 +25,8 @@ export class WordRepository {
 		return await this.wordRepository.save(registeredUser);
 	}
 
-	async update(
-		id: string,
-		updateFieldDto: RequestUpdateWordDto,
-	) {
-		const result = await this.wordRepository.update(
-			{ id },
-			{ ...updateFieldDto },
-		);
+	async update(id: string, updateFieldDto: RequestUpdateWordDto) {
+		const result = await this.wordRepository.update({ id }, updateFieldDto);
 		return result.raw as Word;
 	}
 
@@ -45,33 +39,39 @@ export class WordRepository {
 	}
 
 	async findBySearchWord(
-		keyword: string,
+		wordListDto: RequestWordListDto,
 		paginationOption: PaginationOptionDto,
 	) {
-		const queryBuilder = this.wordRepository.createQueryBuilder('word');
-		const skip = (paginationOption.page - 1) * paginationOption.limit;
+		const { keyword, userId } = wordListDto;
 
-		queryBuilder
+		const [words, totalCount] = await this.wordRepository
+			.createQueryBuilder('word')
 			.orderBy('word.createdAt', 'ASC')
 			.where('word.name like :keyword', { keyword: `${keyword}%` })
-			.skip(skip)
-			.take(paginationOption.limit)
+			.leftJoinAndSelect(
+				'word.likes',
+				'like',
+				userId ? 'like.userId = :userId' : 'false', // NOTE : userId 가 존재하지 않을 경우 항상 False 로 추론
+				{ userId },
+			)
 			.select([
 				'word.id',
 				'word.name',
 				'word.pronunciation',
 				'word.diacritic',
 				'word.description',
-			]);
-
-		const [entities, totalCount] = await queryBuilder.getManyAndCount();
+				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+			])
+			.skip(paginationOption.getSkip())
+			.take(paginationOption.limit)
+			.getManyAndCount();
 
 		const paginationMeta = new PaginationMetaDto({
 			paginationOption,
 			totalCount,
 		});
 
-		return new PaginationDto(entities, paginationMeta);
+		return new PaginationDto(words, paginationMeta);
 	}
 
 	async findWithList(paginationOption: PaginationOptionDto) {

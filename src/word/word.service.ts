@@ -9,6 +9,7 @@ import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import { RequestUpdateWordDto } from './dto/update-word.dto';
+import { RequestWordListDto } from './dto/word-list.dto';
 
 @Injectable()
 export class WordService {
@@ -122,11 +123,11 @@ export class WordService {
 	}
 
 	async getWordByKeyword(
-		keyword: string,
+		wordListDto: RequestWordListDto,
 		paginationOption: PaginationOptionDto,
 	) {
 		return await this.wordRepository.findBySearchWord(
-			keyword,
+			wordListDto,
 			paginationOption,
 		);
 	}

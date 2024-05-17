@@ -1,13 +1,19 @@
-import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
+import { plainToInstance } from 'class-transformer';
+
+import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
+import { User } from '#/common/databases/entities/user.entity';
 import { Word } from '#/common/databases/entities/word.entity';
 import {
 	PaginationDto,
 	PaginationOptionDto,
 } from '#/common/dto/pagination.dto';
 
+import { RequestWordListDto } from './dto/word-list.dto';
 import { WordService } from './word.service';
+import { OptionalAuthGuard } from '#/auth/guard/optional-auth.guard';
 
 @Controller('word')
 export class WordController {
@@ -59,13 +65,20 @@ export class WordController {
 		description: '요청 성공시',
 		type: PaginationDto<Word>,
 	})
+	@UseGuards(OptionalAuthGuard)
 	@Get('/search')
 	async findBySearch(
+		@AuthenticatedUser() user: User,
 		@Query('keyword') keyword: string,
 		@Query() paginationOptionDto: PaginationOptionDto,
 	) {
-		return await this.wordService.getWordByKeyword(
+		const wordListDto = plainToInstance(RequestWordListDto, {
 			keyword,
+			userId: user.id,
+		});
+
+		return await this.wordService.getWordByKeyword(
+			wordListDto,
 			paginationOptionDto,
 		);
 	}
