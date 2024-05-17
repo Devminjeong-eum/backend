@@ -1,9 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
+import { plainToInstance } from 'class-transformer';
+
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
+import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { WordRepository } from '#databases/repositories/word.repository';
+
+import { RequestUpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class WordService {
@@ -75,8 +80,13 @@ export class WordService {
 			);
 
 			const wordEntity = isExist
-				? await this.wordRepository.update(uuid, wordInformation)
-				: await this.wordRepository.create(wordInformation);
+				? await this.wordRepository.update(
+						uuid,
+						plainToInstance(RequestUpdateWordDto, wordInformation),
+					)
+				: await this.wordRepository.create(
+						plainToInstance(RequestCreateUserDto, wordInformation),
+					);
 
 			if (!isExist) {
 				await this.spreadSheetService.insertCellData(

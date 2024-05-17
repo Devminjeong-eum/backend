@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
+import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
+
 import {
 	PaginationDto,
 	PaginationMetaDto,
 	PaginationOptionDto,
 } from '#/common/dto/pagination.dto';
 import { Word } from '#databases/entities/word.entity';
+import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
 
 @Injectable()
 export class WordRepository {
@@ -17,18 +20,18 @@ export class WordRepository {
 		private wordRepository: Repository<Word>,
 	) {}
 
-	async create(word: Omit<Word, 'createdAt' | 'updatedAt' | 'id'>) {
-		const registeredUser = this.wordRepository.create(word);
+	async create(createWordDto: RequestCreateUserDto) {
+		const registeredUser = this.wordRepository.create(createWordDto);
 		return await this.wordRepository.save(registeredUser);
 	}
 
 	async update(
 		id: string,
-		updatedFieldData: Partial<Omit<Word, 'createdAt' | 'updatedAt' | 'id'>>,
+		updateFieldDto: RequestUpdateWordDto,
 	) {
 		const result = await this.wordRepository.update(
 			{ id },
-			{ ...updatedFieldData },
+			{ ...updateFieldDto },
 		);
 		return result.raw as Word;
 	}
