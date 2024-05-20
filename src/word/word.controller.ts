@@ -1,19 +1,26 @@
-import { Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	Param,
+	Patch,
+	Query,
+	UseInterceptors,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
-import { User } from '#/common/databases/entities/user.entity';
-import { Word } from '#/common/databases/entities/word.entity';
+import { UserInformationInterceptor } from '#/auth/interceptors/user-information.interceptor';
 import {
 	PaginationDto,
 	PaginationOptionDto,
 } from '#/common/dto/pagination.dto';
+import { User } from '#databases/entities/user.entity';
+import { Word } from '#databases/entities/word.entity';
 
 import { RequestWordListDto } from './dto/word-list.dto';
 import { WordService } from './word.service';
-import { OptionalAuthGuard } from '#/auth/guard/optional-auth.guard';
 
 @Controller('word')
 export class WordController {
@@ -65,7 +72,7 @@ export class WordController {
 		description: '요청 성공시',
 		type: PaginationDto<Word>,
 	})
-	@UseGuards(OptionalAuthGuard)
+	@UseInterceptors(UserInformationInterceptor)
 	@Get('/search')
 	async findBySearch(
 		@AuthenticatedUser() user: User,

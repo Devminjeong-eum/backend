@@ -10,7 +10,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
-import { OptionalAuthGuard } from './guard/optional-auth.guard';
+import { UserInformationInterceptor } from './interceptors/user-information.interceptor';
 
 @Module({
 	imports: [
@@ -26,9 +26,10 @@ import { OptionalAuthGuard } from './guard/optional-auth.guard';
 		AuthService,
 		// Guard
 		AuthenticationGuard,
-		OptionalAuthGuard,
 		KakaoAuthGuard,
+		// Interceptor
+		UserInformationInterceptor,
 	],
-	exports: [AuthService, AuthenticationGuard, OptionalAuthGuard],
+	exports: [AuthService, AuthenticationGuard, UserInformationInterceptor],
 })
 export class AuthModule {}
