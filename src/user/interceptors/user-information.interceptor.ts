@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { UserRepository } from '#databases/repositories/user.repository';
 
-import type { JwtPayload } from '../interface/jwt-auth.interface';
+import type { JwtPayload } from '../../auth/interface/jwt-auth.interface';
 
 @Injectable()
 export class UserInformationInterceptor implements NestInterceptor {

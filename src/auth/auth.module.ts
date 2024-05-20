@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserModule } from '#/user/user.module';
@@ -10,8 +10,6 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
-import { UserInformationInterceptor } from './interceptors/user-information.interceptor';
-
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([User]),
@@ -24,12 +22,15 @@ import { UserInformationInterceptor } from './interceptors/user-information.inte
 	providers: [
 		// Service
 		AuthService,
+		JwtService,
 		// Guard
 		AuthenticationGuard,
 		KakaoAuthGuard,
-		// Interceptor
-		UserInformationInterceptor,
 	],
-	exports: [AuthService, AuthenticationGuard, UserInformationInterceptor],
+	exports: [
+		AuthService,
+		JwtService,
+		AuthenticationGuard,
+	],
 })
 export class AuthModule {}

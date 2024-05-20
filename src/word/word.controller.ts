@@ -11,7 +11,7 @@ import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
-import { UserInformationInterceptor } from '#/auth/interceptors/user-information.interceptor';
+import { UserInformationInterceptor } from '#/user/interceptors/user-information.interceptor';
 import {
 	PaginationDto,
 	PaginationOptionDto,
