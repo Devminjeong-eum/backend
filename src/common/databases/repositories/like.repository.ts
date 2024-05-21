@@ -23,11 +23,13 @@ export class LikeRepository {
 	}
 
 	async findByUserAndWord(word: Word, user: User) {
-		return await this.likeRepository
-			.createQueryBuilder('like')
-			.where('wordId = :wordId', { wordId: word.id })
-			.andWhere('userId = :userId', { userId: user.id })
-			.getOne();
+		return await this.likeRepository.findOne({
+			where: {
+				word: { id: word.id },
+				user: { id: user.id },
+			},
+			relations: ['word', 'user'],
+		});
 	}
 
 	async restore(word: Word, user: User) {

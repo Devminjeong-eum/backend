@@ -3,13 +3,13 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { plainToInstance } from 'class-transformer';
 
-import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
 import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import { RequestUpdateWordDto } from './dto/update-word.dto';
 import { RequestWordListDto } from './dto/word-list.dto';
+import { RequestWordSearchDto } from './dto/word-search.dto';
 
 @Injectable()
 export class WordService {
@@ -108,8 +108,8 @@ export class WordService {
 		return await this.updateWordList();
 	}
 
-	async getWordList(paginationOption: PaginationOptionDto) {
-		return await this.wordRepository.findWithList(paginationOption);
+	async getWordList(requestWordListDto: RequestWordListDto) {
+		return await this.wordRepository.findWithList(requestWordListDto);
 	}
 
 	async getWordById(wordId: string) {
@@ -122,13 +122,7 @@ export class WordService {
 		return word;
 	}
 
-	async getWordByKeyword(
-		wordListDto: RequestWordListDto,
-		paginationOption: PaginationOptionDto,
-	) {
-		return await this.wordRepository.findBySearchWord(
-			wordListDto,
-			paginationOption,
-		);
+	async getWordByKeyword(requestWordSearchDto: RequestWordSearchDto) {
+		return await this.wordRepository.findBySearchWord(requestWordSearchDto);
 	}
 }

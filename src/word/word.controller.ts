@@ -11,15 +11,16 @@ import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
-import { UserInformationInterceptor } from '#/user/interceptors/user-information.interceptor';
 import {
 	PaginationDto,
 	PaginationOptionDto,
 } from '#/common/dto/pagination.dto';
+import { UserInformationInterceptor } from '#/user/interceptors/user-information.interceptor';
 import { User } from '#databases/entities/user.entity';
 import { Word } from '#databases/entities/word.entity';
 
 import { RequestWordListDto } from './dto/word-list.dto';
+import { RequestWordSearchDto } from './dto/word-search.dto';
 import { WordService } from './word.service';
 
 @Controller('word')
@@ -44,9 +45,18 @@ export class WordController {
 		description: '요청 성공시',
 		type: PaginationDto<Word>,
 	})
+	@UseInterceptors(UserInformationInterceptor)
 	@Get('/list')
-	async findAll(@Query() paginationOptionDto: PaginationOptionDto) {
-		return await this.wordService.getWordList(paginationOptionDto);
+	async findAll(
+		@AuthenticatedUser() user: User,
+		@Query() paginationOptionDto: PaginationOptionDto,
+	) {
+		const requestWordListDto = plainToInstance(RequestWordListDto, {
+			userId: user.id,
+			page: paginationOptionDto.page,
+			limit: paginationOptionDto.limit,
+		});
+		return await this.wordService.getWordList(requestWordListDto);
 	}
 
 	@ApiOperation({
@@ -79,15 +89,14 @@ export class WordController {
 		@Query('keyword') keyword: string,
 		@Query() paginationOptionDto: PaginationOptionDto,
 	) {
-		const wordListDto = plainToInstance(RequestWordListDto, {
+		const wordSearchDto = plainToInstance(RequestWordSearchDto, {
 			keyword,
 			userId: user.id,
+			page: paginationOptionDto.page,
+			limit: paginationOptionDto.limit,
 		});
 
-		return await this.wordService.getWordByKeyword(
-			wordListDto,
-			paginationOptionDto,
-		);
+		return await this.wordService.getWordByKeyword(wordSearchDto);
 	}
 
 	@ApiOperation({

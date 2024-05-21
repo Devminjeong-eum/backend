@@ -1,23 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { plainToInstance } from 'class-transformer';
+import { DataSource, Repository } from 'typeorm';
 
-import {
-	PaginationDto,
-	PaginationMetaDto,
-	PaginationOptionDto,
-} from '#/common/dto/pagination.dto';
+import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
 import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
-import { RequestWordListDto } from '#/word/dto/word-list.dto';
+import {
+	RequestWordListDto,
+	ResponseWordListDto,
+} from '#/word/dto/word-list.dto';
+import {
+	RequestWordSearchDto,
+	ResponseWordSearchDto,
+} from '#/word/dto/word-search.dto';
 import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
 export class WordRepository {
 	constructor(
 		@InjectRepository(Word)
-		private wordRepository: Repository<Word>,
+		private readonly wordRepository: Repository<Word>,
+		private readonly dataSource: DataSource,
 	) {}
 
 	async create(createWordDto: RequestCreateUserDto) {
@@ -38,20 +43,25 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id });
 	}
 
-	async findBySearchWord(
-		wordListDto: RequestWordListDto,
-		paginationOption: PaginationOptionDto,
-	) {
-		const { keyword, userId } = wordListDto;
+	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
+		const { keyword, userId } = requestWordSearchDto;
 
-		const [words, totalCount] = await this.wordRepository
+		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
-			.orderBy('word.createdAt', 'ASC')
-			.where('word.name like :keyword', { keyword: `${keyword}%` })
+			.where('word.name like :keyword', { keyword: `${keyword}%` });
+
+		const totalCount = await queryBuilder.getCount();
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordSearchDto,
+			totalCount,
+		});
+
+		const words = await queryBuilder
 			.leftJoinAndSelect(
 				'word.likes',
 				'like',
-				userId ? 'like.userId = :userId' : 'false', // NOTE : userId 가 존재하지 않을 경우 항상 False 로 추론
+				userId ? 'like.userId = :userId' : '',
 				{ userId },
 			)
 			.select([
@@ -60,44 +70,62 @@ export class WordRepository {
 				'word.pronunciation',
 				'word.diacritic',
 				'word.description',
+				'word.createdAt',
 				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
 			])
-			.skip(paginationOption.getSkip())
-			.take(paginationOption.limit)
-			.getManyAndCount();
+			.orderBy('word.createdAt', 'ASC')
+			.skip(requestWordSearchDto.getSkip())
+			.take(requestWordSearchDto.limit)
+			.getRawMany();
 
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption,
-			totalCount,
-		});
+		const responseWordSearchDto = plainToInstance(
+			ResponseWordSearchDto,
+			words,
+			{ excludeExtraneousValues: true },
+		);
 
-		return new PaginationDto(words, paginationMeta);
+		return new PaginationDto(responseWordSearchDto, paginationMeta);
 	}
 
-	async findWithList(paginationOption: PaginationOptionDto) {
-		const totalCount = await this.wordRepository.countBy({});
+	async findWithList(requestWordListDto: RequestWordListDto) {
+		const { userId } = requestWordListDto;
+		const totalCount = this.dataSource.getMetadata(Word).columns.length;
 
 		const paginationMeta = new PaginationMetaDto({
-			paginationOption,
+			paginationOption: requestWordListDto,
 			totalCount,
 		});
 
-		const queryBuilder = this.wordRepository.createQueryBuilder('word');
-
-		queryBuilder
-			.orderBy('word.createdAt', 'ASC')
-			.skip(paginationMeta.skip)
-			.take(paginationMeta.limit)
+		const words = await this.wordRepository
+			.createQueryBuilder('word')
+			.leftJoinAndSelect(
+				'word.likes',
+				'like',
+				userId ? 'like.userId = :userId' : '',
+				{ userId },
+			)
 			.select([
 				'word.id',
 				'word.name',
 				'word.pronunciation',
 				'word.diacritic',
 				'word.description',
-			]);
+				'word.createdAt',
+				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+			])
+			.orderBy('word.createdAt', 'ASC')
+			.skip(paginationMeta.skip)
+			.take(paginationMeta.limit)
+			.getRawMany();
 
-		const entities = await queryBuilder.getMany();
+		const responseWordListDto = plainToInstance(
+			ResponseWordListDto,
+			words,
+			{ excludeExtraneousValues: true },
+		);
 
-		return new PaginationDto(entities, paginationMeta);
+		console.log(responseWordListDto);
+
+		return new PaginationDto(responseWordListDto, paginationMeta);
 	}
 }
