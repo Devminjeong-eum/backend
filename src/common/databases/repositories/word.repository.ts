@@ -1,35 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { plainToInstance } from 'class-transformer';
+import { DataSource, Repository } from 'typeorm';
 
+import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
+import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
+import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
 import {
-	PaginationDto,
-	PaginationMetaDto,
-	PaginationOptionDto,
-} from '#/common/dto/pagination.dto';
+	RequestWordListDto,
+	ResponseWordListDto,
+} from '#/word/dto/word-list.dto';
+import {
+	RequestWordSearchDto,
+	ResponseWordSearchDto,
+} from '#/word/dto/word-search.dto';
+import {
+	RequestWordUserLikeDto,
+	ResponseWordUserLikeDto,
+} from '#/word/dto/word-user-like.dto';
 import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
 export class WordRepository {
 	constructor(
 		@InjectRepository(Word)
-		private wordRepository: Repository<Word>,
+		private readonly wordRepository: Repository<Word>,
+		private readonly dataSource: DataSource,
 	) {}
 
-	async create(word: Omit<Word, 'createdAt' | 'updatedAt' | 'id'>) {
-		const registeredUser = this.wordRepository.create(word);
+	async create(createWordDto: RequestCreateUserDto) {
+		const registeredUser = this.wordRepository.create(createWordDto);
 		return await this.wordRepository.save(registeredUser);
 	}
 
-	async update(
-		id: string,
-		updatedFieldData: Partial<Omit<Word, 'createdAt' | 'updatedAt' | 'id'>>,
-	) {
-		const result = await this.wordRepository.update(
-			{ id },
-			{ ...updatedFieldData },
-		);
+	async update(id: string, updateFieldDto: RequestUpdateWordDto) {
+		const result = await this.wordRepository.update({ id }, updateFieldDto);
 		return result.raw as Word;
 	}
 
@@ -41,60 +47,121 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id });
 	}
 
-	async findBySearchWord(
-		keyword: string,
-		paginationOption: PaginationOptionDto,
-	) {
-		const queryBuilder = this.wordRepository.createQueryBuilder('word');
-		const skip = (paginationOption.page - 1) * paginationOption.limit;
+	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
+		const { keyword, userId } = requestWordSearchDto;
 
-		queryBuilder
-			.orderBy('word.createdAt', 'ASC')
-			.where('word.name like :keyword', { keyword: `${keyword}%` })
-			.skip(skip)
-			.take(paginationOption.limit)
+		const queryBuilder = this.wordRepository
+			.createQueryBuilder('word')
+			.where('word.name like :keyword', { keyword: `${keyword}%` });
+
+		const totalCount = await queryBuilder.getCount();
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordSearchDto,
+			totalCount,
+		});
+
+		const words = await queryBuilder
+			.leftJoinAndSelect(
+				'word.likes',
+				'like',
+				userId ? 'like.userId = :userId' : '',
+				{ userId },
+			)
 			.select([
 				'word.id',
 				'word.name',
 				'word.pronunciation',
 				'word.diacritic',
 				'word.description',
-			]);
+				'word.createdAt',
+				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+			])
+			.orderBy('word.createdAt', 'ASC')
+			.skip(requestWordSearchDto.getSkip())
+			.take(requestWordSearchDto.limit)
+			.getRawMany();
 
-		const [entities, totalCount] = await queryBuilder.getManyAndCount();
+		const responseWordSearchDto = plainToInstance(
+			ResponseWordSearchDto,
+			words,
+			{ excludeExtraneousValues: true },
+		);
 
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption,
-			totalCount,
-		});
-
-		return new PaginationDto(entities, paginationMeta);
+		return new PaginationDto(responseWordSearchDto, paginationMeta);
 	}
 
-	async findWithList(paginationOption: PaginationOptionDto) {
-		const totalCount = await this.wordRepository.countBy({});
+	async findWithList(requestWordListDto: RequestWordListDto) {
+		const { userId } = requestWordListDto;
+		const totalCount = this.dataSource.getMetadata(Word).columns.length;
 
 		const paginationMeta = new PaginationMetaDto({
-			paginationOption,
+			paginationOption: requestWordListDto,
 			totalCount,
 		});
 
-		const queryBuilder = this.wordRepository.createQueryBuilder('word');
-
-		queryBuilder
+		const words = await this.wordRepository
+			.createQueryBuilder('word')
+			.leftJoinAndSelect(
+				'word.likes',
+				'like',
+				userId ? 'like.userId = :userId' : '',
+				{ userId },
+			)
+			.select([
+				'word.id',
+				'word.name',
+				'word.pronunciation',
+				'word.diacritic',
+				'word.description',
+				'word.createdAt',
+				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+			])
 			.orderBy('word.createdAt', 'ASC')
 			.skip(paginationMeta.skip)
 			.take(paginationMeta.limit)
+			.getRawMany();
+
+		const responseWordListDto = plainToInstance(
+			ResponseWordListDto,
+			words,
+			{ excludeExtraneousValues: true },
+		);
+
+		return new PaginationDto(responseWordListDto, paginationMeta);
+	}
+
+	async findUserLikeWord(requestWordListDto: RequestWordUserLikeDto) {
+		const { userId } = requestWordListDto;
+
+		const [words, totalCount] = await this.wordRepository
+			.createQueryBuilder('word')
+			.innerJoin('word.likes', 'like')
+			.innerJoin('like.user', 'user')
+			.where('user.id = :userId', { userId })
 			.select([
 				'word.id',
 				'word.name',
 				'word.pronunciation',
 				'word.diacritic',
 				'word.description',
-			]);
+				'word.createdAt',
+			])
+			.orderBy('word.createdAt', 'ASC')
+			.skip(requestWordListDto.getSkip())
+			.take(requestWordListDto.limit)
+			.getManyAndCount();
 
-		const entities = await queryBuilder.getMany();
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordListDto,
+			totalCount,
+		});
 
-		return new PaginationDto(entities, paginationMeta);
+		const responseWordListDto = plainToInstance(
+			ResponseWordUserLikeDto,
+			words,
+		);
+
+		return new PaginationDto(responseWordListDto, paginationMeta);
 	}
 }

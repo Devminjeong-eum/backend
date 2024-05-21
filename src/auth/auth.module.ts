@@ -26,6 +26,8 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 		// Guard
 		AuthenticationGuard,
 		KakaoAuthGuard,
+		// Config
+		JwtConfig,
 	],
 	exports: [AuthService, AuthenticationGuard],
 })

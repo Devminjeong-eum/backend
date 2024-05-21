@@ -1,4 +1,9 @@
-import axios, { AxiosError, isAxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import axios, {
+	AxiosError,
+	type AxiosRequestConfig,
+	type AxiosResponse,
+	isAxiosError,
+} from 'axios';
 
 /**
  * API 요청에서 범용적으로 사용할 Axios Instance 생성
