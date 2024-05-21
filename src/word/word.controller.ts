@@ -7,7 +7,13 @@ import {
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+	ApiOperation,
+	ApiParam,
+	ApiQuery,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -29,6 +35,7 @@ import {
 } from './dto/word-user-like.dto';
 import { WordService } from './word.service';
 
+@ApiTags('Word')
 @Controller('word')
 export class WordController {
 	constructor(private readonly wordService: WordService) {}

@@ -22,6 +22,11 @@ export class UserController {
 		description: '요청 성공 시 받을 응답',
 		type: ResponseUserInformationDto,
 	})
+	@ApiResponse({
+		status: 200,
+		description: '요청 성공 시',
+		type: User,
+	})
 	@Get()
 	@UseGuards(AuthenticationGuard)
 	getOwnInformation(@AuthenticatedUser() user: User) {
@@ -34,7 +39,8 @@ export class UserController {
 	})
 	@ApiResponse({
 		status: 200,
-		description: '요청 성공 시 받을 응답',
+		description: '요청 성공 시',
+		type: User,
 	})
 	@Get(':userId')
 	getUserInformation(@Param('userId') userId: string) {
