@@ -28,10 +28,15 @@ export class LikeService {
 			throw new BadRequestException('존재하지 않는 단어입니다.');
 		}
 
-		const isAlreadyApplied = await this.likeRepository.findByUserAndWord(word, user);
+		const isAlreadyApplied = await this.likeRepository.findByUserAndWord(
+			word,
+			user,
+		);
 
 		if (isAlreadyApplied) {
-			throw new BadRequestException('이미 해당 단어에 좋아요를 적용한 상태입니다.')
+			throw new BadRequestException(
+				'이미 해당 단어에 좋아요를 적용한 상태입니다.',
+			);
 		}
 
 		const restoreResult = await this.likeRepository.restore(word, user);
@@ -39,7 +44,6 @@ export class LikeService {
 
 		const creationResult = await this.likeRepository.create(word, user);
 		return !!creationResult;
-
 	}
 
 	async revertUserLike(revertLikeDto: RequestRevertLikeDto, user: User) {

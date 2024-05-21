@@ -15,8 +15,11 @@ import {
 	RequestWordSearchDto,
 	ResponseWordSearchDto,
 } from '#/word/dto/word-search.dto';
+import {
+	RequestWordUserLikeDto,
+	ResponseWordUserLikeDto,
+} from '#/word/dto/word-user-like.dto';
 import { Word } from '#databases/entities/word.entity';
-import { RequestWordUserLikeDto, ResponseWordUserLikeDto } from '#/word/dto/word-user-like.dto';
 
 @Injectable()
 export class WordRepository {
@@ -154,7 +157,10 @@ export class WordRepository {
 			totalCount,
 		});
 
-		const responseWordListDto = plainToInstance(ResponseWordUserLikeDto, words);
+		const responseWordListDto = plainToInstance(
+			ResponseWordUserLikeDto,
+			words,
+		);
 
 		return new PaginationDto(responseWordListDto, paginationMeta);
 	}

@@ -1,7 +1,7 @@
+import { Exclude } from 'class-transformer';
 import { IsArray, IsString, IsUUID } from 'class-validator';
 
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
-import { Exclude } from 'class-transformer';
 
 export class RequestWordUserLikeDto extends PaginationOptionDto {
 	@IsUUID()

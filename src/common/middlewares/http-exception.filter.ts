@@ -12,7 +12,12 @@ import { ValidationException } from '../exceptions/ValidationException';
 
 export class HttpExceptionFilter implements ExceptionFilter {
 	private getPartialStackTrace(stack: string | undefined, lines: number = 3) {
-		return stack ? stack.split('\n').slice(1, lines + 1).join('\n') : '';
+		return stack
+			? stack
+					.split('\n')
+					.slice(1, lines + 1)
+					.join('\n')
+			: '';
 	}
 
 	catch(exception: Error, host: ArgumentsHost) {

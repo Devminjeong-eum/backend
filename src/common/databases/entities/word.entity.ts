@@ -9,6 +9,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+
 import { Like } from './like.entity';
 
 @Entity()
@@ -64,7 +65,7 @@ export class Word {
 
 	@Exclude()
 	@OneToMany(() => Like, (like) => like.word)
-	likes: Like[]
+	likes: Like[];
 
 	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })

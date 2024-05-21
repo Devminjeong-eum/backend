@@ -5,6 +5,7 @@ import * as cookieParser from 'cookie-parser';
 
 import { ApiResponseInterceptor } from '#middlewares/api-response.interceptor';
 import { HttpExceptionFilter } from '#middlewares/http-exception.filter';
+
 import { ValidationException } from '../exceptions/ValidationException';
 
 export const setupNestApplication = (app: INestApplication) => {

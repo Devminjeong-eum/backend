@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
+
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([User]),
@@ -28,9 +29,6 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 		// Config
 		JwtConfig,
 	],
-	exports: [
-		AuthService,
-		AuthenticationGuard,
-	],
+	exports: [AuthService, AuthenticationGuard],
 })
 export class AuthModule {}

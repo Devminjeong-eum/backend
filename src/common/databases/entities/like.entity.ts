@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
 	CreateDateColumn,
 	DeleteDateColumn,
@@ -7,9 +8,8 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 
-import { Word } from './word.entity';
 import { User } from './user.entity';
-import { Expose } from 'class-transformer';
+import { Word } from './word.entity';
 
 @Entity({ name: 'like' })
 export class Like {
