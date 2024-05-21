@@ -4,19 +4,16 @@ import {
 	Injectable,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 
 import type { Response } from 'express';
 
 import { UserRepository } from '#databases/repositories/user.repository';
 
 import { AuthService } from '../auth.service';
-import { JwtPayload } from '../interface/jwt-auth.interface';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
 	constructor(
-		private readonly jwtService: JwtService,
 		private readonly authService: AuthService,
 		private readonly userRepository: UserRepository,
 	) {}
@@ -42,15 +39,12 @@ export class AuthenticationGuard implements CanActivate {
 		let userId: string;
 
 		try {
-			userId = await this.jwtService
-				.verifyAsync<JwtPayload>(accessToken)
-				.then((payload) => payload.id);
+			userId =
+				await this.authService.verifyAuthenticateToken(accessToken);
 		} catch (error) {
-			userId = await this.jwtService
-				.verifyAsync<JwtPayload>(refreshToken)
-				.then((payload) => payload.id)
-				.catch((error) => {
-					console.log(error);
+			userId = await this.authService
+				.verifyAuthenticateToken(accessToken)
+				.catch(() => {
 					this.removeAuthenticateCookie(response);
 					throw new UnauthorizedException(
 						'토큰이 만료되었습니다. 다시 로그인해주세요.',

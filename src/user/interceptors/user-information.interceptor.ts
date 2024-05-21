@@ -4,16 +4,15 @@ import {
 	Injectable,
 	NestInterceptor,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 
 import { UserRepository } from '#databases/repositories/user.repository';
 
-import type { JwtPayload } from '../../auth/interface/jwt-auth.interface';
+import { AuthService } from '../../auth/auth.service';
 
 @Injectable()
 export class UserInformationInterceptor implements NestInterceptor {
 	constructor(
-		private readonly jwtService: JwtService,
+		private readonly authService: AuthService,
 		private readonly userRepository: UserRepository,
 	) {}
 
@@ -30,9 +29,8 @@ export class UserInformationInterceptor implements NestInterceptor {
 		let userId: string | null;
 
 		try {
-			userId = await this.jwtService
-				.verifyAsync<JwtPayload>(accessToken)
-				.then((payload) => payload.id);
+			userId =
+				await this.authService.verifyAuthenticateToken(accessToken);
 		} catch (error) {
 			request.user = null;
 			return next.handle();

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserModule } from '#/user/user.module';
@@ -22,14 +22,14 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 	providers: [
 		// Service
 		AuthService,
-		JwtService,
 		// Guard
 		AuthenticationGuard,
 		KakaoAuthGuard,
+		// Config
+		JwtConfig,
 	],
 	exports: [
 		AuthService,
-		JwtService,
 		AuthenticationGuard,
 	],
 })
