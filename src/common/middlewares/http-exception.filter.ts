@@ -11,6 +11,10 @@ import type { Request, Response } from 'express';
 import { ValidationException } from '../exceptions/ValidationException';
 
 export class HttpExceptionFilter implements ExceptionFilter {
+	private getPartialStackTrace(stack: string | undefined, lines: number = 3) {
+		return stack ? stack.split('\n').slice(1, lines + 1).join('\n') : '';
+	}
+
 	catch(exception: Error, host: ArgumentsHost) {
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse<Response>();
@@ -42,19 +46,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
 					statusCode,
 					message: exception.message,
 					error: errorDetails,
-					stack: exception.stack,
+					stack: this.getPartialStackTrace(exception.stack),
 				});
 				break;
 			}
 			case exception instanceof HttpException: {
 				statusCode = exception.getStatus();
-				const responseBody = exception.getResponse() as Record<string, any>;
+				const responseBody = exception.getResponse() as Record<
+					string,
+					any
+				>;
 				Logger.error({
 					...errorResponse,
 					statusCode,
 					message: responseBody.message,
 					error: responseBody.error,
-					stack: exception.stack,
+					stack: this.getPartialStackTrace(exception.stack),
 				});
 				break;
 			}
@@ -66,7 +73,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 					statusCode,
 					message: exception.message,
 					error: exception,
-					stack: exception.stack,
+					stack: this.getPartialStackTrace(exception.stack),
 				});
 			}
 		}
