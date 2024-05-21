@@ -16,6 +16,7 @@ import {
 	ResponseWordSearchDto,
 } from '#/word/dto/word-search.dto';
 import { Word } from '#databases/entities/word.entity';
+import { RequestWordUserLikeDto, ResponseWordUserLikeDto } from '#/word/dto/word-user-like.dto';
 
 @Injectable()
 export class WordRepository {
@@ -124,7 +125,36 @@ export class WordRepository {
 			{ excludeExtraneousValues: true },
 		);
 
-		console.log(responseWordListDto);
+		return new PaginationDto(responseWordListDto, paginationMeta);
+	}
+
+	async findUserLikeWord(requestWordListDto: RequestWordUserLikeDto) {
+		const { userId } = requestWordListDto;
+
+		const [words, totalCount] = await this.wordRepository
+			.createQueryBuilder('word')
+			.innerJoin('word.likes', 'like')
+			.innerJoin('like.user', 'user')
+			.where('user.id = :userId', { userId })
+			.select([
+				'word.id',
+				'word.name',
+				'word.pronunciation',
+				'word.diacritic',
+				'word.description',
+				'word.createdAt',
+			])
+			.orderBy('word.createdAt', 'ASC')
+			.skip(requestWordListDto.getSkip())
+			.take(requestWordListDto.limit)
+			.getManyAndCount();
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordListDto,
+			totalCount,
+		});
+
+		const responseWordListDto = plainToInstance(ResponseWordUserLikeDto, words);
 
 		return new PaginationDto(responseWordListDto, paginationMeta);
 	}

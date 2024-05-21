@@ -10,6 +10,7 @@ import { WordRepository } from '#databases/repositories/word.repository';
 import { RequestUpdateWordDto } from './dto/update-word.dto';
 import { RequestWordListDto } from './dto/word-list.dto';
 import { RequestWordSearchDto } from './dto/word-search.dto';
+import { RequestWordUserLikeDto } from './dto/word-user-like.dto';
 
 @Injectable()
 export class WordService {
@@ -108,8 +109,12 @@ export class WordService {
 		return await this.updateWordList();
 	}
 
-	async getWordList(requestWordListDto: RequestWordListDto) {
-		return await this.wordRepository.findWithList(requestWordListDto);
+	async getWordList(wordListDto: RequestWordListDto) {
+		return await this.wordRepository.findWithList(wordListDto);
+	}
+
+	async getWordUserLike(wordUserLikeDto: RequestWordUserLikeDto) {
+		return await this.wordRepository.findUserLikeWord(wordUserLikeDto);
 	}
 
 	async getWordById(wordId: string) {
