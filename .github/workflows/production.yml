@@ -98,6 +98,7 @@ jobs:
           echo "GOOGLE_PRIVATE_KEY=${{ secrets.GOOGLE_PRIVATE_KEY }}" >> .env.production
           echo "GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}" >> .env.production
           echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env.production
+          echo "TEST_ADMIN_KEY"=${{ secrets.TEST_ADMIN_KEY }} >> .env.production
 
           sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
           sudo docker run -p 8080:8080 \
