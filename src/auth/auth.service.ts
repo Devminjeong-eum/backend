@@ -12,6 +12,8 @@ export class AuthService {
 		const accessToken = this.jwtService.sign(payload, { expiresIn: '5m' });
 		const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
+		console.log({ accessToken, refreshToken });
+
 		return { accessToken, refreshToken };
 	}
 

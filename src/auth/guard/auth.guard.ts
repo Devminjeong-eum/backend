@@ -4,6 +4,7 @@ import {
 	Injectable,
 	UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import type { Response } from 'express';
 
@@ -15,6 +16,7 @@ import { AuthService } from '../auth.service';
 export class AuthenticationGuard implements CanActivate {
 	constructor(
 		private readonly authService: AuthService,
+		private readonly configService: ConfigService,
 		private readonly userRepository: UserRepository,
 	) {}
 
@@ -27,6 +29,16 @@ export class AuthenticationGuard implements CanActivate {
 	async canActivate(context: ExecutionContext) {
 		const request = context.switchToHttp().getRequest();
 		const response = context.switchToHttp().getResponse<Response>();
+
+		// NOTE : 원활한 개발을 위해 임시로 생성한 Admin 계정에 접근 가능하도록 하는 Key
+		const { admin_key: requestAdminKey } = request.headers;
+		const adminKey = this.configService.get<string>('TEST_ADMIN_KEY');
+
+		if (requestAdminKey && adminKey && requestAdminKey === adminKey) {
+			const user = await this.userRepository.findById(adminKey);
+			request.user = user;
+			return true;
+		}
 
 		const { accessToken, refreshToken } = request.cookies ?? {};
 
