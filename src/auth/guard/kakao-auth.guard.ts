@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { getAsync, postAsync } from '#/common/apis';
+import { checkIsAxiosError, getAsync, postAsync } from '#/common/apis';
 
 import {
 	KakaoOauthResponse,
@@ -37,9 +37,15 @@ export class KakaoAuthGuard implements CanActivate {
 			request.user = await this.getKakaoUserProfile(accessToken);
 			return true;
 		} catch (error) {
-			throw new InternalServerErrorException(
-				'Kakao 서버와 통신하는 과정에서 문제가 발생했습니다.',
-			);
+			if (checkIsAxiosError(error)) {
+				throw new InternalServerErrorException({
+					error: error.response?.data,
+					message:
+						'Kakao 서버와 통신하는 과정에서 문제가 발생했습니다.',
+				});
+			}
+
+			throw error;
 		}
 	}
 
