@@ -2,11 +2,13 @@ import {
 	type ArgumentsHost,
 	type ExceptionFilter,
 	HttpException,
+	HttpStatus,
 	Logger,
 } from '@nestjs/common';
 
-import { ValidationError } from 'class-validator';
 import type { Request, Response } from 'express';
+
+import { ValidationException } from '../exceptions/ValidationException';
 
 export class HttpExceptionFilter implements ExceptionFilter {
 	catch(exception: Error, host: ArgumentsHost) {
@@ -15,7 +17,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		const request = ctx.getRequest<Request>();
 
 		let statusCode = 500;
-
 		const errorResponse = {
 			statusCode,
 			timestamp: new Date().toISOString(),
@@ -25,26 +26,48 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		};
 
 		switch (true) {
-			case exception instanceof ValidationError: {
-				statusCode = 400;
-				Logger.error(
-					'Validation Error',
-					JSON.stringify({ ...errorResponse, statusCode }),
-					exception.stack,
+			case exception instanceof ValidationException: {
+				const errorDetails = exception.validationErrors.map(
+					(error) => ({
+						property: error.property,
+						value: error.value,
+						constraints: error.constraints,
+					}),
 				);
+
+				statusCode = HttpStatus.BAD_REQUEST;
+
+				Logger.error({
+					...errorResponse,
+					statusCode,
+					message: exception.message,
+					error: errorDetails,
+					stack: exception.stack,
+				});
 				break;
 			}
 			case exception instanceof HttpException: {
 				statusCode = exception.getStatus();
-				Logger.error(
-					'HTTP Error',
-					JSON.stringify({ ...errorResponse, statusCode }),
-					exception.stack,
-				);
+				const responseBody = exception.getResponse() as Record<string, any>;
+				Logger.error({
+					...errorResponse,
+					statusCode,
+					message: responseBody.message,
+					error: responseBody.error,
+					stack: exception.stack,
+				});
 				break;
 			}
 			default: {
-				Logger.warn('Server Error', JSON.stringify(errorResponse));
+				statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+				Logger.error({
+					...errorResponse,
+					statusCode,
+					message: exception.message,
+					error: exception,
+					stack: exception.stack,
+				});
 			}
 		}
 
