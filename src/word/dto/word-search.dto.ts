@@ -5,17 +5,22 @@ import {
 	IsOptional,
 	IsString,
 	IsUUID,
+	MinLength,
 } from 'class-validator';
 
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 
-export class RequestWordListDto extends PaginationOptionDto {
+export class RequestWordSearchDto extends PaginationOptionDto {
 	@IsOptional()
 	@IsUUID()
 	userId?: string;
+
+	@IsString()
+	@MinLength(3)
+	keyword: string;
 }
 
-export class ResponseWordListDto {
+export class ResponseWordSearchDto {
 	@IsUUID()
 	@Transform(({ obj }) => obj.word_id)
 	@Expose({ name: 'id' })
