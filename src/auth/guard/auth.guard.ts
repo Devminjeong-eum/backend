@@ -2,6 +2,7 @@ import {
 	CanActivate,
 	ExecutionContext,
 	Injectable,
+	InternalServerErrorException,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -35,8 +36,14 @@ export class AuthenticationGuard implements CanActivate {
 		const adminKey = this.configService.get<string>('TEST_ADMIN_KEY');
 
 		if (requestAdminKey && adminKey && requestAdminKey === adminKey) {
-			const user = await this.userRepository.findById(adminKey);
-			request.user = user;
+			const adminUser = await this.userRepository.findById(adminKey);
+
+			if (!adminUser)
+				throw new InternalServerErrorException(
+					'Admin User 정보가 DB 에 존재하지 않습니다.',
+				);
+
+			request.user = adminUser;
 			return true;
 		}
 
@@ -55,7 +62,7 @@ export class AuthenticationGuard implements CanActivate {
 				await this.authService.verifyAuthenticateToken(accessToken);
 		} catch (error) {
 			userId = await this.authService
-				.verifyAuthenticateToken(accessToken)
+				.verifyAuthenticateToken(refreshToken)
 				.catch(() => {
 					this.removeAuthenticateCookie(response);
 					throw new UnauthorizedException(
