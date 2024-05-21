@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-	TypeOrmModule,
-	TypeOrmModuleOptions,
-	TypeOrmOptionsFactory,
-} from '@nestjs/typeorm';
+import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 
 @Injectable()
 export class TypeOrmConfig implements TypeOrmOptionsFactory {
@@ -35,7 +31,3 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
 		};
 	}
 }
-
-export const GlobalTypeOrmModule = TypeOrmModule.forRootAsync({
-	useClass: TypeOrmConfig,
-});

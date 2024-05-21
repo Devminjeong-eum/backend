@@ -1,13 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+
+import { Like } from './like.entity';
 
 @Entity()
 export class Word {
@@ -15,7 +18,6 @@ export class Word {
 		description: '단어 별 고유 UUID 입니다.',
 		type: String,
 	})
-	@Expose()
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -23,7 +25,6 @@ export class Word {
 		description: '단어의 이름입니다.',
 		type: String,
 	})
-	@Expose()
 	@Column({ type: 'varchar', unique: true })
 	name: string;
 
@@ -31,7 +32,6 @@ export class Word {
 		description: '단어에 대한 설명입니다.',
 		type: String,
 	})
-	@Expose()
 	@Column({ type: 'text' })
 	description: string;
 
@@ -39,7 +39,6 @@ export class Word {
 		description: '단어의 발음 기호 목록입니다.',
 		type: Array<string>,
 	})
-	@Expose()
 	@Column({ type: 'varchar', array: true })
 	diacritic: string[];
 
@@ -47,7 +46,6 @@ export class Word {
 		description: '단어의 올바른 발음 예시 목록입니다.',
 		type: Array<string>,
 	})
-	@Expose()
 	@Column({ type: 'varchar', array: true })
 	pronunciation: string[];
 
@@ -65,9 +63,15 @@ export class Word {
 	@Column({ type: 'text' })
 	exampleSentence: string;
 
+	@Exclude()
+	@OneToMany(() => Like, (like) => like.word)
+	likes: Like[];
+
+	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })
 	createdAt?: Date;
 
+	@Exclude()
 	@UpdateDateColumn({ type: 'timestamp' })
 	updatedAt?: Date;
 }
