@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import axios, { AxiosError, isAxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 /**
  * API 요청에서 범용적으로 사용할 Axios Instance 생성
@@ -111,4 +111,11 @@ export async function deleteAsync<T, D>(
 	);
 
 	return response.data;
+}
+
+/**
+ * 인자로 받은 Error 객체가 AxiosError 인지를 체크하하는 checkIsAxiosError
+ */
+export function checkIsAxiosError(error: unknown): error is AxiosError {
+	return isAxiosError(error);
 }
