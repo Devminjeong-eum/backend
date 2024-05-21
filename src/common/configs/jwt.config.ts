@@ -13,8 +13,6 @@ export class JwtConfig implements JwtOptionsFactory {
 			);
 		}
 
-		console.log(secret);
-
 		return {
 			secret,
 			signOptions: {
