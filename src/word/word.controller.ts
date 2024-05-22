@@ -27,6 +27,7 @@ import { UserInformationInterceptor } from '#/user/interceptors/user-information
 import { User } from '#databases/entities/user.entity';
 import { Word } from '#databases/entities/word.entity';
 
+import { RequestWordDetailDto } from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import { RequestWordSearchDto } from './dto/word-search.dto';
 import {
@@ -157,8 +158,16 @@ export class WordController {
 		description: '요청 성공시',
 	})
 	@Get('/:wordId')
-	async findById(@Param('wordId') wordId: string) {
-		return await this.wordService.getWordById(wordId);
+	@UseInterceptors(UserInformationInterceptor)
+	async findById(
+		@AuthenticatedUser() user: User,
+		@Param('wordId') wordId: string,
+	) {
+		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
+			userId: user.id,
+			wordId,
+		});
+		return await this.wordService.getWordById(wordDetailDto);
 	}
 
 	@ApiOperation({

@@ -8,7 +8,10 @@ import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
 import { Word } from '#/databases/entities/word.entity';
 import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
-import { ResponseWordDetailDto } from '#/word/dto/word-detail.dto';
+import {
+	RequestWordDetailDto,
+	ResponseWordDetailDto,
+} from '#/word/dto/word-detail.dto';
 import {
 	RequestWordListDto,
 	ResponseWordListDto,
@@ -48,7 +51,8 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id: wordId });
 	}
 
-	async findByIdWithUserLike(wordId: string, userId?: string) {
+	async findByIdWithUserLike(wordDetailDto: RequestWordDetailDto) {
+		const { wordId, userId } = wordDetailDto;
 		const word = await this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')

@@ -8,6 +8,7 @@ import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import { RequestUpdateWordDto } from './dto/update-word.dto';
+import { RequestWordDetailDto } from './dto/word-detail.dto';
 import { RequestWordListDto } from './dto/word-list.dto';
 import { RequestWordSearchDto } from './dto/word-search.dto';
 import { RequestWordUserLikeDto } from './dto/word-user-like.dto';
@@ -117,12 +118,12 @@ export class WordService {
 		return await this.wordRepository.findUserLikeWord(wordUserLikeDto);
 	}
 
-	async getWordById(wordId: string) {
-		const word = await this.wordRepository.findById(wordId);
+	async getWordById(wordDetailDto: RequestWordDetailDto) {
+		const word = await this.wordRepository.findByIdWithUserLike(wordDetailDto);
 
 		if (!word)
 			throw new BadRequestException(
-				`${wordId} id 를 가진 Word 가 존재하지 않습니다.`,
+				`해당 ID 를 가진 Word 가 존재하지 않습니다.`,
 			);
 		return word;
 	}
