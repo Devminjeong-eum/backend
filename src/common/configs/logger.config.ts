@@ -7,7 +7,7 @@ const { combine, timestamp, simple, ms } = format;
 export const winstonLogger = WinstonModule.createLogger({
 	transports: [
 		new transports.Console({
-			level: isProduction ? 'http' : 'debug',
+			level: isProduction ? 'info' : 'debug',
 			format: isProduction
 				? simple()
 				: combine(
