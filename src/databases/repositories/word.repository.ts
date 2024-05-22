@@ -19,7 +19,7 @@ import {
 	RequestWordUserLikeDto,
 	ResponseWordUserLikeDto,
 } from '#/word/dto/word-user-like.dto';
-import { Word } from '#databases/entities/word.entity';
+import { Word } from '#/databases/entities/word.entity';
 
 @Injectable()
 export class WordRepository {

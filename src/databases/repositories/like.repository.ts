@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
-import { Like } from '#databases/entities/like.entity';
-import { User } from '#databases/entities/user.entity';
-import { Word } from '#databases/entities/word.entity';
+import { Like } from '#/databases/entities/like.entity';
+import { User } from '#/databases/entities/user.entity';
+import { Word } from '#/databases/entities/word.entity';
 
 @Injectable()
 export class LikeRepository {

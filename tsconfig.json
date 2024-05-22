@@ -15,8 +15,9 @@
     "baseUrl": "./",
     "paths": {
       "#/*": ["src/*"],
+      "#apis/*": ["src/common/apis/*"],
       "#configs/*": ["src/common/configs/*"],
-      "#databases/*": ["src/common/databases/*"],
+      "#databases/*": ["src/databases/*"],
       "#middlewares/*": ["src/common/middlewares/*"]
     }
   }
