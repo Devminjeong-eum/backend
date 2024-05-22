@@ -119,7 +119,8 @@ export class WordService {
 	}
 
 	async getWordById(wordDetailDto: RequestWordDetailDto) {
-		const word = await this.wordRepository.findByIdWithUserLike(wordDetailDto);
+		const word =
+			await this.wordRepository.findByIdWithUserLike(wordDetailDto);
 
 		if (!word)
 			throw new BadRequestException(

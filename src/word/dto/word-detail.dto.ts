@@ -43,7 +43,6 @@ export class ResponseWordDetailDto {
 	@Expose({ name: 'pronunciation' })
 	pronunciation: string[];
 
-	
 	@IsArray()
 	@Transform(({ obj }) => obj.word_wrongPronunciations)
 	@Expose({ name: 'wrongPronunciation' })
