@@ -5,8 +5,10 @@ import { plainToInstance } from 'class-transformer';
 import { DataSource, Repository } from 'typeorm';
 
 import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
+import { Word } from '#/databases/entities/word.entity';
 import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
+import { ResponseWordDetailDto } from '#/word/dto/word-detail.dto';
 import {
 	RequestWordListDto,
 	ResponseWordListDto,
@@ -19,7 +21,6 @@ import {
 	RequestWordUserLikeDto,
 	ResponseWordUserLikeDto,
 } from '#/word/dto/word-user-like.dto';
-import { Word } from '#/databases/entities/word.entity';
 
 @Injectable()
 export class WordRepository {
@@ -43,8 +44,36 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ name });
 	}
 
-	findById(id: string) {
-		return this.wordRepository.findOneBy({ id });
+	findById(wordId: string) {
+		return this.wordRepository.findOneBy({ id: wordId });
+	}
+
+	async findByIdWithUserLike(wordId: string, userId?: string) {
+		const word = await this.wordRepository
+			.createQueryBuilder('word')
+			.leftJoin('word.likes', 'like')
+			.where('word.id = :wordId', { wordId })
+			.select([
+				'word.id',
+				'word.name',
+				'word.description',
+				'word.diacritic',
+				'word.pronunciation',
+				'word.wrongPronunciations',
+				'word.exampleSentence',
+				'COUNT(like.id) AS likeCount',
+				'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
+			])
+			.setParameter('userId', userId)
+			.groupBy('word.id')
+			.getRawOne();
+
+		const responseWordDetailDto = plainToInstance(
+			ResponseWordDetailDto,
+			word,
+			{ excludeExtraneousValues: true },
+		);
+		return responseWordDetailDto;
 	}
 
 	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
