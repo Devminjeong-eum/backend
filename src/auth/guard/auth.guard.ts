@@ -1,16 +1,13 @@
 import {
 	CanActivate,
 	ExecutionContext,
-	Inject,
 	Injectable,
 	InternalServerErrorException,
-	LoggerService,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { Response } from 'express';
-import { Logger } from 'winston';
 
 import { UserRepository } from '#databases/repositories/user.repository';
 
@@ -19,7 +16,6 @@ import { AuthService } from '../auth.service';
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
 	constructor(
-		@Inject(Logger) private readonly logger: LoggerService,
 		private readonly authService: AuthService,
 		private readonly configService: ConfigService,
 		private readonly userRepository: UserRepository,
@@ -36,7 +32,7 @@ export class AuthenticationGuard implements CanActivate {
 		const response = context.switchToHttp().getResponse<Response>();
 
 		// NOTE : 원활한 개발을 위해 임시로 생성한 Admin 계정에 접근 가능하도록 하는 Key
-		const { admin_key: requestAdminKey } = request.headers;
+		const { authorization: requestAdminKey } = request.headers;
 		const adminKey = this.configService.get<string>('TEST_ADMIN_KEY');
 
 		if (requestAdminKey && adminKey && requestAdminKey === adminKey) {
@@ -46,12 +42,6 @@ export class AuthenticationGuard implements CanActivate {
 				throw new InternalServerErrorException(
 					'Admin User 정보가 DB 에 존재하지 않습니다.',
 				);
-				
-				this.logger.log({
-					message: 'Admin Request',
-					method: request.method,
-					url: request.url,
-				});
 
 			request.user = adminUser;
 			return true;

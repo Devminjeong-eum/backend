@@ -23,7 +23,7 @@ export class UserInformationInterceptor implements NestInterceptor {
 		const request = context.switchToHttp().getRequest();
 
 		// NOTE : 원활한 개발을 위해 임시로 생성한 Admin 계정에 접근 가능하도록 하는 Key
-		const { admin_key: requestAdminKey } = request.headers;
+		const { authorization: requestAdminKey } = request.headers;
 		const adminKey = this.configService.get<string>('TEST_ADMIN_KEY');
 
 		if (requestAdminKey && adminKey && requestAdminKey === adminKey) {
