@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+import { RankingRepository } from '#/databases/repositories/ranking.repository';
+
 @Injectable()
 export class RankingService {
-  findAll() {
-    return `This action returns all ranking`;
-  }
+	constructor(private readonly rankingRepository: RankingRepository) {}
 
-  findOne(id: number) {
-    return `This action returns a #${id} ranking`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ranking`;
-  }
+	findCurrentRanking() {
+		return `This action returns all ranking`;
+	}
 }
