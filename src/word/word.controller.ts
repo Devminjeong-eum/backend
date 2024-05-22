@@ -66,7 +66,7 @@ export class WordController {
 		@Query() paginationOptionDto: PaginationOptionDto,
 	) {
 		const requestWordListDto = plainToInstance(RequestWordListDto, {
-			userId: user.id,
+			userId: user?.id,
 			page: paginationOptionDto.page,
 			limit: paginationOptionDto.limit,
 		});
@@ -137,7 +137,7 @@ export class WordController {
 	) {
 		const wordSearchDto = plainToInstance(RequestWordSearchDto, {
 			keyword,
-			userId: user.id,
+			userId: user?.id,
 			page: paginationOptionDto.page,
 			limit: paginationOptionDto.limit,
 		});
