@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 
 import { Like } from './like.entity';
+import { Ranking } from './ranking.entity';
 
 @Entity()
 export class Word {
@@ -64,6 +65,10 @@ export class Word {
 	@Exclude()
 	@OneToMany(() => Like, (like) => like.word, { cascade: ['soft-remove'] })
 	wordSearches: Relation<Like>[];
+
+	@Exclude()
+	@OneToMany(() => Ranking, (ranking) => ranking.word)
+	rankings: Ranking[];
 
 	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })
