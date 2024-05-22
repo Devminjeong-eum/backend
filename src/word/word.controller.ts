@@ -164,7 +164,7 @@ export class WordController {
 		@Param('wordId') wordId: string,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
-			userId: user.id,
+			userId: user?.id,
 			wordId,
 		});
 		return await this.wordService.getWordById(wordDetailDto);

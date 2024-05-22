@@ -53,7 +53,8 @@ export class WordRepository {
 
 	async findByIdWithUserLike(wordDetailDto: RequestWordDetailDto) {
 		const { wordId, userId } = wordDetailDto;
-		const word = await this.wordRepository
+
+		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')
 			.where('word.id = :wordId', { wordId })
@@ -66,11 +67,19 @@ export class WordRepository {
 				'word.wrongPronunciations',
 				'word.exampleSentence',
 				'COUNT(like.id) AS likeCount',
-				'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
-			])
-			.setParameter('userId', userId)
-			.groupBy('word.id')
-			.getRawOne();
+			]);
+
+		if (userId) {
+			queryBuilder
+				.addSelect([
+					'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
+				])
+				.setParameter('userId', userId);
+		} else {
+			queryBuilder.addSelect(['false AS isLike']);
+		}
+
+		const word = await queryBuilder.groupBy('word.id').getRawOne();
 
 		const responseWordDetailDto = plainToInstance(
 			ResponseWordDetailDto,
