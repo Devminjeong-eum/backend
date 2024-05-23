@@ -39,9 +39,11 @@ class QuizResultWord {
 
 export class ResponseQuizResultDto {
     @IsUUID()
+	@Expose()
     quizResultId: string;
 
 	@IsNumber()
+	@Expose()
 	score: number;
 
     @Type(() => QuizResultWord)
