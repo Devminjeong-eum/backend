@@ -28,4 +28,8 @@ export class QuizResultRepository {
 
 		return this.quizResultRepository.save(quizResult);
 	}
+
+	async findById(quizResultId: string) {
+		return await this.quizResultRepository.findOneBy({ id: quizResultId });
+	}
 }
