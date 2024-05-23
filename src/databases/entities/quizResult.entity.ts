@@ -16,4 +16,7 @@ export class QuizResult {
   
 	@Column('uuid', { array: true })
 	incorrectWordIds: string[];
+
+	@Column({ type: 'timestamp' })
+	expiredAt: Date;
 }
