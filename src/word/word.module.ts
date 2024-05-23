@@ -24,5 +24,6 @@ import { WordService } from './word.service';
 		// Repository
 		WordRepository,
 	],
+	exports: [WordService, WordRepository],
 })
 export class WordModule {}
