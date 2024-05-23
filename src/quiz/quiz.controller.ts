@@ -38,7 +38,7 @@ export class QuizController {
 	}
 
 	@UseInterceptors(UserInformationInterceptor)
-	@Get('/:quizResultId')
+	@Get('/result/:quizResultId')
 	async findQuizResultById(
 		@AuthenticatedUser() user: User,
 		@Param('quizResultId') quizResultId: string,

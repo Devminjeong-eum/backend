@@ -42,8 +42,10 @@ export class ResponseQuizResultDto {
     quizResultId: string;
 
     @Type(() => QuizResultWord)
-    correctWords: QuizResultWord[];
+    @Expose({ name: 'correctWords' })
+	correctWords: QuizResultWord[];
 
     @Type(() => QuizResultWord)
+	@Expose({ name: 'incorrectWords' })
     incorrectWords: QuizResultWord[];
 }

@@ -60,7 +60,7 @@ export class WordRepository {
 	}) {
 		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
-			.leftJoinAndSelect('word.likes', 'like', 'like.id')
+			.leftJoin('word.likes', 'like')
 			.where('word.id IN (:...wordIdList)', { wordIdList })
 			.select([
 				'word.id',

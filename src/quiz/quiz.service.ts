@@ -5,7 +5,10 @@ import { plainToInstance } from 'class-transformer';
 import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
 import { WordRepository } from '#databases/repositories/word.repository';
 
-import { RequestCreateQuizResultDto } from './dto/create-quiz-result.dto';
+import {
+	RequestCreateQuizResultDto,
+	ResponseCreateQuizResultDto,
+} from './dto/create-quiz-result.dto';
 import {
 	RequestQuizResultDto,
 	ResponseQuizResultDto,
@@ -32,7 +35,16 @@ export class QuizService {
 			);
 		}
 
-		return await this.quizResultRepository.create(createQuizResultDto);
+		const createdQuizResult =
+			await this.quizResultRepository.create(createQuizResultDto);
+
+		const responseCreateQuizResultDto = plainToInstance(
+			ResponseCreateQuizResultDto,
+			createdQuizResult,
+			{ excludeExtraneousValues: true },
+		);
+
+		return responseCreateQuizResultDto;
 	}
 
 	async findQuizResultById(quizResultDto: RequestQuizResultDto) {
@@ -58,11 +70,17 @@ export class QuizService {
 			}),
 		]);
 
-		const responseQuizResultDto = plainToInstance(ResponseQuizResultDto, {
-			id,
-			correctWords,
-			incorrectWords,
-		});
+		const responseQuizResultDto = plainToInstance(
+			ResponseQuizResultDto,
+			{
+				quizResultId: id,
+				correctWords,
+				incorrectWords,
+			},
+			{
+				excludeExtraneousValues: true,
+			},
+		);
 
 		return responseQuizResultDto;
 	}
