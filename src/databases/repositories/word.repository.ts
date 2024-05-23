@@ -51,6 +51,37 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id: wordId });
 	}
 
+	async findByIdListWithUserLike({
+		wordIdList,
+		userId,
+	}: {
+		wordIdList: string[];
+		userId?: string;
+	}) {
+		const queryBuilder = this.wordRepository
+			.createQueryBuilder('word')
+			.leftJoin('word.likes', 'like')
+			.where('word.id IN (:...wordIdList)', { wordIdList })
+			.select([
+				'word.id',
+				'word.name',
+				'word.diacritic',
+				'word.pronunciation',
+			]);
+
+		if (userId) {
+			queryBuilder
+				.addSelect([
+					'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
+				])
+				.setParameters({ userId });
+		} else {
+			queryBuilder.addSelect(['false AS isLike']);
+		}
+
+		return await queryBuilder.groupBy('word.id').getRawMany();
+	}
+
 	async findByIdWithUserLike(wordDetailDto: RequestWordDetailDto) {
 		const { wordId, userId } = wordDetailDto;
 
@@ -74,7 +105,7 @@ export class WordRepository {
 				.addSelect([
 					'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
 				])
-				.setParameter('userId', userId);
+				.setParameters({ userId });
 		} else {
 			queryBuilder.addSelect(['false AS isLike']);
 		}
