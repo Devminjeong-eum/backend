@@ -70,10 +70,13 @@ export class QuizService {
 			}),
 		]);
 
+		const score = correctWordIds.length * 10;
+
 		const responseQuizResultDto = plainToInstance(
 			ResponseQuizResultDto,
 			{
 				quizResultId: id,
+				score,
 				correctWords,
 				incorrectWords,
 			},
