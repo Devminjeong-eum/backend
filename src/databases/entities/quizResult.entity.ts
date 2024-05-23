@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { User } from '#databases/entities/user.entity';
 
@@ -13,7 +19,7 @@ export class QuizResult {
 
 	@Column('uuid', { array: true })
 	correctWordIds: string[];
-  
+
 	@Column('uuid', { array: true })
 	incorrectWordIds: string[];
 

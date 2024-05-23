@@ -48,6 +48,6 @@ export class QuizController {
 			quizResultId,
 		});
 
-    return this.quizService.findQuizResultById(quizResultDto)
+		return this.quizService.findQuizResultById(quizResultDto);
 	}
 }
