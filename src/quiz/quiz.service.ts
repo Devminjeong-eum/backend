@@ -138,6 +138,7 @@ export class QuizService {
 			if (!isExist) {
 				const insertedCellLocation = `${this.SPREAD_SHEET_UUID_ROW}${index}`;
 				await this.spreadSheetService.insertCellData(
+					'quizSelection',
 					insertedCellLocation,
 					quizSelectionEntity.id,
 				);

@@ -52,6 +52,7 @@ export class WordService {
 			if (!isExist) {
 				const insertedCellLocation = `${this.SPREAD_SHEET_UUID_ROW}${index}`;
 				await this.spreadSheetService.insertCellData(
+					'word',
 					insertedCellLocation,
 					wordEntity.id,
 				);

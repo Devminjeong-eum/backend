@@ -33,11 +33,11 @@ export class SpreadSheetService {
 		return google.sheets({ version: 'v4', auth: this.jwtClient });
 	}
 
-	async getRangeCellData(range: string) {
+	async getRangeCellData(sheetName: string, range: string) {
 		const sheets = this.getGoogleSheetConnect();
 		const rangeCells = await sheets.spreadsheets.values.get({
 			spreadsheetId: this.spreadSheetId,
-			range,
+			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
 		});
 
 		const rangeCellValues: string[][] = rangeCells.data.values ?? [];
@@ -45,11 +45,11 @@ export class SpreadSheetService {
 		return rangeCellValues;
 	}
 
-	async insertCellData(range: string, value: string) {
+	async insertCellData(sheetName: string, range: string, value: string) {
 		const sheets = this.getGoogleSheetConnect();
 		const response = await sheets.spreadsheets.values.update({
 			spreadsheetId: this.spreadSheetId,
-			range: `${process.env.NODE_ENV}!${range}`,
+			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
 			valueInputOption: 'RAW',
 			requestBody: {
 				values: [[value]],
@@ -60,8 +60,8 @@ export class SpreadSheetService {
 	}
 
 	async parseWordSpreadSheet() {
-		const spreadSheetRange = `${process.env.NODE_ENV}!A2:Z`;
-		const sheetCellList = await this.getRangeCellData(spreadSheetRange);
+		const spreadSheetRange = `word-${process.env.NODE_ENV}!A2:Z`;
+		const sheetCellList = await this.getRangeCellData('word', spreadSheetRange);
 
 		if (!sheetCellList?.length) return [];
 
@@ -105,7 +105,7 @@ export class SpreadSheetService {
 
 	async parseQuizSelectionSheet() {
 		const spreadSheetRange = `${process.env.NODE_ENV}-QuizSelection!A2:Z`;
-		const sheetCellList = await this.getRangeCellData(spreadSheetRange);
+		const sheetCellList = await this.getRangeCellData('quizSelection', spreadSheetRange);
 
 		if (!sheetCellList?.length) return [];
 
