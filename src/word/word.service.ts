@@ -4,9 +4,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { plainToInstance } from 'class-transformer';
 
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
-import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
 import { WordRepository } from '#databases/repositories/word.repository';
 
+import { RequestCreateWordDto } from './dto/create-word.dto';
 import { RequestUpdateWordDto } from './dto/update-word.dto';
 import { RequestWordDetailDto } from './dto/word-detail.dto';
 import { RequestWordListDto } from './dto/word-list.dto';
@@ -19,6 +19,8 @@ export class WordService {
 		private readonly wordRepository: WordRepository,
 		private readonly spreadSheetService: SpreadSheetService,
 	) {}
+
+	private SPREAD_SHEET_UUID_ROW = 'G';
 
 	/**
 	 * Google Spread SHeet 에서 단어 목록을 파싱하는 메서드 parseWordSpreadSheet
@@ -88,12 +90,12 @@ export class WordService {
 						plainToInstance(RequestUpdateWordDto, wordInformation),
 					)
 				: await this.wordRepository.create(
-						plainToInstance(RequestCreateUserDto, wordInformation),
+						plainToInstance(RequestCreateWordDto, wordInformation),
 					);
 
 			if (!isExist) {
 				await this.spreadSheetService.insertCellData(
-					`G${index}`,
+					`${this.SPREAD_SHEET_UUID_ROW}${index}`,
 					wordEntity.id,
 				);
 			}

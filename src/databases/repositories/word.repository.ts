@@ -5,8 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { DataSource, Repository } from 'typeorm';
 
 import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
-import { Word } from '#/databases/entities/word.entity';
-import { RequestCreateUserDto } from '#/user/dto/create-user.dto';
+import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
 import {
 	RequestWordDetailDto,
@@ -24,6 +23,7 @@ import {
 	RequestWordUserLikeDto,
 	ResponseWordUserLikeDto,
 } from '#/word/dto/word-user-like.dto';
+import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
 export class WordRepository {
@@ -33,7 +33,7 @@ export class WordRepository {
 		private readonly dataSource: DataSource,
 	) {}
 
-	async create(createWordDto: RequestCreateUserDto) {
+	async create(createWordDto: RequestCreateWordDto) {
 		const registeredUser = this.wordRepository.create(createWordDto);
 		return await this.wordRepository.save(registeredUser);
 	}
