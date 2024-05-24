@@ -62,8 +62,8 @@ export class WordService {
 		return true;
 	}
 
-	@Cron(CronExpression.EVERY_3_HOURS, {
-		name: 'update-spread-sheets',
+	@Cron(CronExpression.EVERY_12_HOURS, {
+		name: 'update-word-list',
 		timeZone: 'Asia/Seoul',
 	})
 	async updateWordListBatch() {

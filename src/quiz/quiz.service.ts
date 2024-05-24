@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -129,10 +130,16 @@ export class QuizService {
 			const quizSelectionEntity = isExist
 				? await this.quizSelectionRepository.update(
 						quizSelectionId,
-						plainToInstance(RequestUpdateQuizSelectDto, quizSelectionInformation),
+						plainToInstance(
+							RequestUpdateQuizSelectDto,
+							quizSelectionInformation,
+						),
 					)
 				: await this.quizSelectionRepository.create(
-						plainToInstance(RequestCreateQuizSelectDto, quizSelectionInformation),
+						plainToInstance(
+							RequestCreateQuizSelectDto,
+							quizSelectionInformation,
+						),
 					);
 
 			if (!isExist) {
@@ -146,5 +153,13 @@ export class QuizService {
 		}
 
 		return true;
+	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+		name: 'update-quiz-selections',
+		timeZone: 'Asia/Seoul',
+	})
+	async updateQuizSelectionListBatch() {
+		return await this.updateQuizSelectionList();
 	}
 }
