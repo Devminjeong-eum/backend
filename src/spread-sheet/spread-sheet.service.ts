@@ -33,11 +33,11 @@ export class SpreadSheetService {
 		return google.sheets({ version: 'v4', auth: this.jwtClient });
 	}
 
-	async getRangeCellData() {
+	async getRangeCellData(range: string) {
 		const sheets = this.getGoogleSheetConnect();
 		const rangeCells = await sheets.spreadsheets.values.get({
 			spreadsheetId: this.spreadSheetId,
-			range: `${process.env.NODE_ENV}!A2:Z`,
+			range,
 		});
 
 		const rangeCellValues: string[][] = rangeCells.data.values ?? [];
@@ -57,5 +57,83 @@ export class SpreadSheetService {
 		});
 
 		return response.data.updatedCells ?? 0;
+	}
+
+	async parseWordSpreadSheet() {
+		const spreadSheetRange = `${process.env.NODE_ENV}!A2:Z`;
+		const sheetCellList = await this.getRangeCellData(spreadSheetRange);
+
+		if (!sheetCellList?.length) return [];
+
+		const parseResult =
+			sheetCellList.map(
+				(
+					[
+						name,
+						description,
+						diacritic,
+						pronunciation,
+						wrongPronunciations,
+						exampleSentence,
+						uuid,
+					],
+					index,
+				) => {
+					const diacriticList = diacritic.split(',');
+					const pronunciationList = pronunciation
+						.split(',')
+						.map((word) => word.trim());
+					const wrongPronunciationList = wrongPronunciations
+						.split(',')
+						.map((word) => word.trim());
+
+					return {
+						name,
+						description,
+						diacritic: diacriticList,
+						pronunciation: pronunciationList,
+						wrongPronunciations: wrongPronunciationList,
+						exampleSentence,
+						uuid,
+						index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+					};
+				},
+			) ?? [];
+
+		return parseResult;
+	}
+
+	async parseQuizSelectionSheet() {
+		const spreadSheetRange = `${process.env.NODE_ENV}-QuizSelection!A2:Z`;
+		const sheetCellList = await this.getRangeCellData(spreadSheetRange);
+
+		if (!sheetCellList?.length) return [];
+
+		const parseResult =
+			sheetCellList.map(
+				(
+					[
+						name,
+						correct,
+						rawIncorrectList,
+						quizSelectionId,
+					],
+					index,
+				) => {
+					const incorrectList = rawIncorrectList
+						.split(',')
+						.map((word) => word.trim());
+
+					return {
+						name,
+						correct,
+						incorrectList,
+						quizSelectionId,
+						index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+					};
+				},
+			) ?? [];
+
+		return parseResult;
 	}
 }

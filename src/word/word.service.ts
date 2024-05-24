@@ -23,56 +23,12 @@ export class WordService {
 	private SPREAD_SHEET_UUID_ROW = 'G';
 
 	/**
-	 * Google Spread SHeet 에서 단어 목록을 파싱하는 메서드 parseWordSpreadSheet
-	 */
-	private async parseWordSpreadSheet() {
-		const sheetCellList =
-			(await this.spreadSheetService.getRangeCellData()) ?? [];
-
-		if (!sheetCellList.length) return [];
-
-		const parseResult =
-			sheetCellList.map(
-				(
-					[
-						name,
-						description,
-						diacritic,
-						pronunciation,
-						wrongPronunciations,
-						exampleSentence,
-						uuid,
-					],
-					index,
-				) => {
-					const diacriticList = diacritic.split(',');
-					const pronunciationList = pronunciation
-						.split(',')
-						.map((word) => word.trim());
-					const wrongPronunciationList = wrongPronunciations
-						.split(',')
-						.map((word) => word.trim());
-					return {
-						name,
-						description,
-						diacritic: diacriticList,
-						pronunciation: pronunciationList,
-						wrongPronunciations: wrongPronunciationList,
-						exampleSentence,
-						uuid,
-						index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
-					};
-				},
-			) ?? [];
-
-		return parseResult;
-	}
-
-	/**
 	 * Spread Sheet 데이터를 파싱하여 DB 에 저장하는 매서드 updateWordList
 	 */
 	async updateWordList() {
-		const parsedSheetDataList = await this.parseWordSpreadSheet();
+		const parsedSheetDataList =
+			await this.spreadSheetService.parseWordSpreadSheet();
+
 		if (!parsedSheetDataList.length) return true;
 
 		for await (const {
@@ -94,8 +50,9 @@ export class WordService {
 					);
 
 			if (!isExist) {
+				const insertedCellLocation = `${this.SPREAD_SHEET_UUID_ROW}${index}`;
 				await this.spreadSheetService.insertCellData(
-					`${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					insertedCellLocation,
 					wordEntity.id,
 				);
 			}
