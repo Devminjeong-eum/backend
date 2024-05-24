@@ -38,9 +38,12 @@ export class WordRepository {
 		return await this.wordRepository.save(registeredUser);
 	}
 
-	async update(id: string, updateFieldDto: RequestUpdateWordDto) {
+	async update(
+		id: string,
+		updateFieldDto: RequestUpdateWordDto,
+	): Promise<Word> {
 		const result = await this.wordRepository.update({ id }, updateFieldDto);
-		return result.raw as Word;
+		return result.raw;
 	}
 
 	findByName(name: string) {
