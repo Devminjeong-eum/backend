@@ -16,6 +16,7 @@ import {
 	RequestQuizResultDto,
 	ResponseQuizResultDto,
 } from './dto/quiz-result.dto';
+import { RequestUpdateQuizSelectDto } from './dto/update-quiz-selection.dto';
 
 @Injectable()
 export class QuizService {
@@ -128,7 +129,7 @@ export class QuizService {
 			const quizSelectionEntity = isExist
 				? await this.quizSelectionRepository.update(
 						quizSelectionId,
-						plainToInstance(RequestUpdateWordDto, quizSelectionInformation),
+						plainToInstance(RequestUpdateQuizSelectDto, quizSelectionInformation),
 					)
 				: await this.quizSelectionRepository.create(
 						plainToInstance(RequestCreateQuizSelectDto, quizSelectionInformation),

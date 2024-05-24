@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { RequestCreateQuizSelectDto } from '#/quiz/dto/create-quiz-selection.dto';
+import { RequestUpdateQuizSelectDto } from '#/quiz/dto/update-quiz-selection.dto';
 import { QuizSelection } from '#databases/entities/quizSelection.entity';
 
 @Injectable()
@@ -18,6 +19,17 @@ export class QuizSelectionRepository {
 			this.quizSelectionRepository.create(createQuizSelectDto);
 
 		return this.quizSelectionRepository.save(quizSelection);
+	}
+
+	async update(
+		quizSelectionId: string,
+		updateFieldDto: RequestUpdateQuizSelectDto,
+	): Promise<QuizSelection> {
+		const updateResult = await this.quizSelectionRepository.update(
+			quizSelectionId,
+			updateFieldDto,
+		);
+		return updateResult.raw;
 	}
 
 	findById(quizSelectionId: string) {
