@@ -19,4 +19,25 @@ export class QuizSelectionRepository {
 
 		return this.quizSelectionRepository.save(quizSelection);
 	}
+
+	findById(quizSelectionId: string) {
+		return this.quizSelectionRepository
+			.createQueryBuilder('quizSelection')
+			.where('quizSelection.id = :quizSelectionId', { quizSelectionId })
+			.getOne();
+	}
+
+	findByWordId(wordId: string) {
+		return this.quizSelectionRepository
+			.createQueryBuilder('quizSelection')
+			.leftJoinAndSelect('quizSelection.word', 'word')
+			.where('word.id = :wordId', { wordId })
+			.select([
+				'quizSelection.id',
+				'quizSelection.correct',
+				'quizSelection.incorrectList',
+				'word.id',
+			])
+			.getOne();
+	}
 }

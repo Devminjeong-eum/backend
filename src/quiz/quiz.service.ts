@@ -2,13 +2,16 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { plainToInstance } from 'class-transformer';
 
+import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
 import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
+import { QuizSelectionRepository } from '#databases/repositories/quizSelection.repository';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import {
 	RequestCreateQuizResultDto,
 	ResponseCreateQuizResultDto,
 } from './dto/create-quiz-result.dto';
+import { RequestCreateQuizSelectDto } from './dto/create-quiz-selection.dto';
 import {
 	RequestQuizResultDto,
 	ResponseQuizResultDto,
@@ -17,11 +20,14 @@ import {
 @Injectable()
 export class QuizService {
 	constructor(
+		private readonly spreadSheetService: SpreadSheetService,
 		private readonly quizResultRepository: QuizResultRepository,
+		private readonly quizSelectionRepository: QuizSelectionRepository,
 		private readonly wordRepository: WordRepository,
 	) {}
 
-	private MAX_QUIZ_AMOUNT = 10;
+	private readonly MAX_QUIZ_AMOUNT = 10;
+	private readonly SPREAD_SHEET_UUID_ROW = 'E';
 
 	async createQuizResult(createQuizResultDto: RequestCreateQuizResultDto) {
 		const { correctWordIds, incorrectWordIds } = createQuizResultDto;
@@ -86,5 +92,57 @@ export class QuizService {
 		);
 
 		return responseQuizResultDto;
+	}
+
+	createQuizSelection(createQuizSelectionDto: RequestCreateQuizSelectDto) {
+		return this.quizSelectionRepository.create(createQuizSelectionDto);
+	}
+
+	async findQuizSelectionByWordId(wordId: string) {
+		const quizSelection =
+			await this.quizSelectionRepository.findByWordId(wordId);
+
+		if (!quizSelection) {
+			throw new BadRequestException(
+				'해당 단어 ID 를 가진 퀴즈 선택 데이터가 없습니다.',
+			);
+		}
+
+		return quizSelection;
+	}
+
+	async updateQuizSelectionList() {
+		const parsedSheetDataList =
+			await this.spreadSheetService.parseQuizSelectionSheet();
+
+		if (!parsedSheetDataList.length) return true;
+
+		for await (const {
+			quizSelectionId,
+			index,
+			...quizSelectionInformation
+		} of parsedSheetDataList) {
+			const isExist =
+				await this.quizSelectionRepository.findById(quizSelectionId);
+
+			const quizSelectionEntity = isExist
+				? await this.quizSelectionRepository.update(
+						quizSelectionId,
+						plainToInstance(RequestUpdateWordDto, quizSelectionInformation),
+					)
+				: await this.quizSelectionRepository.create(
+						plainToInstance(RequestCreateQuizSelectDto, quizSelectionInformation),
+					);
+
+			if (!isExist) {
+				const insertedCellLocation = `${this.SPREAD_SHEET_UUID_ROW}${index}`;
+				await this.spreadSheetService.insertCellData(
+					insertedCellLocation,
+					quizSelectionEntity.id,
+				);
+			}
+		}
+
+		return true;
 	}
 }
