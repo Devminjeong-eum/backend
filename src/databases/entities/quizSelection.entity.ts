@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Word } from './word.entity';
 
@@ -8,6 +8,7 @@ export class QuizSelection {
 	id: string;
 
 	@OneToOne(() => Word, { eager: true })
+	@JoinColumn()
 	word: Word;
 
 	@Column({ type: 'varchar' })
