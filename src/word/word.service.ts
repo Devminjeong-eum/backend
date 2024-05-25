@@ -21,7 +21,7 @@ export class WordService {
 	) {}
 
 	private SPREAD_SHEET_UUID_ROW = 'G';
-	private readonly SPREAD_SHEET_NAME = 'word'
+	private readonly SPREAD_SHEET_NAME = 'word';
 	private parseWordFromSpreadSheet = (
 		[
 			name,

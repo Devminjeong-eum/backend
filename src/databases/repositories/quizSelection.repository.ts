@@ -16,8 +16,10 @@ export class QuizSelectionRepository {
 	) {}
 
 	async create(word: Word, createQuizSelectDto: RequestCreateQuizSelectDto) {
-		const quizSelection =
-			this.quizSelectionRepository.create({ word, ...createQuizSelectDto});
+		const quizSelection = this.quizSelectionRepository.create({
+			word,
+			...createQuizSelectDto,
+		});
 		return this.quizSelectionRepository.save(quizSelection);
 	}
 
@@ -60,16 +62,9 @@ export class QuizSelectionRepository {
 	findRandomQuizSelection() {
 		return this.quizSelectionRepository
 			.createQueryBuilder('quizSelection')
-			.select([
-				'quizSelection.correct',
-				'quizSelection.incorrectList',
-			])
+			.select(['quizSelection.correct', 'quizSelection.incorrectList'])
 			.leftJoin('quizSelection.word', 'word')
-			.addSelect([
-				'word.id',
-				'word.name',
-				'word.diacritic',
-			])
+			.addSelect(['word.id', 'word.name', 'word.diacritic'])
 			.orderBy('RANDOM()')
 			.limit(10)
 			.getRawMany();

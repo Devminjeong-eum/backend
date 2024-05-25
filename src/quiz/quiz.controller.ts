@@ -52,7 +52,6 @@ export class QuizController {
 		return this.quizService.findQuizResultById(quizResultDto);
 	}
 
-
 	@Get('/selection')
 	findQuizSelectionRandom() {
 		return this.quizService.findQuizSelectionRandom();
