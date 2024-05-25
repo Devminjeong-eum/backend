@@ -197,8 +197,6 @@ export class WordRepository {
 			queryBuilder.getCount(),
 		]);
 
-		console.log(words.length);
-
 		const responseWordListDto = plainToInstance(
 			ResponseWordListDto,
 			words,
