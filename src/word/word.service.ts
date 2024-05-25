@@ -21,13 +21,46 @@ export class WordService {
 	) {}
 
 	private SPREAD_SHEET_UUID_ROW = 'G';
+	private readonly SPREAD_SHEET_NAME = 'word'
+	private parseWordFromSpreadSheet = (
+		[
+			name,
+			description,
+			diacritic,
+			pronunciation,
+			wrongPronunciations,
+			exampleSentence,
+			uuid,
+		]: string[],
+		index: number,
+	) => {
+		const diacriticList = diacritic.split(',');
+		const pronunciationList = pronunciation
+			.split(',')
+			.map((word) => word.trim());
+		const wrongPronunciationList = wrongPronunciations
+			.split(',')
+			.map((word) => word.trim());
 
-	/**
-	 * Spread Sheet 데이터를 파싱하여 DB 에 저장하는 매서드 updateWordList
-	 */
+		return {
+			name,
+			description,
+			diacritic: diacriticList,
+			pronunciation: pronunciationList,
+			wrongPronunciations: wrongPronunciationList,
+			exampleSentence,
+			uuid,
+			index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+		};
+	};
+
 	async updateWordList() {
 		const parsedSheetDataList =
-			await this.spreadSheetService.parseWordSpreadSheet();
+			await this.spreadSheetService.parseSpreadSheet({
+				sheetName: this.SPREAD_SHEET_NAME,
+				range: 'A2:Z',
+				parseCallback: this.parseWordFromSpreadSheet,
+			});
 
 		if (!parsedSheetDataList.length) return true;
 
@@ -50,12 +83,11 @@ export class WordService {
 					);
 
 			if (!isExist) {
-				const insertedCellLocation = `${this.SPREAD_SHEET_UUID_ROW}${index}`;
-				await this.spreadSheetService.insertCellData(
-					'word',
-					insertedCellLocation,
-					wordEntity.id,
-				);
+				await this.spreadSheetService.insertCellData({
+					sheetName: this.SPREAD_SHEET_NAME,
+					range: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					value: wordEntity.id,
+				});
 			}
 		}
 

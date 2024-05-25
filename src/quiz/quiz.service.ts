@@ -29,7 +29,77 @@ export class QuizService {
 	) {}
 
 	private readonly MAX_QUIZ_AMOUNT = 10;
-	private readonly SPREAD_SHEET_UUID_ROW = 'E';
+	private readonly SPREAD_SHEET_UUID_ROW = 'D';
+	private readonly SPREAD_SHEET_NAME = 'quizSelection'
+	private readonly parseQuizSelectionFromSheet = (
+		[name, correct, rawIncorrectList, quizSelectionId]: string[],
+		index: number,
+	) => {
+		const incorrectList = rawIncorrectList
+			.split(',')
+			.map((word) => word.trim());
+
+		return {
+			name,
+			correct,
+			incorrectList,
+			quizSelectionId,
+			index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+		};
+	};
+
+	async updateQuizSelectionList() {
+		const parsedSheetDataList =
+			await this.spreadSheetService.parseSpreadSheet({
+				sheetName: this.SPREAD_SHEET_NAME,
+				range: 'A2:Z',
+				parseCallback: this.parseQuizSelectionFromSheet,
+			});
+
+		if (!parsedSheetDataList.length) return true;
+
+		for await (const {
+			quizSelectionId,
+			index,
+			...quizSelectionInformation
+		} of parsedSheetDataList) {
+			const isExist =
+				await this.quizSelectionRepository.findById(quizSelectionId);
+
+			const quizSelectionEntity = isExist
+				? await this.quizSelectionRepository.update(
+						quizSelectionId,
+						plainToInstance(
+							RequestUpdateQuizSelectDto,
+							quizSelectionInformation,
+						),
+					)
+				: await this.quizSelectionRepository.create(
+						plainToInstance(
+							RequestCreateQuizSelectDto,
+							quizSelectionInformation,
+						),
+					);
+
+			if (!isExist) {
+				await this.spreadSheetService.insertCellData({
+					sheetName: this.SPREAD_SHEET_NAME,
+					range: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					value: quizSelectionEntity.id,
+				});
+			}
+		}
+
+		return true;
+	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+		name: 'update-quiz-selections',
+		timeZone: 'Asia/Seoul',
+	})
+	async updateQuizSelectionListBatch() {
+		return await this.updateQuizSelectionList();
+	}
 
 	async createQuizResult(createQuizResultDto: RequestCreateQuizResultDto) {
 		const { correctWordIds, incorrectWordIds } = createQuizResultDto;
@@ -111,55 +181,5 @@ export class QuizService {
 		}
 
 		return quizSelection;
-	}
-
-	async updateQuizSelectionList() {
-		const parsedSheetDataList =
-			await this.spreadSheetService.parseQuizSelectionSheet();
-
-		if (!parsedSheetDataList.length) return true;
-
-		for await (const {
-			quizSelectionId,
-			index,
-			...quizSelectionInformation
-		} of parsedSheetDataList) {
-			const isExist =
-				await this.quizSelectionRepository.findById(quizSelectionId);
-
-			const quizSelectionEntity = isExist
-				? await this.quizSelectionRepository.update(
-						quizSelectionId,
-						plainToInstance(
-							RequestUpdateQuizSelectDto,
-							quizSelectionInformation,
-						),
-					)
-				: await this.quizSelectionRepository.create(
-						plainToInstance(
-							RequestCreateQuizSelectDto,
-							quizSelectionInformation,
-						),
-					);
-
-			if (!isExist) {
-				const insertedCellLocation = `${this.SPREAD_SHEET_UUID_ROW}${index}`;
-				await this.spreadSheetService.insertCellData(
-					'quizSelection',
-					insertedCellLocation,
-					quizSelectionEntity.id,
-				);
-			}
-		}
-
-		return true;
-	}
-
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
-		name: 'update-quiz-selections',
-		timeZone: 'Asia/Seoul',
-	})
-	async updateQuizSelectionListBatch() {
-		return await this.updateQuizSelectionList();
 	}
 }

@@ -33,11 +33,19 @@ export class SpreadSheetService {
 		return google.sheets({ version: 'v4', auth: this.jwtClient });
 	}
 
-	async getRangeCellData(sheetName: string, range: string) {
+	async getRangeCellData({
+		sheetName,
+		range,
+	}: {
+		sheetName: string;
+		range: string;
+	}) {
 		const sheets = this.getGoogleSheetConnect();
+		const selectedRange = `${sheetName}-${process.env.NODE_ENV}!${range}`;
+
 		const rangeCells = await sheets.spreadsheets.values.get({
 			spreadsheetId: this.spreadSheetId,
-			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
+			range: selectedRange,
 		});
 
 		const rangeCellValues: string[][] = rangeCells.data.values ?? [];
@@ -45,7 +53,15 @@ export class SpreadSheetService {
 		return rangeCellValues;
 	}
 
-	async insertCellData(sheetName: string, range: string, value: string) {
+	async insertCellData({
+		sheetName,
+		range,
+		value,
+	}: {
+		sheetName: string;
+		range: string;
+		value: string;
+	}) {
 		const sheets = this.getGoogleSheetConnect();
 		const response = await sheets.spreadsheets.values.update({
 			spreadsheetId: this.spreadSheetId,
@@ -59,81 +75,17 @@ export class SpreadSheetService {
 		return response.data.updatedCells ?? 0;
 	}
 
-	async parseWordSpreadSheet() {
-		const spreadSheetRange = `word-${process.env.NODE_ENV}!A2:Z`;
-		const sheetCellList = await this.getRangeCellData('word', spreadSheetRange);
+	async parseSpreadSheet<T extends (...args: any[]) => any>({
+		sheetName,
+		range,
+		parseCallback,
+	}: {
+		sheetName: string;
+		range: string;
+		parseCallback: T;
+	}): Promise<Array<ReturnType<T>>> {
+		const sheetCellList = await this.getRangeCellData({ sheetName, range });
 
-		if (!sheetCellList?.length) return [];
-
-		const parseResult =
-			sheetCellList.map(
-				(
-					[
-						name,
-						description,
-						diacritic,
-						pronunciation,
-						wrongPronunciations,
-						exampleSentence,
-						uuid,
-					],
-					index,
-				) => {
-					const diacriticList = diacritic.split(',');
-					const pronunciationList = pronunciation
-						.split(',')
-						.map((word) => word.trim());
-					const wrongPronunciationList = wrongPronunciations
-						.split(',')
-						.map((word) => word.trim());
-
-					return {
-						name,
-						description,
-						diacritic: diacriticList,
-						pronunciation: pronunciationList,
-						wrongPronunciations: wrongPronunciationList,
-						exampleSentence,
-						uuid,
-						index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
-					};
-				},
-			) ?? [];
-
-		return parseResult;
-	}
-
-	async parseQuizSelectionSheet() {
-		const spreadSheetRange = `${process.env.NODE_ENV}-QuizSelection!A2:Z`;
-		const sheetCellList = await this.getRangeCellData('quizSelection', spreadSheetRange);
-
-		if (!sheetCellList?.length) return [];
-
-		const parseResult =
-			sheetCellList.map(
-				(
-					[
-						name,
-						correct,
-						rawIncorrectList,
-						quizSelectionId,
-					],
-					index,
-				) => {
-					const incorrectList = rawIncorrectList
-						.split(',')
-						.map((word) => word.trim());
-
-					return {
-						name,
-						correct,
-						incorrectList,
-						quizSelectionId,
-						index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
-					};
-				},
-			) ?? [];
-
-		return parseResult;
+		return sheetCellList.length ? sheetCellList.map(parseCallback) : [];
 	}
 }
