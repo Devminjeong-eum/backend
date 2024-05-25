@@ -127,33 +127,34 @@ export class WordRepository {
 			.createQueryBuilder('word')
 			.where('word.name like :keyword', { keyword: `${keyword}%` });
 
-		const totalCount = await queryBuilder.getCount();
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.leftJoinAndSelect(
+					'word.likes',
+					'like',
+					userId ? 'like.userId = :userId' : '',
+					{ userId },
+				)
+				.select([
+					'word.id',
+					'word.name',
+					'word.pronunciation',
+					'word.diacritic',
+					'word.description',
+					'word.createdAt',
+					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+				])
+				.orderBy('word.createdAt', 'ASC')
+				.offset(requestWordSearchDto.getSkip())
+				.limit(requestWordSearchDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
 
 		const paginationMeta = new PaginationMetaDto({
 			paginationOption: requestWordSearchDto,
 			totalCount,
 		});
-
-		const words = await queryBuilder
-			.leftJoinAndSelect(
-				'word.likes',
-				'like',
-				userId ? 'like.userId = :userId' : '',
-				{ userId },
-			)
-			.select([
-				'word.id',
-				'word.name',
-				'word.pronunciation',
-				'word.diacritic',
-				'word.description',
-				'word.createdAt',
-				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
-			])
-			.orderBy('word.createdAt', 'ASC')
-			.skip(requestWordSearchDto.getSkip())
-			.take(requestWordSearchDto.limit)
-			.getRawMany();
 
 		const responseWordSearchDto = plainToInstance(
 			ResponseWordSearchDto,
@@ -166,40 +167,45 @@ export class WordRepository {
 
 	async findWithList(requestWordListDto: RequestWordListDto) {
 		const { userId } = requestWordListDto;
-		const totalCount = this.dataSource.getMetadata(Word).columns.length;
 
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordListDto,
-			totalCount,
-		});
+		const queryBuilder = this.wordRepository.createQueryBuilder('word');
 
-		const words = await this.wordRepository
-			.createQueryBuilder('word')
-			.leftJoinAndSelect(
-				'word.likes',
-				'like',
-				userId ? 'like.userId = :userId' : '',
-				{ userId },
-			)
-			.select([
-				'word.id',
-				'word.name',
-				'word.pronunciation',
-				'word.diacritic',
-				'word.description',
-				'word.createdAt',
-				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
-			])
-			.orderBy('word.createdAt', 'ASC')
-			.skip(paginationMeta.skip)
-			.take(paginationMeta.limit)
-			.getRawMany();
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.leftJoinAndSelect(
+					'word.likes',
+					'like',
+					userId ? 'like.userId = :userId' : '',
+					{ userId },
+				)
+				.select([
+					'word.id',
+					'word.name',
+					'word.pronunciation',
+					'word.diacritic',
+					'word.description',
+					'word.createdAt',
+					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+				])
+				.orderBy('word.createdAt', 'ASC')
+				.offset(requestWordListDto.getSkip())
+				.limit(requestWordListDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
+
+		console.log(words.length);
 
 		const responseWordListDto = plainToInstance(
 			ResponseWordListDto,
 			words,
 			{ excludeExtraneousValues: true },
 		);
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordListDto,
+			totalCount,
+		});
 
 		return new PaginationDto(responseWordListDto, paginationMeta);
 	}
