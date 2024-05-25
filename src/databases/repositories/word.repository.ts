@@ -51,6 +51,37 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id: wordId });
 	}
 
+	async findByIdListWithUserLike({
+		wordIdList,
+		userId,
+	}: {
+		wordIdList: string[];
+		userId?: string;
+	}) {
+		const queryBuilder = this.wordRepository
+			.createQueryBuilder('word')
+			.leftJoin('word.likes', 'like')
+			.where('word.id IN (:...wordIdList)', { wordIdList })
+			.select([
+				'word.id',
+				'word.name',
+				'word.diacritic',
+				'word.pronunciation',
+			]);
+
+		if (userId) {
+			queryBuilder
+				.addSelect([
+					'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
+				])
+				.setParameters({ userId });
+		} else {
+			queryBuilder.addSelect(['false AS isLike']);
+		}
+
+		return await queryBuilder.groupBy('word.id').getRawMany();
+	}
+
 	async findByIdWithUserLike(wordDetailDto: RequestWordDetailDto) {
 		const { wordId, userId } = wordDetailDto;
 
@@ -74,7 +105,7 @@ export class WordRepository {
 				.addSelect([
 					'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
 				])
-				.setParameter('userId', userId);
+				.setParameters({ userId });
 		} else {
 			queryBuilder.addSelect(['false AS isLike']);
 		}
@@ -96,33 +127,34 @@ export class WordRepository {
 			.createQueryBuilder('word')
 			.where('word.name like :keyword', { keyword: `${keyword}%` });
 
-		const totalCount = await queryBuilder.getCount();
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.leftJoinAndSelect(
+					'word.likes',
+					'like',
+					userId ? 'like.userId = :userId' : '',
+					{ userId },
+				)
+				.select([
+					'word.id',
+					'word.name',
+					'word.pronunciation',
+					'word.diacritic',
+					'word.description',
+					'word.createdAt',
+					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+				])
+				.orderBy('word.createdAt', 'ASC')
+				.offset(requestWordSearchDto.getSkip())
+				.limit(requestWordSearchDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
 
 		const paginationMeta = new PaginationMetaDto({
 			paginationOption: requestWordSearchDto,
 			totalCount,
 		});
-
-		const words = await queryBuilder
-			.leftJoinAndSelect(
-				'word.likes',
-				'like',
-				userId ? 'like.userId = :userId' : '',
-				{ userId },
-			)
-			.select([
-				'word.id',
-				'word.name',
-				'word.pronunciation',
-				'word.diacritic',
-				'word.description',
-				'word.createdAt',
-				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
-			])
-			.orderBy('word.createdAt', 'ASC')
-			.skip(requestWordSearchDto.getSkip())
-			.take(requestWordSearchDto.limit)
-			.getRawMany();
 
 		const responseWordSearchDto = plainToInstance(
 			ResponseWordSearchDto,
@@ -135,40 +167,45 @@ export class WordRepository {
 
 	async findWithList(requestWordListDto: RequestWordListDto) {
 		const { userId } = requestWordListDto;
-		const totalCount = this.dataSource.getMetadata(Word).columns.length;
 
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordListDto,
-			totalCount,
-		});
+		const queryBuilder = this.wordRepository.createQueryBuilder('word');
 
-		const words = await this.wordRepository
-			.createQueryBuilder('word')
-			.leftJoinAndSelect(
-				'word.likes',
-				'like',
-				userId ? 'like.userId = :userId' : '',
-				{ userId },
-			)
-			.select([
-				'word.id',
-				'word.name',
-				'word.pronunciation',
-				'word.diacritic',
-				'word.description',
-				'word.createdAt',
-				'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
-			])
-			.orderBy('word.createdAt', 'ASC')
-			.skip(paginationMeta.skip)
-			.take(paginationMeta.limit)
-			.getRawMany();
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.leftJoinAndSelect(
+					'word.likes',
+					'like',
+					userId ? 'like.userId = :userId' : '',
+					{ userId },
+				)
+				.select([
+					'word.id',
+					'word.name',
+					'word.pronunciation',
+					'word.diacritic',
+					'word.description',
+					'word.createdAt',
+					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+				])
+				.orderBy('word.createdAt', 'ASC')
+				.offset(requestWordListDto.getSkip())
+				.limit(requestWordListDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
+
+		console.log(words.length);
 
 		const responseWordListDto = plainToInstance(
 			ResponseWordListDto,
 			words,
 			{ excludeExtraneousValues: true },
 		);
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordListDto,
+			totalCount,
+		});
 
 		return new PaginationDto(responseWordListDto, paginationMeta);
 	}

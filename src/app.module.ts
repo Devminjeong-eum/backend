@@ -14,6 +14,7 @@ import { LoggerMiddleware } from '#middlewares/logger.middleware';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { LikeModule } from './like/like.module';
+import { QuizModule } from './quiz/quiz.module';
 import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
 
@@ -31,6 +32,7 @@ import { WordModule } from './word/word.module';
 		AuthModule,
 		WordModule,
 		LikeModule,
+		QuizModule,
 	],
 	controllers: [AppController],
 	providers: [Logger],
