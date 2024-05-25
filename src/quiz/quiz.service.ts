@@ -21,6 +21,7 @@ import {
 	RequestQuizResultDto,
 	ResponseQuizResultDto,
 } from './dto/quiz-result.dto';
+import { ResponseQuizSelectionDto } from './dto/quiz-selection.dto';
 import { RequestUpdateQuizSelectDto } from './dto/update-quiz-selection.dto';
 
 @Injectable()
@@ -87,8 +88,8 @@ export class QuizService {
 						}),
 					)
 				: await this.quizSelectionRepository.create(
+						word,
 						plainToInstance(RequestCreateQuizSelectDto, {
-							wordId: word.id,
 							correct,
 							incorrectList,
 						}),
@@ -179,10 +180,6 @@ export class QuizService {
 		return responseQuizResultDto;
 	}
 
-	createQuizSelection(createQuizSelectionDto: RequestCreateQuizSelectDto) {
-		return this.quizSelectionRepository.create(createQuizSelectionDto);
-	}
-
 	async findQuizSelectionByWordId(wordId: string) {
 		const quizSelection =
 			await this.quizSelectionRepository.findByWordId(wordId);
@@ -194,5 +191,18 @@ export class QuizService {
 		}
 
 		return quizSelection;
+	}
+
+	async findQuizSelectionRandom() {
+		const quizSelectionList =
+			await this.quizSelectionRepository.findRandomQuizSelection();
+
+		const responseQuizSelectionDto = plainToInstance(
+			ResponseQuizSelectionDto,
+			quizSelectionList,
+			{ excludeExtraneousValues: true },
+		);
+
+		return responseQuizSelectionDto;
 	}
 }
