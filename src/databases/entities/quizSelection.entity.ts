@@ -10,9 +10,9 @@ export class QuizSelection {
 	@OneToOne(() => Word, { eager: true })
 	word: Word;
 
-	@Column()
+	@Column({ type: 'varchar' })
 	correct: string;
 
-	@Column({ array: true })
+	@Column({ type: 'varchar', array: true })
 	incorrectList: string[];
 }
