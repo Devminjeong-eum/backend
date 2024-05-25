@@ -3,6 +3,7 @@ import {
 	Controller,
 	Get,
 	Param,
+	Patch,
 	Post,
 	UseGuards,
 	UseInterceptors,
@@ -49,5 +50,11 @@ export class QuizController {
 		});
 
 		return this.quizService.findQuizResultById(quizResultDto);
+	}
+
+	@UseGuards(AuthenticationGuard)
+	@Patch('/selection/spread-sheet')
+	patchUpdateSpreadSheet() {
+		return this.quizService.updateQuizSelectionList();
 	}
 }

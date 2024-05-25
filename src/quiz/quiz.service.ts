@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { plainToInstance } from 'class-transformer';
@@ -30,9 +34,9 @@ export class QuizService {
 
 	private readonly MAX_QUIZ_AMOUNT = 10;
 	private readonly SPREAD_SHEET_UUID_ROW = 'D';
-	private readonly SPREAD_SHEET_NAME = 'quizSelection'
+	private readonly SPREAD_SHEET_NAME = 'quizSelection';
 	private readonly parseQuizSelectionFromSheet = (
-		[name, correct, rawIncorrectList, quizSelectionId]: string[],
+		[name, correct, rawIncorrectList, uuid]: string[],
 		index: number,
 	) => {
 		const incorrectList = rawIncorrectList
@@ -43,7 +47,7 @@ export class QuizService {
 			name,
 			correct,
 			incorrectList,
-			quizSelectionId,
+			uuid,
 			index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
 		};
 	};
@@ -59,26 +63,35 @@ export class QuizService {
 		if (!parsedSheetDataList.length) return true;
 
 		for await (const {
-			quizSelectionId,
+			name,
+			correct,
+			incorrectList,
+			uuid,
 			index,
-			...quizSelectionInformation
 		} of parsedSheetDataList) {
-			const isExist =
-				await this.quizSelectionRepository.findById(quizSelectionId);
+			const word = await this.wordRepository.findByName(name);
+
+			if (!word)
+				throw new InternalServerErrorException(
+					`${name} 단어는 현재 Word 에 저장되어 있지 않습니다.`,
+				);
+
+			const isExist = await this.quizSelectionRepository.findById(uuid);
 
 			const quizSelectionEntity = isExist
 				? await this.quizSelectionRepository.update(
-						quizSelectionId,
-						plainToInstance(
-							RequestUpdateQuizSelectDto,
-							quizSelectionInformation,
-						),
+						uuid,
+						plainToInstance(RequestUpdateQuizSelectDto, {
+							correct,
+							incorrectList,
+						}),
 					)
 				: await this.quizSelectionRepository.create(
-						plainToInstance(
-							RequestCreateQuizSelectDto,
-							quizSelectionInformation,
-						),
+						plainToInstance(RequestCreateQuizSelectDto, {
+							wordId: word.id,
+							correct,
+							incorrectList,
+						}),
 					);
 
 			if (!isExist) {
