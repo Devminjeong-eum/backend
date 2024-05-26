@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ResponseUserInformationDto {
 	@ApiProperty()
@@ -12,7 +12,7 @@ export class ResponseUserInformationDto {
 
 	@ApiProperty()
 	socialType: string;
-	
+
 	@ApiProperty()
 	createdAt: Date;
 

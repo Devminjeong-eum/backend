@@ -23,9 +23,12 @@ import {
 	RequestCreateQuizResultDto,
 	ResponseCreateQuizResultDto,
 } from './dto/create-quiz-result.dto';
-import { RequestQuizResultDto, ResponseQuizResultDto } from './dto/quiz-result.dto';
-import { QuizService } from './quiz.service';
+import {
+	RequestQuizResultDto,
+	ResponseQuizResultDto,
+} from './dto/quiz-result.dto';
 import { ResponseQuizSelectionDto } from './dto/quiz-selection.dto';
+import { QuizService } from './quiz.service';
 
 @ApiTags('Quiz')
 @Controller('quiz')

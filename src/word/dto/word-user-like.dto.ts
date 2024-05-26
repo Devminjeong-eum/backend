@@ -1,8 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 import { Exclude } from 'class-transformer';
 import { IsArray, IsString, IsUUID } from 'class-validator';
 
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class RequestWordUserLikeDto extends PaginationOptionDto {
 	@IsUUID()
@@ -31,14 +32,14 @@ export class ResponseWordUserLikeDto {
 	@IsArray()
 	@ApiProperty({
 		type: String,
-		isArray: true
+		isArray: true,
 	})
 	diacritic: string[];
 
 	@IsArray()
 	@ApiProperty({
 		type: String,
-		isArray: true
+		isArray: true,
 	})
 	pronunciation: string[];
 

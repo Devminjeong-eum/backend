@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Expose, Transform, Type } from 'class-transformer';
 import {
 	IsBoolean,
