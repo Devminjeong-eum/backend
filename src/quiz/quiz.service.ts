@@ -1,27 +1,119 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { plainToInstance } from 'class-transformer';
 
+import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
 import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
+import { QuizSelectionRepository } from '#databases/repositories/quizSelection.repository';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import {
 	RequestCreateQuizResultDto,
 	ResponseCreateQuizResultDto,
 } from './dto/create-quiz-result.dto';
+import { RequestCreateQuizSelectDto } from './dto/create-quiz-selection.dto';
 import {
 	RequestQuizResultDto,
 	ResponseQuizResultDto,
 } from './dto/quiz-result.dto';
+import { ResponseQuizSelectionDto } from './dto/quiz-selection.dto';
+import { RequestUpdateQuizSelectDto } from './dto/update-quiz-selection.dto';
 
 @Injectable()
 export class QuizService {
 	constructor(
+		private readonly spreadSheetService: SpreadSheetService,
 		private readonly quizResultRepository: QuizResultRepository,
+		private readonly quizSelectionRepository: QuizSelectionRepository,
 		private readonly wordRepository: WordRepository,
 	) {}
 
-	private MAX_QUIZ_AMOUNT = 10;
+	private readonly MAX_QUIZ_AMOUNT = 10;
+	private readonly SPREAD_SHEET_UUID_ROW = 'D';
+	private readonly SPREAD_SHEET_NAME = 'quizSelection';
+	private readonly parseQuizSelectionFromSheet = (
+		[name, correct, rawIncorrectList, uuid]: string[],
+		index: number,
+	) => {
+		const incorrectList = rawIncorrectList
+			.split(',')
+			.map((word) => word.trim());
+
+		return {
+			name,
+			correct,
+			incorrectList,
+			uuid,
+			index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+		};
+	};
+
+	async updateQuizSelectionList() {
+		const parsedSheetDataList =
+			await this.spreadSheetService.parseSpreadSheet({
+				sheetName: this.SPREAD_SHEET_NAME,
+				range: 'A2:Z',
+				parseCallback: this.parseQuizSelectionFromSheet,
+			});
+
+		if (!parsedSheetDataList.length) return true;
+
+		for await (const {
+			name,
+			correct,
+			incorrectList,
+			uuid,
+			index,
+		} of parsedSheetDataList) {
+			const word = await this.wordRepository.findByName(name);
+
+			if (!word)
+				throw new InternalServerErrorException(
+					`${name} 단어는 현재 Word 에 저장되어 있지 않습니다.`,
+				);
+
+			const isExist = await this.quizSelectionRepository.findById(uuid);
+
+			const quizSelectionEntity = isExist
+				? await this.quizSelectionRepository.update(
+						uuid,
+						plainToInstance(RequestUpdateQuizSelectDto, {
+							correct,
+							incorrectList,
+						}),
+					)
+				: await this.quizSelectionRepository.create(
+						word,
+						plainToInstance(RequestCreateQuizSelectDto, {
+							correct,
+							incorrectList,
+						}),
+					);
+
+			if (!isExist) {
+				await this.spreadSheetService.insertCellData({
+					sheetName: this.SPREAD_SHEET_NAME,
+					range: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					value: quizSelectionEntity.id,
+				});
+			}
+		}
+
+		return true;
+	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+		name: 'update-quiz-selections',
+		timeZone: 'Asia/Seoul',
+	})
+	async updateQuizSelectionListBatch() {
+		return await this.updateQuizSelectionList();
+	}
 
 	async createQuizResult(createQuizResultDto: RequestCreateQuizResultDto) {
 		const { correctWordIds, incorrectWordIds } = createQuizResultDto;
@@ -86,5 +178,31 @@ export class QuizService {
 		);
 
 		return responseQuizResultDto;
+	}
+
+	async findQuizSelectionByWordId(wordId: string) {
+		const quizSelection =
+			await this.quizSelectionRepository.findByWordId(wordId);
+
+		if (!quizSelection) {
+			throw new BadRequestException(
+				'해당 단어 ID 를 가진 퀴즈 선택 데이터가 없습니다.',
+			);
+		}
+
+		return quizSelection;
+	}
+
+	async findQuizSelectionRandom() {
+		const quizSelectionList =
+			await this.quizSelectionRepository.findRandomQuizSelection();
+
+		const responseQuizSelectionDto = plainToInstance(
+			ResponseQuizSelectionDto,
+			quizSelectionList,
+			{ excludeExtraneousValues: true },
+		);
+
+		return responseQuizSelectionDto;
 	}
 }
