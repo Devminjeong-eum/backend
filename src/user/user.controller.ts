@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpStatus,
+	Param,
+	Patch,
+	UseGuards,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
+import { ApiDocs } from '#/common/decorators/swagger.decorator';
 import { User } from '#databases/entities/user.entity';
 
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
@@ -14,18 +23,12 @@ import { UserService } from './user.service';
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: '자기 자신의 유저 정보를 열람합니다',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공 시 받을 응답',
-		type: ResponseUserInformationDto,
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공 시',
-		type: User,
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: User,
+		},
 	})
 	@Get()
 	@UseGuards(AuthenticationGuard)
@@ -34,25 +37,25 @@ export class UserController {
 		return this.userService.getUserInformation(userId);
 	}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: '특정 ID 를 가진 유저 정보를 조회합니다',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공 시',
-		type: User,
+		params: {
+			name: 'userId',
+			required: true,
+			description: '조회할 유저 UUID (id)',
+		},
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseUserInformationDto,
+		},
 	})
 	@Get(':userId')
 	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation(userId);
 	}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: '특정 ID 를 가진 유저의 닉네임을 수정합니다',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공 시 받을 응답',
 	})
 	@Patch('/nickname')
 	patchChangeNickname(
