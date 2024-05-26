@@ -103,7 +103,7 @@ export class PaginationMetaDto {
 
 export class PaginationOptionDto {
 	@ApiProperty({
-		description: '조회할 페이지',
+		description: '데이터를 조회할 페이지',
 		type: Number,
 		required: false,
 		default: 1,
@@ -119,7 +119,7 @@ export class PaginationOptionDto {
 		description: '페이지 당 제공할 데이터 수량',
 		type: Number,
 		required: false,
-		default: 1,
+		default: 10,
 		minimum: 1,
 		maximum: 50,
 	})
