@@ -1,5 +1,7 @@
 import { HttpStatus, Type, applyDecorators } from '@nestjs/common';
 import {
+	ApiBody,
+	ApiBodyOptions,
 	ApiExtraModels,
 	ApiHeader,
 	ApiHeaderOptions,
@@ -20,6 +22,7 @@ interface ApiDocsParams {
 	headers?: ApiHeaderOptions[] | ApiHeaderOptions;
 	params?: ApiParamOptions[] | ApiParamOptions;
 	query?: ApiQueryOptions[] | ApiQueryOptions;
+	body?: ApiBodyOptions;
 	response?: {
 		statusCode: HttpStatus;
 		schema: Type<any>;
@@ -56,6 +59,14 @@ export const ApiDocs = (apiDocs: ApiDocsParams) => {
 					appliedDecorators.push(ApiQuery(queryOption)),
 				)
 			: appliedDecorators.push(ApiQuery(apiDocs.query));
+	}
+
+	if (apiDocs.body) {
+		Array.isArray(apiDocs.body)
+			? apiDocs.body.map((bodyOption) =>
+					appliedDecorators.push(ApiBody(bodyOption)),
+				)
+			: appliedDecorators.push(ApiBody(apiDocs.body));
 	}
 
 	if (apiDocs.response) {

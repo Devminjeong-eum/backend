@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import {
 	IsBoolean,
@@ -46,17 +47,21 @@ class QuizResultWord {
 export class ResponseQuizResultDto {
 	@IsUUID()
 	@Expose()
+	@ApiProperty()
 	quizResultId: string;
 
 	@IsNumber()
 	@Expose()
+	@ApiProperty()
 	score: number;
 
 	@Type(() => QuizResultWord)
 	@Expose({ name: 'correctWords' })
+	@ApiProperty()
 	correctWords: QuizResultWord[];
 
 	@Type(() => QuizResultWord)
 	@Expose({ name: 'incorrectWords' })
+	@ApiProperty()
 	incorrectWords: QuizResultWord[];
 }
