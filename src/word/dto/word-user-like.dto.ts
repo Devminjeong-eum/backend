@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 import { Exclude } from 'class-transformer';
 import { IsArray, IsString, IsUUID } from 'class-validator';
 
@@ -10,18 +12,35 @@ export class RequestWordUserLikeDto extends PaginationOptionDto {
 
 export class ResponseWordUserLikeDto {
 	@IsUUID()
+	@ApiProperty({
+		type: String,
+	})
 	id: string;
 
 	@IsString()
+	@ApiProperty({
+		type: String,
+	})
 	name: string;
 
 	@IsString()
+	@ApiProperty({
+		type: String,
+	})
 	description: string;
 
 	@IsArray()
+	@ApiProperty({
+		type: String,
+		isArray: true,
+	})
 	diacritic: string[];
 
 	@IsArray()
+	@ApiProperty({
+		type: String,
+		isArray: true,
+	})
 	pronunciation: string[];
 
 	@Exclude()

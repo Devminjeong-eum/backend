@@ -1,35 +1,33 @@
 import {
 	Controller,
 	Get,
+	HttpStatus,
 	Param,
 	Patch,
 	Query,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
-import {
-	ApiOperation,
-	ApiParam,
-	ApiQuery,
-	ApiResponse,
-	ApiTags,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
-import {
-	PaginationDto,
-	PaginationOptionDto,
-} from '#/common/dto/pagination.dto';
+import { ApiDocs } from '#/common/decorators/swagger.decorator';
+import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 import { UserInformationInterceptor } from '#/user/interceptors/user-information.interceptor';
 import { User } from '#databases/entities/user.entity';
-import { Word } from '#databases/entities/word.entity';
 
-import { RequestWordDetailDto } from './dto/word-detail.dto';
+import {
+	RequestWordDetailDto,
+	ResponseWordDetailDto,
+} from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
-import { RequestWordSearchDto } from './dto/word-search.dto';
+import {
+	RequestWordSearchDto,
+	ResponseWordSearchDto,
+} from './dto/word-search.dto';
 import {
 	RequestWordUserLikeDto,
 	ResponseWordUserLikeDto,
@@ -41,23 +39,13 @@ import { WordService } from './word.service';
 export class WordController {
 	constructor(private readonly wordService: WordService) {}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: '현재 등록된 단어 목록을 조회합니다.',
-	})
-	@ApiQuery({
-		name: 'page',
-		required: false,
-		description: '요청할 페이지',
-	})
-	@ApiQuery({
-		name: 'limit',
-		required: false,
-		description: '페이지 당 요청할 자료 수',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공시',
-		type: PaginationDto<ResponseWordListDto>,
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseWordListDto,
+			isPaginated: true,
+		},
 	})
 	@UseInterceptors(UserInformationInterceptor)
 	@Get('/list')
@@ -73,23 +61,13 @@ export class WordController {
 		return await this.wordService.getWordList(requestWordListDto);
 	}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: '유저가 좋아요를 누른 단어 목록을 조회합니다.',
-	})
-	@ApiQuery({
-		name: 'page',
-		required: false,
-		description: '요청할 페이지',
-	})
-	@ApiQuery({
-		name: 'limit',
-		required: false,
-		description: '페이지 당 요청할 자료 수',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공시',
-		type: PaginationDto<ResponseWordUserLikeDto>,
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseWordUserLikeDto,
+			isPaginated: true,
+		},
 	})
 	@UseGuards(AuthenticationGuard)
 	@Get('/like')
@@ -105,57 +83,41 @@ export class WordController {
 		return await this.wordService.getWordUserLike(wordUserLikeDto);
 	}
 
-	@ApiOperation({
-		summary: '특정 키워드에 부합하는 단어 목록을 조회합니다.',
-	})
-	@ApiQuery({
-		name: 'keyword',
-		required: false,
-		description: '검색 키워드',
-	})
-	@ApiQuery({
-		name: 'page',
-		required: false,
-		description: '요청할 페이지',
-	})
-	@ApiQuery({
-		name: 'limit',
-		required: false,
-		description: '페이지 당 요청할 자료 수',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공시',
-		type: PaginationDto<Word>,
+	@ApiDocs({
+		summary: '특정 키워드 검색에 대한 단어 목록을 조회합니다.',
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseWordSearchDto,
+			isPaginated: true,
+		},
 	})
 	@UseInterceptors(UserInformationInterceptor)
 	@Get('/search')
 	async findBySearch(
 		@AuthenticatedUser() user: User,
-		@Query('keyword') keyword: string,
-		@Query() paginationOptionDto: PaginationOptionDto,
+		@Query() requestWordSearchDto: RequestWordSearchDto,
 	) {
 		const wordSearchDto = plainToInstance(RequestWordSearchDto, {
-			keyword,
 			userId: user?.id,
-			page: paginationOptionDto.page,
-			limit: paginationOptionDto.limit,
+			keyword: requestWordSearchDto.keyword,
+			page: requestWordSearchDto.page,
+			limit: requestWordSearchDto.limit,
 		});
 
 		return await this.wordService.getWordByKeyword(wordSearchDto);
 	}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: '특정 Word Id 를 가진 단어의 상세 정보를 열람합니다.',
-	})
-	@ApiParam({
-		name: 'wordId',
-		required: false,
-		description: '조회할 Word UUID (id)',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '요청 성공시',
+		params: {
+			name: 'wordId',
+			required: true,
+			description: '조회할 Word UUID (id)',
+		},
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseWordDetailDto,
+		},
 	})
 	@Get('/:wordId')
 	@UseInterceptors(UserInformationInterceptor)
@@ -170,14 +132,14 @@ export class WordController {
 		return await this.wordService.getWordById(wordDetailDto);
 	}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary:
-			'데브말싸미 Google Spread Sheet 를 기반으로 단어 목록을 갱신합니다..',
-	})
-	@ApiResponse({
-		status: 200,
-		type: Boolean,
-		description: '요청 성공시',
+			'데브말싸미 Google Spread Sheet 를 기반으로 단어 목록을 갱신합니다.',
+		headers: {
+			name: 'Authorization',
+			required: true,
+			description: '어드민 전용 Api Key',
+		},
 	})
 	@Patch('/spread-sheet')
 	async patchUpdateSpreadSheet() {

@@ -33,11 +33,19 @@ export class SpreadSheetService {
 		return google.sheets({ version: 'v4', auth: this.jwtClient });
 	}
 
-	async getRangeCellData() {
+	async getRangeCellData({
+		sheetName,
+		range,
+	}: {
+		sheetName: string;
+		range: string;
+	}) {
 		const sheets = this.getGoogleSheetConnect();
+		const selectedRange = `${sheetName}-${process.env.NODE_ENV}!${range}`;
+
 		const rangeCells = await sheets.spreadsheets.values.get({
 			spreadsheetId: this.spreadSheetId,
-			range: `${process.env.NODE_ENV}!A2:Z`,
+			range: selectedRange,
 		});
 
 		const rangeCellValues: string[][] = rangeCells.data.values ?? [];
@@ -45,11 +53,19 @@ export class SpreadSheetService {
 		return rangeCellValues;
 	}
 
-	async insertCellData(range: string, value: string) {
+	async insertCellData({
+		sheetName,
+		range,
+		value,
+	}: {
+		sheetName: string;
+		range: string;
+		value: string;
+	}) {
 		const sheets = this.getGoogleSheetConnect();
 		const response = await sheets.spreadsheets.values.update({
 			spreadsheetId: this.spreadSheetId,
-			range: `${process.env.NODE_ENV}!${range}`,
+			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
 			valueInputOption: 'RAW',
 			requestBody: {
 				values: [[value]],
@@ -57,5 +73,19 @@ export class SpreadSheetService {
 		});
 
 		return response.data.updatedCells ?? 0;
+	}
+
+	async parseSpreadSheet<T extends (...args: any[]) => any>({
+		sheetName,
+		range,
+		parseCallback,
+	}: {
+		sheetName: string;
+		range: string;
+		parseCallback: T;
+	}): Promise<Array<ReturnType<T>>> {
+		const sheetCellList = await this.getRangeCellData({ sheetName, range });
+
+		return sheetCellList.length ? sheetCellList.map(parseCallback) : [];
 	}
 }
