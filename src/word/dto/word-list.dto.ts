@@ -4,6 +4,8 @@ import { Expose, Transform } from 'class-transformer';
 import {
 	IsArray,
 	IsBoolean,
+	IsIn,
+	IsNumber,
 	IsOptional,
 	IsString,
 	IsUUID,
@@ -11,10 +13,23 @@ import {
 
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 
+import {
+	SORTING_WORD_OPTION,
+	type SortingWordListOption,
+} from '../interface/word-list-sorting.interface';
+
 export class RequestWordListDto extends PaginationOptionDto {
 	@IsOptional()
 	@IsUUID()
 	userId?: string;
+
+	@IsOptional()
+	@IsIn(SORTING_WORD_OPTION)
+	@ApiProperty({
+		type: 'enum',
+		enum: SORTING_WORD_OPTION,
+	})
+	sorting: SortingWordListOption = 'CREATED';
 }
 
 export class ResponseWordListDto {
@@ -53,4 +68,10 @@ export class ResponseWordListDto {
 	@Expose({ name: 'isLike' })
 	@ApiProperty()
 	isLike: boolean;
+
+	@IsNumber()
+	@Transform(({ obj }) => Number(obj.likecount))
+	@Expose({ name: 'likeCount' })
+	@ApiProperty()
+	likeCount: number;
 }

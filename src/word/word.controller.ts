@@ -51,13 +51,17 @@ export class WordController {
 	@Get('/list')
 	async findAll(
 		@AuthenticatedUser() user: User,
-		@Query() paginationOptionDto: PaginationOptionDto,
+		@Query() wordListDto: RequestWordListDto,
 	) {
-		const requestWordListDto = plainToInstance(RequestWordListDto, {
-			userId: user?.id,
-			page: paginationOptionDto.page,
-			limit: paginationOptionDto.limit,
-		});
+		const requestWordListDto = plainToInstance(
+			RequestWordListDto,
+			{
+				userId: user?.id,
+				...wordListDto,
+			},
+			{ exposeDefaultValues: true },
+		);
+
 		return await this.wordService.getWordList(requestWordListDto);
 	}
 
