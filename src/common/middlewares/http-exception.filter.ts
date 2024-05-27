@@ -26,6 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		const request = ctx.getRequest<Request>();
 
 		let statusCode: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		
 		let error: unknown = exception;
 		let errorResponse: Record<string, unknown> = {
 			timestamp: new Date().toISOString(),
@@ -46,12 +47,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				);
 
 				statusCode = HttpStatus.BAD_REQUEST;
-				(error = errorDetails),
-					(errorResponse = {
-						...errorResponse,
-						statusCode,
-						message: exception.message,
-					});
+				error = errorDetails;
+				errorResponse = {
+					...errorResponse,
+					statusCode,
+					message: exception.message,
+				};
 				break;
 			}
 			case exception instanceof HttpException: {
@@ -61,12 +62,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				>;
 
 				statusCode = exception.getStatus();
-				(error = responseBody.error),
-					(errorResponse = {
-						...errorResponse,
-						statusCode,
-						message: responseBody.message,
-					});
+				error = responseBody.error;
+				errorResponse = {
+					...errorResponse,
+					statusCode,
+					message: responseBody.message,
+				};
 				break;
 			}
 			default: {
