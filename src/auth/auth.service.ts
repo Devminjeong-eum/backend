@@ -22,6 +22,9 @@ export class AuthService {
 		path: '/',
 	} as const;
 
+	private readonly ACCESS_TOKEN_MAX_AGE = 5 * 60 * 1000;
+	private readonly REFRESH_TOKEN_MAX_AGE =  7 * 24 * 60 * 60 * 1000;
+
 	async checkIsAdminRequest(request: Request) {
 		const { authorization: requestAdminKey } = request.headers;
 		const adminKey = this.configService.get<string>('TEST_ADMIN_KEY');
@@ -80,11 +83,11 @@ export class AuthService {
 	) {
 		response.cookie('accessToken', accessToken, {
 			...this.cookieOption,
-			maxAge: 5 * 60 * 1000, // NOTE : 5H
+			maxAge: this.ACCESS_TOKEN_MAX_AGE,
 		});
 		response.cookie('refreshToken', refreshToken, {
 			...this.cookieOption,
-			maxAge: 7 * 24 * 60 * 60 * 1000, // NOTE : 7D
+			maxAge: this.REFRESH_TOKEN_MAX_AGE,
 		});
 	}
 
