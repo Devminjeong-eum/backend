@@ -13,14 +13,16 @@ export class LoggerMiddleware implements NestMiddleware {
 	constructor(@Inject(Logger) private readonly logger: LoggerService) {}
 
 	use(request: Request, response: Response, next: NextFunction) {
-		const { method, url, query, body } = request;
+		const { method, originalUrl, query, body } = request;
 		const { statusCode } = response;
+
+
 
 		this.logger.log({
 			message: 'HTTP Request',
 			statusCode,
 			method,
-			url,
+			url: originalUrl,
 			query,
 			body,
 		});
