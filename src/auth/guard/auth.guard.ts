@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	CanActivate,
 	ExecutionContext,
 	Injectable,
@@ -40,7 +41,7 @@ export class AuthenticationGuard implements CanActivate {
 
 			if (!adminUser)
 				throw new InternalServerErrorException(
-					'Admin User 정보가 DB 에 존재하지 않습니다.',
+					'Admin User 정보가 DB 에 존재하지 않습니다. 관리자에게 문의하세요.',
 				);
 
 			request.user = adminUser;
@@ -49,27 +50,31 @@ export class AuthenticationGuard implements CanActivate {
 
 		const { accessToken, refreshToken } = request.cookies ?? {};
 
-		if (!accessToken || !refreshToken) {
+		if (!refreshToken) {
 			throw new UnauthorizedException(
-				'요청에 계정 정보가 존재하지 않습니다.',
+				'요청에 계정 정보가 존재하지 않습니다. 로그인을 진행해주세요.',
 			);
 		}
 
-		let userId: string;
+		const userId = await this.authService
+			.verifyAuthenticateToken(accessToken)
+			.catch(() => this.checkRefreshToken(response, refreshToken));
 
+		const user = await this.userRepository.findById(userId);
+
+		if (!user) {
+			this.removeAuthenticateCookie(response);
+			throw new BadRequestException('유효하지 않은 계정 정보입니다.');
+		}
+
+		request.user = user;
+		return true;
+	}
+
+	private async checkRefreshToken(response: Response, refreshToken: string) {
 		try {
-			userId =
-				await this.authService.verifyAuthenticateToken(accessToken);
-		} catch (error) {
-			userId = await this.authService
-				.verifyAuthenticateToken(refreshToken)
-				.catch(() => {
-					this.removeAuthenticateCookie(response);
-					throw new UnauthorizedException(
-						'토큰이 만료되었습니다. 다시 로그인해주세요.',
-					);
-				});
-
+			const userId =
+				await this.authService.verifyAuthenticateToken(refreshToken);
 			const {
 				accessToken: reIssueAccessToken,
 				refreshToken: reIssueRefreshToken,
@@ -80,17 +85,13 @@ export class AuthenticationGuard implements CanActivate {
 				reIssueAccessToken,
 				reIssueRefreshToken,
 			);
-		}
-
-		const user = await this.userRepository.findById(userId);
-
-		if (!user) {
+			return userId;
+		} catch (error) {
 			this.removeAuthenticateCookie(response);
-			throw new UnauthorizedException('유효하지 않은 계정 정보입니다.');
+			throw new UnauthorizedException(
+				'토큰이 만료되었습니다. 다시 로그인해주세요.',
+			);
 		}
-
-		request.user = user;
-		return true;
 	}
 
 	private setAuthenticateCookie(
@@ -100,11 +101,11 @@ export class AuthenticationGuard implements CanActivate {
 	) {
 		response.cookie('accessToken', accessToken, {
 			...this.cookieOption,
-			maxAge: 5 * 60 * 1000,
+			maxAge: 5 * 60 * 1000, // NOTE : 5H
 		});
 		response.cookie('refreshToken', refreshToken, {
 			...this.cookieOption,
-			maxAge: 7 * 24 * 60 * 60 * 1000,
+			maxAge: 7 * 24 * 60 * 60 * 1000, // NOTE : 7D
 		});
 	}
 
