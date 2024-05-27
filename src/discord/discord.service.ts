@@ -17,7 +17,8 @@ export class DiscordWebhookService {
 		const discordWebHookUrl = this.configService.get<string>(
 			'DISCORD_WEBHOOK_URL',
 		);
-		const isDev = this.configService.get<string>('NODE_ENV') === 'development';
+		const isDev =
+			this.configService.get<string>('NODE_ENV') === 'development';
 
 		if (!discordWebHookUrl)
 			throw new InternalServerErrorException(

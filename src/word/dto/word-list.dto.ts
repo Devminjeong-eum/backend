@@ -27,7 +27,7 @@ export class RequestWordListDto extends PaginationOptionDto {
 	@IsIn(SORTING_WORD_OPTION)
 	@ApiProperty({
 		type: 'enum',
-		enum: SORTING_WORD_OPTION
+		enum: SORTING_WORD_OPTION,
 	})
 	sorting: SortingWordListOption = 'CREATED';
 }
