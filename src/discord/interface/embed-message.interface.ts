@@ -1,4 +1,4 @@
-import Attachment from "./attachment.interface";
+import Attachment from './attachment.interface';
 
 /**
  * Embed object.
@@ -6,99 +6,97 @@ import Attachment from "./attachment.interface";
  * @link https://discordapp.com/developers/docs/resources/channel#embed-object
  */
 export default interface Embed {
-    /**
-     * Title of the embed.
-     * Up to 256 characters.
-     */
-    title?: string;
+	/**
+	 * Title of the embed.
+	 * Up to 256 characters.
+	 */
+	title?: string;
 
-    /**
-     * Embed type.
-     * (Always "rich" for webhook embeds)
-     */
-    type?: 'rich';
+	/**
+	 * Embed type.
+	 * (Always "rich" for webhook embeds)
+	 */
+	type?: 'rich';
 
-    /**
-     * URL of embed.
-     */
-    url?: string;
+	/**
+	 * URL of embed.
+	 */
+	url?: string;
 
-    /**
-     * Description of the embed.
-     * Up to 2048 characters.
-     */
-    description?: string;
+	/**
+	 * Description of the embed.
+	 * Up to 2048 characters.
+	 */
+	description?: string;
 
-    /**
-     * ISO8601 timestamp of the embed content.
-     */
-    timestamp?: string;
+	/**
+	 * ISO8601 timestamp of the embed content.
+	 */
+	timestamp?: string;
 
-    /**
-     * color code of the embed.
-     */
-    color?: number;
+	/**
+	 * color code of the embed.
+	 */
+	color?: number;
 
-    /**
-     * Footer information.
-     */
-    footer?: EmbedFooter;
+	/**
+	 * Footer information.
+	 */
+	footer?: EmbedFooter;
 
-    /**
-     * Image information.
-     */
-    image?: EmbedImage;
+	/**
+	 * Image information.
+	 */
+	image?: EmbedImage;
 
-    /**
-     * Thumbnail information.
-     */
-    thumbnail?: EmbedThumbnail;
+	/**
+	 * Thumbnail information.
+	 */
+	thumbnail?: EmbedThumbnail;
 
-    /**
-     * Video information.
-     */
-    video?: EmbedVideo;
+	/**
+	 * Video information.
+	 */
+	video?: EmbedVideo;
 
-    /**
-     * Provider information.
-     */
-    provider?: EmbedProvider;
+	/**
+	 * Provider information.
+	 */
+	provider?: EmbedProvider;
 
-    /**
-     * Author information.
-     */
-    author?: EmbedAuthor;
+	/**
+	 * Author information.
+	 */
+	author?: EmbedAuthor;
 
-    /**
-     * Fields information.
-     * Up to 25 fields.
-     */
-    fields?: EmbedField[];
+	/**
+	 * Fields information.
+	 * Up to 25 fields.
+	 */
+	fields?: EmbedField[];
 }
 
 interface EmbedAuthor {
+	/**
+	 * Name of the author.
+	 */
+	name?: string;
 
-    /**
-     * Name of the author.
-     */
-    name?: string;
+	/**
+	 * URL of the author.
+	 */
+	url?: string;
 
-    /**
-     * URL of the author.
-     */
-    url?: string;
+	/**
+	 * URL of the author icon.
+	 * (Only supports HTTP(s) and attachments)
+	 */
+	icon_url?: string | Attachment;
 
-    /**
-     * URL of the author icon.
-     * (Only supports HTTP(s) and attachments)
-     */
-    icon_url?: string | Attachment;
-
-    /**
-     * Proxied URL of the author icon.
-     */
-    proxy_icon_url?: string;
-
+	/**
+	 * Proxied URL of the author icon.
+	 */
+	proxy_icon_url?: string;
 }
 
 /**
@@ -107,24 +105,22 @@ interface EmbedAuthor {
  * @link https://discordapp.com/developers/docs/resources/channel#embed-object-embed-field-structure
  */
 interface EmbedField {
+	/**
+	 * Name of the field.
+	 * Up to 256 characters.
+	 */
+	name: string;
 
-    /**
-     * Name of the field.
-     * Up to 256 characters.
-     */
-    name: string;
+	/**
+	 * Value of the field.
+	 * Up to 1024 characters.
+	 */
+	value: string;
 
-    /**
-     * Value of the field.
-     * Up to 1024 characters.
-     */
-    value: string;
-
-    /**
-     * Whether or not this field should be displayed inline.
-     */
-    inline?: boolean;
-
+	/**
+	 * Whether or not this field should be displayed inline.
+	 */
+	inline?: boolean;
 }
 
 /**
@@ -134,23 +130,21 @@ interface EmbedField {
  */
 
 interface EmbedFooter {
+	/**
+	 * Footer text.
+	 */
+	text: string;
 
-    /**
-     * Footer text.
-     */
-    text: string;
+	/**
+	 * URL of the footer icon.
+	 * Only supports HTTP(s) and attachments
+	 */
+	icon_url?: string | Attachment;
 
-    /**
-     * URL of the footer icon.
-     * Only supports HTTP(s) and attachments
-     */
-    icon_url?: string | Attachment;
-
-    /**
-     * A proxied URL of the footer icon.
-     */
-    proxy_icon_url?: string;
-
+	/**
+	 * A proxied URL of the footer icon.
+	 */
+	proxy_icon_url?: string;
 }
 
 /**
@@ -159,26 +153,26 @@ interface EmbedFooter {
  * @link https://discordapp.com/developers/docs/resources/channel#embed-object-embed-image-structure
  */
 interface EmbedImage {
-    /**
-     * Source URL of the image.
-     * (Only supports http(s) and attachments)
-     */
-    url: string | Attachment;
+	/**
+	 * Source URL of the image.
+	 * (Only supports http(s) and attachments)
+	 */
+	url: string | Attachment;
 
-    /**
-     * A proxied URL of the thumbnail.
-     */
-    proxy_url?: string;
+	/**
+	 * A proxied URL of the thumbnail.
+	 */
+	proxy_url?: string;
 
-    /**
-     * Height of the thumbnail.
-     */
-    height?: number;
+	/**
+	 * Height of the thumbnail.
+	 */
+	height?: number;
 
-    /**
-     * Width of the thumbnail.
-     */
-    width?: number;
+	/**
+	 * Width of the thumbnail.
+	 */
+	width?: number;
 }
 
 /**
@@ -187,17 +181,15 @@ interface EmbedImage {
  * @link https://discordapp.com/developers/docs/resources/channel#embed-object-embed-provider-structure
  */
 interface EmbedProvider {
+	/**
+	 * Name of the provider.
+	 */
+	name?: string;
 
-    /**
-     * Name of the provider.
-     */
-    name?: string;
-
-    /**
-     * URL of the provider.
-     */
-    url?: string;
-
+	/**
+	 * URL of the provider.
+	 */
+	url?: string;
 }
 
 /**
@@ -206,26 +198,26 @@ interface EmbedProvider {
  * @link https://discordapp.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
  */
 interface EmbedThumbnail {
-    /**
-     * Source URL of the thumbnail.
-     * (Only supports http(s) and attachments)
-     */
-    url: string | Attachment;
+	/**
+	 * Source URL of the thumbnail.
+	 * (Only supports http(s) and attachments)
+	 */
+	url: string | Attachment;
 
-    /**
-     * A proxied URL of the thumbnail.
-     */
-    proxy_url?: string;
+	/**
+	 * A proxied URL of the thumbnail.
+	 */
+	proxy_url?: string;
 
-    /**
-     * Height of the thumbnail.
-     */
-    height?: number;
+	/**
+	 * Height of the thumbnail.
+	 */
+	height?: number;
 
-    /**
-     * Width of the thumbnail.
-     */
-    width?: number;
+	/**
+	 * Width of the thumbnail.
+	 */
+	width?: number;
 }
 
 /**
@@ -234,18 +226,18 @@ interface EmbedThumbnail {
  * @link https://discordapp.com/developers/docs/resources/channel#embed-object-embed-video-structure
  */
 interface EmbedVideo {
-    /**
-     * Source URL of the video.
-     */
-    url: string;
+	/**
+	 * Source URL of the video.
+	 */
+	url: string;
 
-    /**
-     * Height of the video.
-     */
-    height?: number;
+	/**
+	 * Height of the video.
+	 */
+	height?: number;
 
-    /**
-     * Width of the video.
-     */
-    width?: number;
+	/**
+	 * Width of the video.
+	 */
+	width?: number;
 }

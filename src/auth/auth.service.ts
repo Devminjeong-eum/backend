@@ -23,7 +23,7 @@ export class AuthService {
 	} as const;
 
 	private readonly ACCESS_TOKEN_MAX_AGE = 5 * 60 * 1000;
-	private readonly REFRESH_TOKEN_MAX_AGE =  7 * 24 * 60 * 60 * 1000;
+	private readonly REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 	async checkIsAdminRequest(request: Request) {
 		const { authorization: requestAdminKey } = request.headers;

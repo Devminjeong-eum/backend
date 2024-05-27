@@ -48,7 +48,9 @@ export class AuthenticationGuard implements CanActivate {
 			);
 
 		if (!userId) {
-			throw new UnauthorizedException('유저 정보가 만료되었습니다. 로그인을 진행해주세요.')
+			throw new UnauthorizedException(
+				'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
+			);
 		}
 
 		const user = await this.userRepository.findById(userId);

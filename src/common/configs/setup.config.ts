@@ -16,7 +16,7 @@ export const setupNestApplication = (app: INestApplication) => {
 
 	/**
 	 * API Validation Pipeline
-	*/
+	 */
 	app.useGlobalPipes(
 		new ValidationPipe({
 			transform: true,
@@ -27,13 +27,13 @@ export const setupNestApplication = (app: INestApplication) => {
 
 	/**
 	 * Server Exception Filter
-	*/
+	 */
 	const discordWebhookService = app.get(DiscordWebhookService);
 	app.useGlobalFilters(new HttpExceptionFilter(discordWebhookService));
-	
+
 	/**
 	 * API Response Format Interceptor
-	*/
+	 */
 	app.useGlobalInterceptors(new ApiResponseInterceptor());
 
 	/**
@@ -50,7 +50,7 @@ export const setupNestApplication = (app: INestApplication) => {
 
 	/**
 	 * Disable non-security Header
-	*/
+	 */
 	const expressApp: Application = app.getHttpAdapter().getInstance();
 	expressApp.disable('x-powered-by');
 	expressApp.disable('Server');

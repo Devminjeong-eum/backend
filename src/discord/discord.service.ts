@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import * as dayjs from 'dayjs';
 
 import { postAsync } from '#/common/apis';
@@ -44,9 +45,11 @@ export class DiscordWebhookService {
 		errorStack: string[] | string,
 	) {
 		const { timestamp, statusCode, path, method, message } = errorResponse;
-		const errorOccurredTime = dayjs(timestamp).format('YYYY년 MM월 DD일 HH시 mm분 ss초');
+		const errorOccurredTime = dayjs(timestamp).format(
+			'YYYY년 MM월 DD일 HH시 mm분 ss초',
+		);
 		const errorStackMessage = Array.isArray(errorStack)
-			? errorStack.join("\n")
+			? errorStack.join('\n')
 			: errorStack;
 
 		const embedMessage: Embed[] = [
