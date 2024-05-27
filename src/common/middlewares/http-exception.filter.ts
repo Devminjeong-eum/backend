@@ -8,9 +8,16 @@ import {
 
 import type { Request, Response } from 'express';
 
+import { DiscordWebhookService } from '#/discord/discord.service';
+
 import { ValidationException } from '../exceptions/ValidationException';
+import type { ApiErrorResponse } from '../interfaces/api-error-response.interface';
 
 export class HttpExceptionFilter implements ExceptionFilter {
+	constructor(
+		private readonly discordWebhookService: DiscordWebhookService,
+	) {}
+
 	private getPartialStackTrace(stack: string | undefined, lines: number = 3) {
 		return stack
 			? stack
@@ -26,8 +33,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		const request = ctx.getRequest<Request>();
 
 		let statusCode: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+
 		let error: unknown = exception;
-		let errorResponse: Record<string, unknown> = {
+		let errorResponse: ApiErrorResponse = {
 			timestamp: new Date().toISOString(),
 			statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
 			path: request.url,
@@ -46,12 +54,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				);
 
 				statusCode = HttpStatus.BAD_REQUEST;
-				(error = errorDetails),
-					(errorResponse = {
-						...errorResponse,
-						statusCode,
-						message: exception.message,
-					});
+				error = errorDetails;
+				errorResponse = {
+					...errorResponse,
+					statusCode,
+					message: exception.message,
+				};
 				break;
 			}
 			case exception instanceof HttpException: {
@@ -61,12 +69,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				>;
 
 				statusCode = exception.getStatus();
-				(error = responseBody.error),
-					(errorResponse = {
-						...errorResponse,
-						statusCode,
-						message: responseBody.message,
-					});
+				error = responseBody.error;
+				errorResponse = {
+					...errorResponse,
+					statusCode,
+					message: responseBody.message as string,
+				};
 				break;
 			}
 			default: {
@@ -79,10 +87,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
 			}
 		}
 
+		const errorStack = this.getPartialStackTrace(exception.stack);
+
+		if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
+			this.discordWebhookService.sendExceptionMessage(
+				errorResponse,
+				errorStack,
+			);
+		}
+
 		Logger.error({
 			...errorResponse,
 			error,
-			stack: this.getPartialStackTrace(exception.stack),
+			stack: errorStack,
 		});
 
 		return response.status(statusCode).json(errorResponse);
