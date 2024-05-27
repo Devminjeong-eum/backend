@@ -11,11 +11,13 @@ import Embed from './interface/embed-message.interface';
 @Injectable()
 export class DiscordWebhookService {
 	private readonly discordWebhookUrl: string;
+	private readonly isDev: boolean;
 
 	constructor(private readonly configService: ConfigService) {
 		const discordWebHookUrl = this.configService.get<string>(
 			'DISCORD_WEBHOOK_URL',
 		);
+		const isDev = this.configService.get<string>('NODE_ENV') === 'development';
 
 		if (!discordWebHookUrl)
 			throw new InternalServerErrorException(
@@ -23,12 +25,14 @@ export class DiscordWebhookService {
 			);
 
 		this.discordWebhookUrl = discordWebHookUrl;
+		this.isDev = isDev;
 	}
 
 	public sendExceptionMessage(
 		exception: ApiErrorResponse,
 		errorStack: string[] | string,
 	) {
+		if (this.isDev) return;
 		const embedMessage = this.createEmbedErrorMessage(
 			exception,
 			errorStack,
