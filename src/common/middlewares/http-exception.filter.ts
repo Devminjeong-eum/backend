@@ -16,7 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 			? stack
 					.split('\n')
 					.slice(1, lines + 1)
-					.join('\n')
+					.map((line) => line.trimStart())
 			: '';
 	}
 
@@ -25,10 +25,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		const response = ctx.getResponse<Response>();
 		const request = ctx.getRequest<Request>();
 
-		let statusCode = 500;
-		const errorResponse = {
-			statusCode,
+		let statusCode: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		let error: unknown = exception;
+		let errorResponse: Record<string, unknown> = {
 			timestamp: new Date().toISOString(),
+			statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
 			path: request.url,
 			method: request.method,
 			message: exception.message,
@@ -45,43 +46,44 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				);
 
 				statusCode = HttpStatus.BAD_REQUEST;
-
-				Logger.error({
-					...errorResponse,
-					statusCode,
-					message: exception.message,
-					error: errorDetails,
-					stack: this.getPartialStackTrace(exception.stack),
-				});
+				(error = errorDetails),
+					(errorResponse = {
+						...errorResponse,
+						statusCode,
+						message: exception.message,
+					});
 				break;
 			}
 			case exception instanceof HttpException: {
-				statusCode = exception.getStatus();
 				const responseBody = exception.getResponse() as Record<
 					string,
-					any
+					unknown
 				>;
-				Logger.error({
-					...errorResponse,
-					statusCode,
-					message: responseBody.message,
-					error: responseBody.error,
-					stack: this.getPartialStackTrace(exception.stack),
-				});
+
+				statusCode = exception.getStatus();
+				(error = responseBody.error),
+					(errorResponse = {
+						...errorResponse,
+						statusCode,
+						message: responseBody.message,
+					});
 				break;
 			}
 			default: {
 				statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-
-				Logger.error({
+				errorResponse = {
 					...errorResponse,
 					statusCode,
 					message: exception.message,
-					error: exception,
-					stack: this.getPartialStackTrace(exception.stack),
-				});
+				};
 			}
 		}
+
+		Logger.error({
+			...errorResponse,
+			error,
+			stack: this.getPartialStackTrace(exception.stack),
+		});
 
 		return response.status(statusCode).json(errorResponse);
 	}
