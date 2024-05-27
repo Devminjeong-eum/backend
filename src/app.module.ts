@@ -17,6 +17,7 @@ import { LikeModule } from './like/like.module';
 import { QuizModule } from './quiz/quiz.module';
 import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
+import { DiscordWebhookModule } from './discord/discord.module';
 
 @Module({
 	imports: [
@@ -28,6 +29,7 @@ import { WordModule } from './word/word.module';
 			useClass: TypeOrmConfig,
 		}),
 		ScheduleModule.forRoot(),
+		DiscordWebhookModule,
 		UserModule,
 		AuthModule,
 		WordModule,

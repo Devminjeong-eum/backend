@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import * as cookieParser from 'cookie-parser';
 
+import { DiscordWebhookService } from '#/discord/discord.service';
 import { ApiResponseInterceptor } from '#middlewares/api-response.interceptor';
 import { HttpExceptionFilter } from '#middlewares/http-exception.filter';
 
@@ -18,7 +19,10 @@ export const setupNestApplication = (app: INestApplication) => {
 			exceptionFactory: (errors) => new ValidationException(errors),
 		}),
 	);
-	app.useGlobalFilters(new HttpExceptionFilter());
+
+	const discordWebhookService = app.get(DiscordWebhookService);
+	app.useGlobalFilters(new HttpExceptionFilter(discordWebhookService));
+	
 	app.useGlobalInterceptors(new ApiResponseInterceptor());
 
 	const config = new DocumentBuilder()
