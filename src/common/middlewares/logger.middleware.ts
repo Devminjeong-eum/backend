@@ -16,8 +16,6 @@ export class LoggerMiddleware implements NestMiddleware {
 		const { method, originalUrl, query, body } = request;
 		const { statusCode } = response;
 
-
-
 		this.logger.log({
 			message: 'HTTP Request',
 			statusCode,
