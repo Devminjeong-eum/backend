@@ -27,7 +27,7 @@ export class ResponseCreateQuizResultDto {
 	@Transform(({ obj }) => obj.id)
 	@Expose()
 	@ApiProperty()
-	userId: string;
+	quizResultId: string;
 
 	@IsArray()
 	@IsUUID()
