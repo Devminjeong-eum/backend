@@ -8,15 +8,17 @@ export class RequestCreateQuizResultDto {
 	userId: string;
 
 	@IsArray()
-	@IsUUID()
-	@MaxLength(10)
-	@ApiProperty()
+	@IsUUID(undefined, { each: true })
+	@ApiProperty({
+		description: '정답으로 처리된 단어 ID 목록',
+	})
 	correctWordIds: string[];
 
 	@IsArray()
-	@IsUUID()
-	@MaxLength(10)
-	@ApiProperty()
+	@IsUUID(undefined, { each: true })
+	@ApiProperty({
+		description: '오답으로 처리된 단어 ID 목록',
+	})
 	incorrectWordIds: string[];
 }
 
