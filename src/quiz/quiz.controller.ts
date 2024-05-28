@@ -4,6 +4,7 @@ import {
 	Get,
 	HttpStatus,
 	Param,
+	ParseUUIDPipe,
 	Patch,
 	Post,
 	UseGuards,
@@ -75,14 +76,17 @@ export class QuizController {
 	@Get('/result/:quizResultId')
 	async findQuizResultById(
 		@AuthenticatedUser() user: User,
-		@Param('quizResultId') quizResultId: string,
+		@Param('quizResultId', new ParseUUIDPipe({ version: undefined }))
+		quizResultId: string,
 	) {
 		const quizResultDto = plainToInstance(RequestQuizResultDto, {
 			userId: user?.id,
 			quizResultId,
 		});
 
-		return this.quizService.findQuizResultById(quizResultDto);
+		console.log(quizResultDto);
+
+		// return this.quizService.findQuizResultById(quizResultDto);
 	}
 
 	@ApiDocs({

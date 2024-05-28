@@ -4,6 +4,7 @@ import {
 	Get,
 	HttpStatus,
 	Param,
+	ParseUUIDPipe,
 	Patch,
 	UseGuards,
 } from '@nestjs/common';
@@ -50,7 +51,10 @@ export class UserController {
 		},
 	})
 	@Get(':userId')
-	getUserInformation(@Param('userId') userId: string) {
+	getUserInformation(
+		@Param('userId', new ParseUUIDPipe({ version: undefined }))
+		userId: string,
+	) {
 		return this.userService.getUserInformation(userId);
 	}
 
