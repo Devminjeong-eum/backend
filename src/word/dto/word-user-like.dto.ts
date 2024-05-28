@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Exclude } from 'class-transformer';
-import { IsArray, IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Exclude, Expose, Transform } from 'class-transformer';
+import { IsArray, IsIn, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 
@@ -26,36 +26,40 @@ export class RequestWordUserLikeDto extends PaginationOptionDto {
 
 export class ResponseWordUserLikeDto {
 	@IsUUID()
-	@ApiProperty({
-		type: String,
-	})
+	@Transform(({ obj }) => obj.word_id)
+	@Expose({ name: 'id' })
+	@ApiProperty()
 	id: string;
 
 	@IsString()
-	@ApiProperty({
-		type: String,
-	})
+	@Transform(({ obj }) => obj.word_name)
+	@Expose({ name: 'name' })
+	@ApiProperty()
 	name: string;
 
 	@IsString()
-	@ApiProperty({
-		type: String,
-	})
+	@Transform(({ obj }) => obj.word_description)
+	@Expose({ name: 'description' })
+	@ApiProperty()
 	description: string;
 
 	@IsArray()
-	@ApiProperty({
-		type: String,
-		isArray: true,
-	})
+	@Transform(({ obj }) => obj.word_diacritic)
+	@Expose({ name: 'diacritic' })
+	@ApiProperty()
 	diacritic: string[];
 
 	@IsArray()
-	@ApiProperty({
-		type: String,
-		isArray: true,
-	})
+	@Transform(({ obj }) => obj.word_pronunciation)
+	@Expose({ name: 'pronunciation' })
+	@ApiProperty()
 	pronunciation: string[];
+
+	@IsNumber()
+	@Transform(({ obj }) => Number(obj.likecount))
+	@Expose({ name: 'likeCount' })
+	@ApiProperty()
+	likeCount: number;
 
 	@Exclude()
 	createdAt: Date;

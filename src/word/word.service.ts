@@ -132,6 +132,7 @@ export class WordService {
 		const responseWordUserLikeListDto = plainToInstance(
 			ResponseWordUserLikeDto,
 			words,
+			{ excludeExtraneousValues: true },
 		);
 		const paginationMeta = new PaginationMetaDto({
 			paginationOption: requestWordUserLikeDto,

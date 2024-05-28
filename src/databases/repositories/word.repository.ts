@@ -187,7 +187,7 @@ export class WordRepository {
 		const { userId, sorting } = requestWordListDto;
 		const [sortOption, ascOrDesc] = WORD_SORTING_TYPE[sorting];
 
-		const [words, totalCount] = await this.wordRepository
+		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.innerJoin('word.likes', 'like')
 			.innerJoin('like.user', 'user')
@@ -199,11 +199,18 @@ export class WordRepository {
 				'word.diacritic',
 				'word.description',
 				'word.createdAt',
+				'COUNT(like.id) AS likeCount',
 			])
-			.orderBy(sortOption, ascOrDesc)
-			.skip(requestWordListDto.getSkip())
-			.take(requestWordListDto.limit)
-			.getManyAndCount();
+			.groupBy('word.id')
+
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.orderBy(sortOption, ascOrDesc)
+				.skip(requestWordListDto.getSkip())
+				.take(requestWordListDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
 
 		return {
 			words,
