@@ -201,7 +201,7 @@ export class WordRepository {
 				'word.createdAt',
 				'COUNT(like.id) AS likeCount',
 			])
-			.groupBy('word.id')
+			.groupBy('word.id');
 
 		const [words, totalCount] = await Promise.all([
 			queryBuilder
