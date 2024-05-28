@@ -208,8 +208,8 @@ export class WordRepository {
 		const [words, totalCount] = await Promise.all([
 			queryBuilder
 				.orderBy(sortOption, ascOrDesc)
-				.skip(requestWordListDto.getSkip())
-				.take(requestWordListDto.limit)
+				.offset(requestWordListDto.getSkip())
+				.limit(requestWordListDto.limit)
 				.getRawMany(),
 			queryBuilder.getCount(),
 		]);

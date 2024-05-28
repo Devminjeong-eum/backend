@@ -3,6 +3,7 @@ import {
 	Get,
 	HttpStatus,
 	Param,
+	ParseUUIDPipe,
 	Patch,
 	Query,
 	UseGuards,
@@ -125,7 +126,8 @@ export class WordController {
 	@UseInterceptors(UserInformationInterceptor)
 	async findById(
 		@AuthenticatedUser() user: User,
-		@Param('wordId') wordId: string,
+		@Param('wordId', new ParseUUIDPipe({ version: undefined }))
+		wordId: string,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
 			userId: user?.id,

@@ -1,7 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+	HttpStatus,
+	Inject,
+	Injectable,
+	InternalServerErrorException,
+	LoggerService,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import * as dayjs from 'dayjs';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { postAsync } from '#/common/apis';
 import { ApiErrorResponse } from '#/common/interfaces/api-error-response.interface';
@@ -13,7 +20,11 @@ export class DiscordWebhookService {
 	private readonly discordWebhookUrl: string;
 	private readonly isDev: boolean;
 
-	constructor(private readonly configService: ConfigService) {
+	constructor(
+		@Inject(WINSTON_MODULE_NEST_PROVIDER)
+		private readonly logger: LoggerService,
+		private readonly configService: ConfigService,
+	) {
 		const discordWebHookUrl = this.configService.get<string>(
 			'DISCORD_WEBHOOK_URL',
 		);
@@ -42,7 +53,19 @@ export class DiscordWebhookService {
 	}
 
 	private async sendDiscordMessage(embedMessage: Embed[]) {
-		return postAsync(this.discordWebhookUrl, { embeds: embedMessage });
+		try {
+			return postAsync(
+				this.discordWebhookUrl,
+				{ embeds: embedMessage },
+				{},
+			);
+		} catch (error) {
+			this.logger.error({
+				timestamp: new Date().toISOString(),
+				statusCode: HttpStatus.TOO_MANY_REQUESTS,
+				message: 'Discord Webhook Limit Exceed',
+			});
+		}
 	}
 
 	private createEmbedErrorMessage(
