@@ -12,7 +12,8 @@ import {
 
 export class RequestWordUserLikeDto extends PaginationOptionDto {
 	@IsUUID()
-	userId: string;
+	@IsOptional()
+	userId?: string;
 
 	@IsOptional()
 	@IsIn(SORTING_WORD_OPTION)
