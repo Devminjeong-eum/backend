@@ -15,7 +15,6 @@ import { plainToInstance } from 'class-transformer';
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
 import { ApiDocs } from '#/common/decorators/swagger.decorator';
-import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 import { UserInformationInterceptor } from '#/user/interceptors/user-information.interceptor';
 import { User } from '#databases/entities/user.entity';
 
@@ -77,12 +76,11 @@ export class WordController {
 	@Get('/like')
 	async findUserLike(
 		@AuthenticatedUser() user: User,
-		@Query() paginationOptionDto: PaginationOptionDto,
+		@Query() requestWordUserDto: RequestWordUserLikeDto,
 	) {
 		const wordUserLikeDto = plainToInstance(RequestWordUserLikeDto, {
+			...requestWordUserDto,
 			userId: user.id,
-			page: paginationOptionDto.page,
-			limit: paginationOptionDto.limit,
 		});
 		return await this.wordService.getWordUserLike(wordUserLikeDto);
 	}
