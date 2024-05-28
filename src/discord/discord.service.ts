@@ -5,7 +5,7 @@ import {
 	InternalServerErrorException,
 	LoggerService,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';1
+import { ConfigService } from '@nestjs/config';
 
 import * as dayjs from 'dayjs';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -21,7 +21,8 @@ export class DiscordWebhookService {
 	private readonly isDev: boolean;
 
 	constructor(
-		@Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
+		@Inject(WINSTON_MODULE_NEST_PROVIDER)
+		private readonly logger: LoggerService,
 		private readonly configService: ConfigService,
 	) {
 		const discordWebHookUrl = this.configService.get<string>(
@@ -53,7 +54,11 @@ export class DiscordWebhookService {
 
 	private async sendDiscordMessage(embedMessage: Embed[]) {
 		try {
-			return postAsync(this.discordWebhookUrl, { embeds: embedMessage });
+			return postAsync(
+				this.discordWebhookUrl,
+				{ embeds: embedMessage },
+				{},
+			);
 		} catch (error) {
 			this.logger.error({
 				timestamp: new Date().toISOString(),
