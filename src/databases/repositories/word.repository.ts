@@ -1,28 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { plainToInstance } from 'class-transformer';
 import { DataSource, Repository } from 'typeorm';
 
-import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
 import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
-import {
-	RequestWordDetailDto,
-	ResponseWordDetailDto,
-} from '#/word/dto/word-detail.dto';
-import {
-	RequestWordListDto,
-	ResponseWordListDto,
-} from '#/word/dto/word-list.dto';
-import {
-	RequestWordSearchDto,
-	ResponseWordSearchDto,
-} from '#/word/dto/word-search.dto';
-import {
-	RequestWordUserLikeDto,
-	ResponseWordUserLikeDto,
-} from '#/word/dto/word-user-like.dto';
+import { RequestWordDetailDto } from '#/word/dto/word-detail.dto';
+import { RequestWordListDto } from '#/word/dto/word-list.dto';
+import { RequestWordSearchDto } from '#/word/dto/word-search.dto';
+import { RequestWordUserLikeDto } from '#/word/dto/word-user-like.dto';
 import { WORD_SORTING_TYPE } from '#/word/interface/word-list-sorting.interface';
 import { Word } from '#databases/entities/word.entity';
 
@@ -114,14 +100,7 @@ export class WordRepository {
 			queryBuilder.addSelect(['false AS isLike']);
 		}
 
-		const word = await queryBuilder.groupBy('word.id').getRawOne();
-
-		const responseWordDetailDto = plainToInstance(
-			ResponseWordDetailDto,
-			word,
-			{ excludeExtraneousValues: true },
-		);
-		return responseWordDetailDto;
+		return await queryBuilder.groupBy('word.id').getRawOne();
 	}
 
 	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
@@ -155,18 +134,7 @@ export class WordRepository {
 			queryBuilder.getCount(),
 		]);
 
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordSearchDto,
-			totalCount,
-		});
-
-		const responseWordSearchDto = plainToInstance(
-			ResponseWordSearchDto,
-			words,
-			{ excludeExtraneousValues: true },
-		);
-
-		return new PaginationDto(responseWordSearchDto, paginationMeta);
+		return { words, totalCount };
 	}
 
 	async findWithList(requestWordListDto: RequestWordListDto) {
@@ -209,24 +177,17 @@ export class WordRepository {
 			.createQueryBuilder('word')
 			.getCount();
 
-		const responseWordListDto = plainToInstance(
-			ResponseWordListDto,
+		return {
 			words,
-			{ excludeExtraneousValues: true },
-		);
-
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordListDto,
 			totalCount,
-		});
-
-		return new PaginationDto(responseWordListDto, paginationMeta);
+		};
 	}
 
 	async findUserLikeWord(requestWordListDto: RequestWordUserLikeDto) {
-		const { userId } = requestWordListDto;
+		const { userId, sorting } = requestWordListDto;
+		const [sortOption, ascOrDesc] = WORD_SORTING_TYPE[sorting];
 
-		const [words, totalCount] = await this.wordRepository
+		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.innerJoin('word.likes', 'like')
 			.innerJoin('like.user', 'user')
@@ -238,22 +199,22 @@ export class WordRepository {
 				'word.diacritic',
 				'word.description',
 				'word.createdAt',
+				'COUNT(like.id) AS likeCount',
 			])
-			.orderBy('word.createdAt', 'ASC')
-			.skip(requestWordListDto.getSkip())
-			.take(requestWordListDto.limit)
-			.getManyAndCount();
+			.groupBy('word.id');
 
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordListDto,
-			totalCount,
-		});
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.orderBy(sortOption, ascOrDesc)
+				.skip(requestWordListDto.getSkip())
+				.take(requestWordListDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
 
-		const responseWordListDto = plainToInstance(
-			ResponseWordUserLikeDto,
+		return {
 			words,
-		);
-
-		return new PaginationDto(responseWordListDto, paginationMeta);
+			totalCount,
+		};
 	}
 }
