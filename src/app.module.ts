@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { WinstonLoggerModule } from '#/common/configs/logger.config';
 import { TypeOrmConfig } from '#configs/typeorm.configs';
 import { LoggerMiddleware } from '#middlewares/logger.middleware';
 
@@ -28,6 +29,7 @@ import { WordModule } from './word/word.module';
 		TypeOrmModule.forRootAsync({
 			useClass: TypeOrmConfig,
 		}),
+		WinstonLoggerModule,
 		ScheduleModule.forRoot(),
 		DiscordWebhookModule,
 		UserModule,
