@@ -84,9 +84,7 @@ export class QuizController {
 			quizResultId,
 		});
 
-		console.log(quizResultDto);
-
-		// return this.quizService.findQuizResultById(quizResultDto);
+		return this.quizService.findQuizResultById(quizResultDto);
 	}
 
 	@ApiDocs({

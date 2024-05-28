@@ -130,6 +130,7 @@ export class WordRepository {
 					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
 				])
 				.orderBy('word.createdAt', 'ASC')
+				.distinct(true)
 				.offset(requestWordSearchDto.getSkip())
 				.limit(requestWordSearchDto.limit)
 				.getRawMany(),
