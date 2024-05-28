@@ -224,7 +224,8 @@ export class WordRepository {
 	}
 
 	async findUserLikeWord(requestWordListDto: RequestWordUserLikeDto) {
-		const { userId } = requestWordListDto;
+		const { userId, sorting } = requestWordListDto;
+		const [sortOption, ascOrDesc] = WORD_SORTING_TYPE[sorting];
 
 		const [words, totalCount] = await this.wordRepository
 			.createQueryBuilder('word')
@@ -239,7 +240,7 @@ export class WordRepository {
 				'word.description',
 				'word.createdAt',
 			])
-			.orderBy('word.createdAt', 'ASC')
+			.orderBy(sortOption, ascOrDesc)
 			.skip(requestWordListDto.getSkip())
 			.take(requestWordListDto.limit)
 			.getManyAndCount();
