@@ -48,6 +48,8 @@ export class WordRepository {
 		wordIdList: string[];
 		userId?: string;
 	}) {
+		if (!wordIdList.length) return [];
+
 		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')
