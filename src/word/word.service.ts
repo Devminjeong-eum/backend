@@ -15,6 +15,10 @@ import {
 } from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
+	RequestWordRelatedSearchDto,
+	ResponseWordRelatedSearchDto,
+} from './dto/word-related-search.dto';
+import {
 	RequestWordSearchDto,
 	ResponseWordSearchDto,
 } from './dto/word-search.dto';
@@ -176,5 +180,26 @@ export class WordService {
 		);
 
 		return new PaginationDto(responseWordSearchDto, paginationMeta);
+	}
+
+	async getWordByRelatedKeyword(
+		requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
+	) {
+		const { words, totalCount } =
+			await this.wordRepository.findByRelatedSearchWord(
+				requestWordRelatedSearchDto,
+			);
+
+		const paginationMeta = new PaginationMetaDto({
+			paginationOption: requestWordRelatedSearchDto,
+			totalCount,
+		});
+
+		const responseWordRelatedSearchDto = plainToInstance(
+			ResponseWordRelatedSearchDto,
+			words,
+		);
+
+		return new PaginationDto(responseWordRelatedSearchDto, paginationMeta);
 	}
 }
