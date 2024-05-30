@@ -18,32 +18,41 @@ export class UserRepository {
 		return await this.userRepository.save(registeredUser);
 	}
 
-	findById(id: string) {
-		return this.userRepository.findOne({
-			where: {
-				id,
-			},
-			select: {
-				id: true,
-				profileImage: true,
-				name: true,
-				socialType: true,
-			},
-		});
+	checkIsExistsById(userId: string) {
+		return this.userRepository
+			.createQueryBuilder('user')
+			.where('user.id = :userId', { userId })
+			.getExists();
+	}
+
+	findById(userId: string) {
+		return this.userRepository
+			.createQueryBuilder('user')
+			.leftJoin('user.likes', 'like')
+			.where('user.id = :userId', { userId })
+			.select([
+				'user.id',
+				'user.profileImage',
+				'user.name',
+				'COUNT(like.id) as likeCount',
+			])
+			.groupBy('user.id')
+			.getRawOne();
 	}
 
 	findByName(name: string) {
-		return this.userRepository.findOne({
-			where: {
-				name,
-			},
-			select: {
-				id: true,
-				profileImage: true,
-				name: true,
-				socialType: true,
-			},
-		});
+		return this.userRepository
+			.createQueryBuilder('user')
+			.leftJoin('user.likes', 'like')
+			.where('user.name = :name', { name })
+			.select([
+				'user.id',
+				'user.profileImage',
+				'user.name',
+				'COUNT(like.id) as likeCount',
+			])
+			.groupBy('user.id')
+			.getRawOne();
 	}
 
 	updateName(id: string, name: string) {
