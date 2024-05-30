@@ -2,7 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	InternalServerErrorException,
-	NotFoundException
+	NotFoundException,
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
@@ -130,11 +130,13 @@ export class QuizService {
 
 		const [isValidCorrectWords, isValidIncorrectWords] = await Promise.all([
 			this.wordRepository.checkIsExistsByIdList(correctWordIds),
-			this.wordRepository.checkIsExistsByIdList(incorrectWordIds)
-		])
+			this.wordRepository.checkIsExistsByIdList(incorrectWordIds),
+		]);
 
 		if (!isValidCorrectWords || !isValidIncorrectWords) {
-			throw new BadRequestException('단어 목록 중에 유효하지 않은 ID 가 있습니다.')
+			throw new BadRequestException(
+				'단어 목록 중에 유효하지 않은 ID 가 있습니다.',
+			);
 		}
 
 		const createdQuizResult =
