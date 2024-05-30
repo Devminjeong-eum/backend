@@ -41,6 +41,18 @@ export class WordRepository {
 		return this.wordRepository.findOneBy({ id: wordId });
 	}
 
+	async checkIsExistsByIdList(wordIdList: string[]) {
+		if (!wordIdList.length) return false;
+
+		const wordCount = await this.wordRepository
+			.createQueryBuilder('word')
+			.where('word.id IN (:...wordIdList)', { wordIdList })
+			.select(['word.id'])
+			.getCount();
+
+		return wordCount === wordIdList.length;
+	}
+
 	async findByIdListWithUserLike({
 		wordIdList,
 		userId,

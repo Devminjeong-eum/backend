@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	InternalServerErrorException,
+	NotFoundException
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
@@ -127,6 +128,15 @@ export class QuizService {
 			);
 		}
 
+		const [isValidCorrectWords, isValidIncorrectWords] = await Promise.all([
+			this.wordRepository.checkIsExistsByIdList(correctWordIds),
+			this.wordRepository.checkIsExistsByIdList(incorrectWordIds)
+		])
+
+		if (!isValidCorrectWords || !isValidIncorrectWords) {
+			throw new BadRequestException('단어 목록 중에 유효하지 않은 ID 가 있습니다.')
+		}
+
 		const createdQuizResult =
 			await this.quizResultRepository.create(createQuizResultDto);
 
@@ -151,7 +161,7 @@ export class QuizService {
 		}
 
 		if (quizResult.expiredAt <= new Date()) {
-			throw new BadRequestException(
+			throw new NotFoundException(
 				'해당 ID 를 가진 퀴즈 결과 데이터는 만료되어 접근할 수 없습니다.',
 			);
 		}
