@@ -150,7 +150,13 @@ export class QuizService {
 			);
 		}
 
-		const { id, correctWordIds, incorrectWordIds } = quizResult;
+		if (quizResult.expiredAt <= new Date()) {
+			throw new BadRequestException(
+				'해당 ID 를 가진 퀴즈 결과 데이터는 만료되어 접근할 수 없습니다.',
+			);
+		}
+
+		const { correctWordIds, incorrectWordIds } = quizResult;
 		const [correctWords, incorrectWords] = await Promise.all([
 			this.wordRepository.findByIdListWithUserLike({
 				wordIdList: correctWordIds,
@@ -162,12 +168,20 @@ export class QuizService {
 			}),
 		]);
 
-		const score = correctWordIds.length * 10;
+		const correctWordAmount = correctWords.length;
+		const incorrectWordAmount = incorrectWords.length;
 
+		if (correctWordAmount + incorrectWordAmount !== 10) {
+			throw new InternalServerErrorException(
+				'유효하지 않은 않은 퀴즈 결과 데이터입니다. 관리자에게 문의하세요.',
+			);
+		}
+
+		const score = correctWordAmount * 10;
 		const responseQuizResultDto = plainToInstance(
 			ResponseQuizResultDto,
 			{
-				quizResultId: id,
+				quizResultId,
 				score,
 				correctWords,
 				incorrectWords,
