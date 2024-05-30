@@ -1,9 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { plainToInstance } from 'class-transformer';
+
 import { UserRepository } from '#databases/repositories/user.repository';
 
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
 import { RequestCreateUserDto } from './dto/create-user.dto';
+import { ResponseUserInformationDto } from './dto/user-information.dto';
 
 @Injectable()
 export class UserService {
@@ -25,14 +28,21 @@ export class UserService {
 		if (!userInformation) {
 			throw new BadRequestException('존재하지 않는 유저입니다');
 		}
-		return userInformation;
+
+		const responseUserInformationDto = plainToInstance(
+			ResponseUserInformationDto,
+			userInformation,
+			{ excludeExtraneousValues: true },
+		);
+
+		return responseUserInformationDto;
 	}
 
 	async changeUserNickname(changeNickNameDto: RequestChangeNicknameDto) {
 		const { userId, nickname } = changeNickNameDto;
-		const userInformation = await this.userRepository.findById(userId);
+		const isExists = await this.userRepository.checkIsExistsById(userId);
 
-		if (!userInformation) {
+		if (!isExists) {
 			throw new BadRequestException('존재하지 않는 유저입니다');
 		}
 
