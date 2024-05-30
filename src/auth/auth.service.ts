@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -70,9 +75,39 @@ export class AuthService {
 				reIssueAccessToken,
 				reIssueRefreshToken,
 			);
+
 			return userId;
 		} catch (error) {
 			this.removeAuthenticateCookie(response);
+		}
+	}
+
+	async reIssueAccessToken(response: Response, refreshToken?: string) {
+		if (!refreshToken) {
+			throw new UnauthorizedException(
+				'요청에 계정 정보가 존재하지 않습니다. 로그인을 진행해주세요.',
+			);
+		}
+
+		try {
+			const userId = await this.verifyAuthenticateToken(refreshToken);
+			const { accessToken: reIssueAccessToken } =
+				this.getAuthenticateToken(userId);
+
+			const user = await this.userRepository.findById(userId);
+
+			if (!user) {
+				this.removeAuthenticateCookie(response);
+				throw new BadRequestException('유효하지 않은 계정 정보입니다.');
+			}
+
+			this.setAccessTokenInCookie(response, reIssueAccessToken);
+			return true;
+		} catch (error) {
+			this.removeAuthenticateCookie(response);
+			throw new UnauthorizedException(
+				'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
+			);
 		}
 	}
 
@@ -81,10 +116,18 @@ export class AuthService {
 		accessToken: string,
 		refreshToken: string,
 	) {
+		this.setAccessTokenInCookie(response, accessToken);
+		this.setRefreshInCookie(response, refreshToken);
+	}
+
+	private setAccessTokenInCookie(response: Response, accessToken: string) {
 		response.cookie('accessToken', accessToken, {
 			...this.cookieOption,
 			maxAge: this.ACCESS_TOKEN_MAX_AGE,
 		});
+	}
+
+	private setRefreshInCookie(response: Response, refreshToken: string) {
 		response.cookie('refreshToken', refreshToken, {
 			...this.cookieOption,
 			maxAge: this.REFRESH_TOKEN_MAX_AGE,

@@ -1,8 +1,17 @@
-import { Controller, Get, Res, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+	Controller,
+	Get,
+	HttpStatus,
+	Patch,
+	Req,
+	Res,
+	UseGuards,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
+import { ApiDocs } from '#/common/decorators/swagger.decorator';
 import { ResponseUserInformationDto } from '#/user/dto/user-information.dto';
 import { UserService } from '#/user/user.service';
 
@@ -19,13 +28,12 @@ export class AuthController {
 		private readonly userService: UserService,
 	) {}
 
-	@ApiOperation({
+	@ApiDocs({
 		summary: 'Kakao OAuth2 로그인을 진행합니다.',
-	})
-	@ApiResponse({
-		status: 200,
-		description: '카카오 로그인 성공 시 받는 응답',
-		type: ResponseUserInformationDto,
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseUserInformationDto,
+		},
 	})
 	@Get('kakao')
 	@UseGuards(KakaoAuthGuard)
@@ -44,21 +52,31 @@ export class AuthController {
 		const { accessToken, refreshToken } =
 			this.authService.getAuthenticateToken(user.id);
 
-		const cookieOption = {
-			secure: true,
-			sameSite: 'none',
-			path: '/',
-		} as const;
-
-		response.cookie('accessToken', accessToken, {
-			...cookieOption,
-			maxAge: 5 * 60 * 1000,
-		});
-		response.cookie('refreshToken', refreshToken, {
-			...cookieOption,
-			maxAge: 7 * 24 * 60 * 60 * 1000,
-		});
+		this.authService.setAuthenticateCookie(
+			response,
+			accessToken,
+			refreshToken,
+		);
 
 		return user;
+	}
+
+	@ApiDocs({
+		summary: 'Refresh Token 을 기반으로 Access Token 을 재발급 합니다.',
+		headers: {
+			name: 'Cookie',
+			description:
+				'Refresh Token 이 담긴 Cookie 입니다. 형식은 refreshToken=[유저가 발급받은 Refresh Token] 입니다.',
+			required: true,
+		},
+	})
+	@Patch('reissue')
+	async reIssueAccessToken(
+		@Req() request: Request,
+		@Res({ passthrough: true }) response: Response,
+	) {
+		const { refreshToken } = request.cookies ?? {};
+
+		return this.authService.reIssueAccessToken(response, refreshToken);
 	}
 }

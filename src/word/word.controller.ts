@@ -25,6 +25,10 @@ import {
 } from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
+	RequestWordRelatedSearchDto,
+	ResponseWordRelatedSearchDto,
+} from './dto/word-related-search.dto';
+import {
 	RequestWordSearchDto,
 	ResponseWordSearchDto,
 } from './dto/word-search.dto';
@@ -84,6 +88,23 @@ export class WordController {
 			userId: user.id,
 		});
 		return await this.wordService.getWordUserLike(wordUserLikeDto);
+	}
+
+	@ApiDocs({
+		summary: '특정 키워드와 연관된 단어 목록을 조회합니다.',
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseWordRelatedSearchDto,
+			isPaginated: true,
+		},
+	})
+	@Get('/search/related')
+	async findByRelatedSearch(
+		@Query() requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
+	) {
+		return await this.wordService.getWordByRelatedKeyword(
+			requestWordRelatedSearchDto,
+		);
 	}
 
 	@ApiDocs({

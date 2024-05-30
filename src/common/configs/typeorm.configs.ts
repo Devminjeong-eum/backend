@@ -23,11 +23,9 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
 			retryAttempts: this.isDev ? 0 : 3,
 			retryDelay: 3000,
 			// TODO : 인증서를 적용하여 SSL 연결이 가능하도록 수정 필요
-			...(!this.isDev && {
-				ssl: {
-					rejectUnauthorized: false,
-				},
-			}),
+			ssl: {
+				rejectUnauthorized: false,
+			},
 		};
 	}
 }
