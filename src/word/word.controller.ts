@@ -25,6 +25,10 @@ import {
 } from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
+	RequestWordRelatedSearchDto,
+	ResponseWordRelatedSearchDto,
+} from './dto/word-related-search.dto';
+import {
 	RequestWordSearchDto,
 	ResponseWordSearchDto,
 } from './dto/word-search.dto';
@@ -33,7 +37,6 @@ import {
 	ResponseWordUserLikeDto,
 } from './dto/word-user-like.dto';
 import { WordService } from './word.service';
-import { RequestWordRelatedSearchDto, ResponseWordRelatedSearchDto } from './dto/word-related-search.dto';
 
 @ApiTags('Word')
 @Controller('word')
@@ -92,14 +95,16 @@ export class WordController {
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordRelatedSearchDto,
-			isPaginated: true
+			isPaginated: true,
 		},
 	})
 	@Get('/search/related')
 	async findByRelatedSearch(
 		@Query() requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
 	) {
-		return await this.wordService.getWordByRelatedKeyword(requestWordRelatedSearchDto);
+		return await this.wordService.getWordByRelatedKeyword(
+			requestWordRelatedSearchDto,
+		);
 	}
 
 	@ApiDocs({
