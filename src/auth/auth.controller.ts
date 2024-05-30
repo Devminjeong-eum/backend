@@ -3,12 +3,13 @@ import {
 	Get,
 	HttpStatus,
 	Patch,
+	Req,
 	Res,
 	UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { ApiDocs } from '#/common/decorators/swagger.decorator';
 import { ResponseUserInformationDto } from '#/user/dto/user-information.dto';
@@ -16,7 +17,6 @@ import { UserService } from '#/user/user.service';
 
 import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
-import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
 
@@ -70,10 +70,13 @@ export class AuthController {
 			required: true,
 		},
 	})
-	@UseGuards(AuthenticationGuard)
 	@Patch('reissue')
-	async reIssueAccessToken() {
-		// NOTE : Access Token 자동 재발급의 경우 AuthenticationGuard 에서 처리
-		return true;
+	async reIssueAccessToken(
+		@Req() request: Request,
+		@Res({ passthrough: true }) response: Response,
+	) {
+		const { refreshToken } = request.cookies ?? {};
+
+		return this.authService.reIssueAccessToken(response, refreshToken);
 	}
 }
