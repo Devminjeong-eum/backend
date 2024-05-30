@@ -35,7 +35,6 @@ export class QuizResultRepository {
 		return await this.quizResultRepository
 			.createQueryBuilder('quizResult')
 			.where('quizResult.id = :quizResultId', { quizResultId })
-			.andWhere('quizResult.expiredAt > :now', { now: new Date() })
 			.getOne();
 	}
 }
