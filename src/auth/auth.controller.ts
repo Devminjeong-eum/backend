@@ -1,4 +1,11 @@
-import { Controller, Get, HttpStatus, Res, UseGuards } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	HttpStatus,
+	Patch,
+	Res,
+	UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import type { Response } from 'express';
@@ -9,6 +16,7 @@ import { UserService } from '#/user/user.service';
 
 import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
+import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
 
@@ -51,5 +59,21 @@ export class AuthController {
 		);
 
 		return user;
+	}
+
+	@ApiDocs({
+		summary: 'Refresh Token 을 기반으로 Access Token 을 재발급 합니다.',
+		headers: {
+			name: 'Cookie',
+			description:
+				'Refresh Token 이 담긴 Cookie 입니다. 형식은 refreshToken=[유저가 발급받은 Refresh Token] 입니다.',
+			required: true,
+		},
+	})
+	@UseGuards(AuthenticationGuard)
+	@Patch('reissue')
+	async reIssueAccessToken() {
+		// NOTE : Access Token 자동 재발급의 경우 AuthenticationGuard 에서 처리
+		return true;
 	}
 }
