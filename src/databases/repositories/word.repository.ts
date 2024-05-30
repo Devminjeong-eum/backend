@@ -117,6 +117,15 @@ export class WordRepository {
 		return await queryBuilder.groupBy('word.id').getRawOne();
 	}
 
+	findByRelatedSearchWord(keyword: string) {
+		return this.wordRepository
+			.createQueryBuilder('word')
+			.where('word.name like :keyword', { keyword: `${keyword}%` })
+			.select(['word.id', 'word.name', 'word.diacritic'])
+			.limit(10)
+			.getMany();
+	}
+
 	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
 		const { keyword, userId } = requestWordSearchDto;
 
