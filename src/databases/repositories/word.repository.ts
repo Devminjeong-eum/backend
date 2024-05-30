@@ -7,6 +7,7 @@ import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
 import { RequestWordDetailDto } from '#/word/dto/word-detail.dto';
 import { RequestWordListDto } from '#/word/dto/word-list.dto';
+import { RequestWordRelatedSearchDto } from '#/word/dto/word-related-search.dto';
 import { RequestWordSearchDto } from '#/word/dto/word-search.dto';
 import { RequestWordUserLikeDto } from '#/word/dto/word-user-like.dto';
 import { WORD_SORTING_TYPE } from '#/word/interface/word-list-sorting.interface';
@@ -117,13 +118,22 @@ export class WordRepository {
 		return await queryBuilder.groupBy('word.id').getRawOne();
 	}
 
-	findByRelatedSearchWord(keyword: string) {
-		return this.wordRepository
+	async findByRelatedSearchWord(
+		requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
+	) {
+		const { keyword } = requestWordRelatedSearchDto;
+
+		const [words, totalCount] = await this.wordRepository
 			.createQueryBuilder('word')
 			.where('word.name like :keyword', { keyword: `${keyword}%` })
 			.select(['word.id', 'word.name', 'word.diacritic'])
-			.limit(10)
-			.getMany();
+			.skip(requestWordRelatedSearchDto.getSkip())
+			.take(requestWordRelatedSearchDto.limit)
+			.getManyAndCount();
+
+		console.log(words);
+
+		return { words, totalCount };
 	}
 
 	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
