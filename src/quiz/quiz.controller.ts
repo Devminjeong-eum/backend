@@ -55,9 +55,9 @@ export class QuizController {
 	) {
 		const createQuizResultDto = plainToInstance(
 			RequestCreateQuizResultDto,
-			{ userId: user.id, correctWordIds, incorrectWordIds },
+			{ correctWordIds, incorrectWordIds },
 		);
-		return this.quizService.createQuizResult(createQuizResultDto);
+		return this.quizService.createQuizResult(user, createQuizResultDto);
 	}
 
 	@ApiDocs({

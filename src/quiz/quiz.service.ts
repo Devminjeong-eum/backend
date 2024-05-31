@@ -8,6 +8,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { plainToInstance } from 'class-transformer';
 
+import { User } from '#/databases/entities/user.entity';
+import { UserRepository } from '#/databases/repositories/user.repository';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
 import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
 import { QuizSelectionRepository } from '#databases/repositories/quizSelection.repository';
@@ -31,6 +33,7 @@ export class QuizService {
 		private readonly spreadSheetService: SpreadSheetService,
 		private readonly quizResultRepository: QuizResultRepository,
 		private readonly quizSelectionRepository: QuizSelectionRepository,
+		private readonly userRepository: UserRepository,
 		private readonly wordRepository: WordRepository,
 	) {}
 
@@ -116,7 +119,10 @@ export class QuizService {
 		return await this.updateQuizSelectionList();
 	}
 
-	async createQuizResult(createQuizResultDto: RequestCreateQuizResultDto) {
+	async createQuizResult(
+		user: User,
+		createQuizResultDto: RequestCreateQuizResultDto,
+	) {
 		const { correctWordIds, incorrectWordIds } = createQuizResultDto;
 		const isValidQuizAmount =
 			new Set([...correctWordIds, ...incorrectWordIds]).size !==
@@ -139,8 +145,10 @@ export class QuizService {
 			);
 		}
 
-		const createdQuizResult =
-			await this.quizResultRepository.create(createQuizResultDto);
+		const createdQuizResult = await this.quizResultRepository.create(
+			user,
+			createQuizResultDto,
+		);
 
 		const responseCreateQuizResultDto = plainToInstance(
 			ResponseCreateQuizResultDto,
