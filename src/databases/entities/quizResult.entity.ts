@@ -3,14 +3,14 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	PrimaryGeneratedColumn,
+	PrimaryColumn,
 } from 'typeorm';
 
 import { User } from '#databases/entities/user.entity';
 
 @Entity()
 export class QuizResult {
-	@PrimaryGeneratedColumn('uuid')
+	@PrimaryColumn()
 	id: string;
 
 	@ManyToOne(() => User)
