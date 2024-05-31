@@ -16,12 +16,13 @@ export class QuizResultRepository {
 		private readonly quizResultRepository: Repository<QuizResult>,
 	) {}
 
+	private QUIZ_RESULT_ID_LENGTH = 6;
 	private async generatedQuizResultId() {
 		let id: string = "";
 		let isAlreadyUsed: boolean = true;
 
 		while (isAlreadyUsed) {
-			id = generateNanoId(6);
+			id = generateNanoId(this.QUIZ_RESULT_ID_LENGTH);
 			isAlreadyUsed = await this.quizResultRepository.exists({ where: { id } });
 		}
 

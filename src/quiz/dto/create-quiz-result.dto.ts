@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Expose, Transform } from 'class-transformer';
-import { IsArray, IsUUID, MaxLength } from 'class-validator';
+import { IsArray, IsString, IsUUID, Length, MaxLength } from 'class-validator';
 
 export class RequestCreateQuizResultDto {
 	@IsArray()
@@ -20,7 +20,8 @@ export class RequestCreateQuizResultDto {
 }
 
 export class ResponseCreateQuizResultDto {
-	@IsUUID()
+	@IsString()
+	@Length(6)
 	@Transform(({ obj }) => obj.id)
 	@Expose()
 	@ApiProperty()
