@@ -26,6 +26,10 @@ export class UserRepository {
 	}
 
 	findById(userId: string) {
+		return this.userRepository.findOne({ where: { id: userId } });
+	}
+
+	findByIdWithLikeCount(userId: string) {
 		return this.userRepository
 			.createQueryBuilder('user')
 			.leftJoin('user.likes', 'like')

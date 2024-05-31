@@ -4,9 +4,6 @@ import { Expose, Transform } from 'class-transformer';
 import { IsArray, IsUUID, MaxLength } from 'class-validator';
 
 export class RequestCreateQuizResultDto {
-	@IsUUID()
-	userId: string;
-
 	@IsArray()
 	@IsUUID(undefined, { each: true })
 	@ApiProperty({
