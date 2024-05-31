@@ -31,7 +31,7 @@
     "cookie-parser": "^1.4.6",
     "dayjs": "^1.11.11",
     "googleapis": "^135.1.0",
-    "nanoid": "^5.0.7",
+    "nanoid": "^3.3.7",
     "nest-winston": "^1.9.4",
     "pg": "^8.11.5",
     "rxjs": "^7.8.1",
