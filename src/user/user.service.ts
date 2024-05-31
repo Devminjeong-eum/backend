@@ -23,7 +23,8 @@ export class UserService {
 	}
 
 	async getUserInformation(userId: string) {
-		const userInformation = await this.userRepository.findById(userId);
+		const userInformation =
+			await this.userRepository.findByIdWithLikeCount(userId);
 
 		if (!userInformation) {
 			throw new BadRequestException('존재하지 않는 유저입니다');

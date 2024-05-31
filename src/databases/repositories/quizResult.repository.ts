@@ -4,9 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import { Repository } from 'typeorm';
 
-import { RequestCreateQuizResultDto } from '#/quiz/dto/create-quiz-result.dto';
 import { QuizResult } from '#databases/entities/quizResult.entity';
 import { User } from '#databases/entities/user.entity';
+import { RequestCreateQuizResultDto } from '#/quiz/dto/create-quiz-result.dto';
 
 @Injectable()
 export class QuizResultRepository {
@@ -15,18 +15,16 @@ export class QuizResultRepository {
 		private readonly quizResultRepository: Repository<QuizResult>,
 	) {}
 
-	async create(createQuizResultDto: RequestCreateQuizResultDto) {
-		const { userId, correctWordIds, incorrectWordIds } =
-			createQuizResultDto;
+	async create(user: User, createQuizResultDto: RequestCreateQuizResultDto) {
+		const { correctWordIds, incorrectWordIds } = createQuizResultDto;
+		const expiredAt = dayjs().add(1, 'day').toDate();
 
-		const user = new User();
-		user.id = userId;
-
-		const quizResult = new QuizResult();
-		quizResult.user = user;
-		quizResult.correctWordIds = correctWordIds;
-		quizResult.incorrectWordIds = incorrectWordIds;
-		quizResult.expiredAt = dayjs().add(1, 'day').toDate();
+		const quizResult = this.quizResultRepository.create({
+			user,
+			correctWordIds,
+			incorrectWordIds,
+			expiredAt,
+		});
 
 		return this.quizResultRepository.save(quizResult);
 	}
