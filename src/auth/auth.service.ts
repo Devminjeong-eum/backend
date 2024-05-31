@@ -5,7 +5,7 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
 import type { Request, Response } from 'express';
 
@@ -78,7 +78,17 @@ export class AuthService {
 
 			return userId;
 		} catch (error) {
-			this.removeAuthenticateCookie(response);
+			if (error instanceof TokenExpiredError) {
+				this.removeAuthenticateCookie(response);
+				throw new UnauthorizedException(
+					'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
+				);
+			}
+			throw new InternalServerErrorException({
+				error,
+				message:
+					'인증 토큰을 파싱하는 과정에서 에러가 발생했습니다.',
+			});
 		}
 	}
 
@@ -104,10 +114,17 @@ export class AuthService {
 			this.setAccessTokenInCookie(response, reIssueAccessToken);
 			return true;
 		} catch (error) {
-			this.removeAuthenticateCookie(response);
-			throw new UnauthorizedException(
-				'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
-			);
+			if (error instanceof TokenExpiredError) {
+				this.removeAuthenticateCookie(response);
+				throw new UnauthorizedException(
+					'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
+				);
+			}
+			throw new InternalServerErrorException({
+				error,
+				message:
+					'인증 토큰을  파싱하는 과정에서 에러가 발생했습니다.',
+			});
 		}
 	}
 

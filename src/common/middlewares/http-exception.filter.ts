@@ -58,7 +58,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				errorResponse = {
 					...errorResponse,
 					statusCode,
-					message: exception.message,
 				};
 				break;
 			}
@@ -73,7 +72,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				errorResponse = {
 					...errorResponse,
 					statusCode,
-					message: responseBody.message as string,
 				};
 				break;
 			}
@@ -82,14 +80,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
 				errorResponse = {
 					...errorResponse,
 					statusCode,
-					message: exception.message,
 				};
 			}
 		}
 
 		const errorStack = this.getPartialStackTrace(exception.stack);
 
-		if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
+		// NOTE : 5XX 에러는 Discord Webhook 으로 에러 메시지를 전송합니다.
+		if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
 			this.discordWebhookService.sendExceptionMessage(
 				errorResponse,
 				errorStack,
