@@ -18,13 +18,13 @@ export class QuizResultRepository {
 
 	private QUIZ_RESULT_ID_LENGTH = 6;
 	private async generatedQuizResultId() {
-		let id: string = "";
-		let isAlreadyUsed: boolean = true;
+		let id: string;
+		let isAlreadyUsed: boolean;
 
-		while (isAlreadyUsed) {
+		do {
 			id = generateNanoId(this.QUIZ_RESULT_ID_LENGTH);
 			isAlreadyUsed = await this.quizResultRepository.exists({ where: { id } });
-		}
+		} while (isAlreadyUsed);
 
 		return id;
 	}
