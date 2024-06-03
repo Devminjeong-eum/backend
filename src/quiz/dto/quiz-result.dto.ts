@@ -7,6 +7,7 @@ import {
 	IsOptional,
 	IsString,
 	IsUUID,
+	Length,
 } from 'class-validator';
 
 export class RequestQuizResultDto {
@@ -14,7 +15,8 @@ export class RequestQuizResultDto {
 	@IsUUID()
 	userId?: string;
 
-	@IsUUID()
+	@IsString()
+	@Length(6)
 	quizResultId: string;
 }
 
@@ -46,7 +48,8 @@ class QuizResultWord {
 }
 
 export class ResponseQuizResultDto {
-	@IsUUID()
+	@IsString()
+	@Length(6)
 	@Expose()
 	@ApiProperty()
 	quizResultId: string;

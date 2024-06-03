@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Test')
@@ -16,5 +16,11 @@ export class AppController {
 	@Get()
 	getHello(): string {
 		return 'Pong!';
+	}
+
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@Get('/favicon.ico') 
+	getPreventFavicon() {
+		return true;
 	}
 }
