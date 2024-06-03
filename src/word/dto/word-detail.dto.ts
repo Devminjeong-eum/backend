@@ -5,6 +5,7 @@ import {
 	IsArray,
 	IsBoolean,
 	IsIn,
+	IsNotEmpty,
 	IsNumber,
 	IsOptional,
 	IsString,
@@ -16,13 +17,14 @@ import {
 	type WordDetailSearchOption,
 } from '../interface/word-search-type.interface';
 
+
 export class RequestWordDetailDto {
 	@IsUUID()
 	@IsOptional()
 	userId?: string;
 
-	@IsOptional()
 	@IsIn(WORD_DETAIL_SEARCH_OPTION)
+	@IsNotEmpty()
 	@ApiProperty({
 		type: 'enum',
 		enum: WORD_DETAIL_SEARCH_OPTION,
@@ -30,6 +32,7 @@ export class RequestWordDetailDto {
 	searchType: WordDetailSearchOption = 'NAME';
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({
 		description:
 			'searchType 이 NAME 일 경우 단어 명을, ID 일 경우 단어 id 를 받습니다.',
