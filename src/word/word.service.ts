@@ -10,10 +10,6 @@ import { WordRepository } from '#databases/repositories/word.repository';
 import { RequestCreateWordDto } from './dto/create-word.dto';
 import { RequestUpdateWordDto } from './dto/update-word.dto';
 import {
-	RequestWordDetailWithNameDto,
-	ResponseWordDetailWithNameDto,
-} from './dto/word-detail-with-name.dto';
-import {
 	RequestWordDetailDto,
 	ResponseWordDetailDto,
 } from './dto/word-detail.dto';
@@ -140,25 +136,6 @@ export class WordService {
 		});
 
 		return new PaginationDto(responseWordUserLikeListDto, paginationMeta);
-	}
-
-	async getWordByName(wordDetailWithNameDto: RequestWordDetailWithNameDto) {
-		const word = await this.wordRepository.findByNameWithUserLike(
-			wordDetailWithNameDto,
-		);
-
-		if (!word)
-			throw new BadRequestException(
-				`해당 이름을 가진 Word 가 존재하지 않습니다.`,
-			);
-
-		const responseWordDetailWithNameDto = plainToInstance(
-			ResponseWordDetailWithNameDto,
-			word,
-			{ excludeExtraneousValues: true },
-		);
-
-		return responseWordDetailWithNameDto;
 	}
 
 	async getWordDetail(wordDetailDto: RequestWordDetailDto) {
