@@ -22,7 +22,7 @@ import { User } from '#databases/entities/user.entity';
 import {
 	RequestWordDetailDto,
 	ResponseWordDetailDto,
-} from './dto/word-detail.dto';
+} from './dto/word-detail-with-id.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
 	RequestWordRelatedSearchDto,

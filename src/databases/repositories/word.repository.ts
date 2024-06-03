@@ -6,7 +6,7 @@ import { DataSource, Repository } from 'typeorm';
 import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
 import { RequestWordDetailWithNameDto } from '#/word/dto/word-detail-with-name.dto';
-import { RequestWordDetailDto } from '#/word/dto/word-detail.dto';
+import { RequestWordDetailDto } from '#/word/dto/word-detail-with-id.dto';
 import { RequestWordListDto } from '#/word/dto/word-list.dto';
 import { RequestWordRelatedSearchDto } from '#/word/dto/word-related-search.dto';
 import { RequestWordSearchDto } from '#/word/dto/word-search.dto';
