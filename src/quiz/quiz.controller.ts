@@ -4,7 +4,6 @@ import {
 	Get,
 	HttpStatus,
 	Param,
-	ParseUUIDPipe,
 	Patch,
 	Post,
 	UseGuards,
@@ -65,7 +64,7 @@ export class QuizController {
 		params: {
 			name: 'quizResultId',
 			required: true,
-			description: '조회할 퀴즈 결과 UUID (id)',
+			description: '조회할 퀴즈 결과 ID',
 		},
 		response: {
 			statusCode: HttpStatus.OK,
@@ -76,8 +75,7 @@ export class QuizController {
 	@Get('/result/:quizResultId')
 	async findQuizResultById(
 		@AuthenticatedUser() user: User,
-		@Param('quizResultId', new ParseUUIDPipe({ version: undefined }))
-		quizResultId: string,
+		@Param('quizResultId') quizResultId: string,
 	) {
 		const quizResultDto = plainToInstance(RequestQuizResultDto, {
 			userId: user?.id,
