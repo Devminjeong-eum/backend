@@ -37,6 +37,7 @@ import {
 	ResponseWordUserLikeDto,
 } from './dto/word-user-like.dto';
 import { WordService } from './word.service';
+import { RequestWordDetailWithNameDto, ResponseWordDetailWithNameDto } from './dto/word-detail-with-name.dto';
 
 @ApiTags('Word')
 @Controller('word')
@@ -155,6 +156,32 @@ export class WordController {
 			wordId,
 		});
 		return await this.wordService.getWordById(wordDetailDto);
+	}
+
+	@ApiDocs({
+		summary: '단어 이름을 기반으로 상세 정보를 열람합니다.',
+		params: {
+			name: 'wordName',
+			required: true,
+			description: '조회할 단어 명',
+		},
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseWordDetailWithNameDto,
+		},
+	})
+	@Get('/:wordName')
+	@UseInterceptors(UserInformationInterceptor)
+	async findByName(
+		@AuthenticatedUser() user: User,
+		@Param('wordName')
+		wordName: string,
+	) {
+		const wordDetailWithNameDto = plainToInstance(RequestWordDetailWithNameDto, {
+			userId: user?.id,
+			wordName,
+		});
+		return await this.wordService.getWordByName(wordDetailWithNameDto);
 	}
 
 	@ApiDocs({

@@ -10,6 +10,10 @@ import { WordRepository } from '#databases/repositories/word.repository';
 import { RequestCreateWordDto } from './dto/create-word.dto';
 import { RequestUpdateWordDto } from './dto/update-word.dto';
 import {
+	RequestWordDetailWithNameDto,
+	ResponseWordDetailWithNameDto,
+} from './dto/word-detail-with-name.dto';
+import {
 	RequestWordDetailDto,
 	ResponseWordDetailDto,
 } from './dto/word-detail.dto';
@@ -47,26 +51,18 @@ export class WordService {
 			uuid,
 		]: string[],
 		index: number,
-	) => {
-		const diacriticList = diacritic.split(',');
-		const pronunciationList = pronunciation
+	) => ({
+		name: name.toLowerCase(),
+		description,
+		diacritic: diacritic.split(','),
+		pronunciation: pronunciation.split(',').map((word) => word.trim()),
+		wrongPronunciations: wrongPronunciations
 			.split(',')
-			.map((word) => word.trim());
-		const wrongPronunciationList = wrongPronunciations
-			.split(',')
-			.map((word) => word.trim());
-
-		return {
-			name,
-			description,
-			diacritic: diacriticList,
-			pronunciation: pronunciationList,
-			wrongPronunciations: wrongPronunciationList,
-			exampleSentence,
-			uuid,
-			index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
-		};
-	};
+			.map((word) => word.trim()),
+		exampleSentence,
+		uuid,
+		index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+	});
 
 	async updateWordList() {
 		const parsedSheetDataList =
@@ -162,6 +158,25 @@ export class WordService {
 		);
 
 		return responseWordDetailDto;
+	}
+
+	async getWordByName(wordDetailWithNameDto: RequestWordDetailWithNameDto) {
+		const word = await this.wordRepository.findByNameWithUserLike(
+			wordDetailWithNameDto,
+		);
+
+		if (!word)
+			throw new BadRequestException(
+				`해당 이름을 가진 Word 가 존재하지 않습니다.`,
+			);
+
+		const responseWordDetailWithNameDto = plainToInstance(
+			ResponseWordDetailWithNameDto,
+			word,
+			{ excludeExtraneousValues: true },
+		);
+
+		return responseWordDetailWithNameDto;
 	}
 
 	async getWordByKeyword(requestWordSearchDto: RequestWordSearchDto) {
