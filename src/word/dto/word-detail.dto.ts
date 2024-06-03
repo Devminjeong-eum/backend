@@ -17,7 +17,6 @@ import {
 	type WordDetailSearchOption,
 } from '../interface/word-search-type.interface';
 
-
 export class RequestWordDetailDto {
 	@IsUUID()
 	@IsOptional()
