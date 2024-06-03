@@ -148,7 +148,7 @@ export class WordService {
 						userId,
 					})
 				: await this.wordRepository.findByNameWithUserLike({
-						name: searchValue,
+						name: searchValue.toLowerCase(),
 						userId,
 					});
 
