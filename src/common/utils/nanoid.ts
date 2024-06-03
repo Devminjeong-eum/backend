@@ -7,4 +7,7 @@ const alphabetWithNumbers = [
 
 const DEFAULT_NANOID_SIZE = 10;
 
-export const generateNanoId = customAlphabet(alphabetWithNumbers, DEFAULT_NANOID_SIZE);
+export const generateNanoId = customAlphabet(
+	alphabetWithNumbers,
+	DEFAULT_NANOID_SIZE,
+);

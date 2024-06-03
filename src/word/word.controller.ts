@@ -2,8 +2,6 @@ import {
 	Controller,
 	Get,
 	HttpStatus,
-	Param,
-	ParseUUIDPipe,
 	Patch,
 	Query,
 	UseGuards,
@@ -132,29 +130,23 @@ export class WordController {
 	}
 
 	@ApiDocs({
-		summary: '특정 Word Id 를 가진 단어의 상세 정보를 열람합니다.',
-		params: {
-			name: 'wordId',
-			required: true,
-			description: '조회할 Word UUID (id)',
-		},
+		summary: '특정 단어의 상세 정보를 ID 혹은 이름으로 검색하여 열람합니다.',
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordDetailDto,
 		},
 	})
-	@Get('/:wordId')
+	@Get('/detail')
 	@UseInterceptors(UserInformationInterceptor)
 	async findById(
 		@AuthenticatedUser() user: User,
-		@Param('wordId', new ParseUUIDPipe({ version: undefined }))
-		wordId: string,
+		@Query() requestWordDetailDto: RequestWordDetailDto,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
 			userId: user?.id,
-			wordId,
+			...requestWordDetailDto,
 		});
-		return await this.wordService.getWordById(wordDetailDto);
+		return await this.wordService.getWordDetail(wordDetailDto);
 	}
 
 	@ApiDocs({

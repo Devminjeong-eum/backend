@@ -36,6 +36,10 @@ export class WordService {
 
 	private SPREAD_SHEET_UUID_ROW = 'G';
 	private readonly SPREAD_SHEET_NAME = 'word';
+	private readonly UUID_REGEX =
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+	private readonly NAME_REGEX = /^[a-z0-9]$/i;
+
 	private parseWordFromSpreadSheet = (
 		[
 			name,
@@ -47,26 +51,18 @@ export class WordService {
 			uuid,
 		]: string[],
 		index: number,
-	) => {
-		const diacriticList = diacritic.split(',');
-		const pronunciationList = pronunciation
+	) => ({
+		name: name.toLowerCase(),
+		description,
+		diacritic: diacritic.split(','),
+		pronunciation: pronunciation.split(',').map((word) => word.trim()),
+		wrongPronunciations: wrongPronunciations
 			.split(',')
-			.map((word) => word.trim());
-		const wrongPronunciationList = wrongPronunciations
-			.split(',')
-			.map((word) => word.trim());
-
-		return {
-			name,
-			description,
-			diacritic: diacriticList,
-			pronunciation: pronunciationList,
-			wrongPronunciations: wrongPronunciationList,
-			exampleSentence,
-			uuid,
-			index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
-		};
-	};
+			.map((word) => word.trim()),
+		exampleSentence,
+		uuid,
+		index: index + 2, // NOTE : SpreadSheet 의 경우 2번부터 단어 시작
+	});
 
 	async updateWordList() {
 		const parsedSheetDataList =
@@ -146,22 +142,44 @@ export class WordService {
 		return new PaginationDto(responseWordUserLikeListDto, paginationMeta);
 	}
 
-	async getWordById(wordDetailDto: RequestWordDetailDto) {
+	async getWordDetail(wordDetailDto: RequestWordDetailDto) {
+		const { searchType, searchValue, userId } = wordDetailDto;
+
+		if (searchType === 'ID' && !searchValue.match(this.UUID_REGEX)) {
+			throw new BadRequestException(
+				'searchType 이 ID 인 경우 searchValue 에는 유효한 UUID 가 와야 합니다.',
+			);
+		}
+
+		if (searchType === 'NAME' && !searchValue.match(this.NAME_REGEX)) {
+			throw new BadRequestException(
+				'searchType 이 NAME 인 경우 searchValue 에는 유효한 단어 명이 와야 합니다.',
+			);
+		}
+
 		const word =
-			await this.wordRepository.findByIdWithUserLike(wordDetailDto);
+			searchType === 'ID'
+				? await this.wordRepository.findByIdWithUserLike({
+						wordId: searchValue,
+						userId,
+					})
+				: await this.wordRepository.findByNameWithUserLike({
+						name: searchValue.toLowerCase(),
+						userId,
+					});
 
 		if (!word)
 			throw new BadRequestException(
-				`해당 ID 를 가진 Word 가 존재하지 않습니다.`,
+				`해당 조건에 맞는 단어가 존재하지 않습니다.`,
 			);
 
-		const responseWordDetailDto = plainToInstance(
+		const responseWordDetailWithNameDto = plainToInstance(
 			ResponseWordDetailDto,
 			word,
 			{ excludeExtraneousValues: true },
 		);
 
-		return responseWordDetailDto;
+		return responseWordDetailWithNameDto;
 	}
 
 	async getWordByKeyword(requestWordSearchDto: RequestWordSearchDto) {

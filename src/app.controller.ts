@@ -19,7 +19,7 @@ export class AppController {
 	}
 
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@Get('/favicon.ico') 
+	@Get('/favicon.ico')
 	getPreventFavicon() {
 		return true;
 	}

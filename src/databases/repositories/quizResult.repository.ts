@@ -23,7 +23,9 @@ export class QuizResultRepository {
 
 		do {
 			id = generateNanoId(this.QUIZ_RESULT_ID_LENGTH);
-			isAlreadyUsed = await this.quizResultRepository.exists({ where: { id } });
+			isAlreadyUsed = await this.quizResultRepository.exists({
+				where: { id },
+			});
 		} while (isAlreadyUsed);
 
 		return id;
