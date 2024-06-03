@@ -16,7 +16,7 @@ import {
 import {
 	RequestWordDetailDto,
 	ResponseWordDetailDto,
-} from './dto/word-detail-with-id.dto';
+} from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
 	RequestWordRelatedSearchDto,
@@ -142,24 +142,6 @@ export class WordService {
 		return new PaginationDto(responseWordUserLikeListDto, paginationMeta);
 	}
 
-	async getWordById(wordDetailDto: RequestWordDetailDto) {
-		const word =
-			await this.wordRepository.findByIdWithUserLike(wordDetailDto);
-
-		if (!word)
-			throw new BadRequestException(
-				`해당 ID 를 가진 Word 가 존재하지 않습니다.`,
-			);
-
-		const responseWordDetailDto = plainToInstance(
-			ResponseWordDetailDto,
-			word,
-			{ excludeExtraneousValues: true },
-		);
-
-		return responseWordDetailDto;
-	}
-
 	async getWordByName(wordDetailWithNameDto: RequestWordDetailWithNameDto) {
 		const word = await this.wordRepository.findByNameWithUserLike(
 			wordDetailWithNameDto,
@@ -172,6 +154,34 @@ export class WordService {
 
 		const responseWordDetailWithNameDto = plainToInstance(
 			ResponseWordDetailWithNameDto,
+			word,
+			{ excludeExtraneousValues: true },
+		);
+
+		return responseWordDetailWithNameDto;
+	}
+
+	async getWordDetail(wordDetailDto: RequestWordDetailDto) {
+		const { searchType, searchValue, userId } = wordDetailDto;
+
+		const word =
+			searchType === 'ID'
+				? await this.wordRepository.findByIdWithUserLike({
+						wordId: searchValue,
+						userId,
+					})
+				: await this.wordRepository.findByNameWithUserLike({
+						name: searchValue,
+						userId,
+					});
+
+		if (!word)
+			throw new BadRequestException(
+				`해당 조건에 맞는 단어가 존재하지 않습니다.`,
+			);
+
+		const responseWordDetailWithNameDto = plainToInstance(
+			ResponseWordDetailDto,
 			word,
 			{ excludeExtraneousValues: true },
 		);

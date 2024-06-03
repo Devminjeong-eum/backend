@@ -5,8 +5,6 @@ import { DataSource, Repository } from 'typeorm';
 
 import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
-import { RequestWordDetailWithNameDto } from '#/word/dto/word-detail-with-name.dto';
-import { RequestWordDetailDto } from '#/word/dto/word-detail-with-id.dto';
 import { RequestWordListDto } from '#/word/dto/word-list.dto';
 import { RequestWordRelatedSearchDto } from '#/word/dto/word-related-search.dto';
 import { RequestWordSearchDto } from '#/word/dto/word-search.dto';
@@ -88,9 +86,13 @@ export class WordRepository {
 		return await queryBuilder.groupBy('word.id').getRawMany();
 	}
 
-	async findByIdWithUserLike(wordDetailDto: RequestWordDetailDto) {
-		const { wordId, userId } = wordDetailDto;
-
+	async findByIdWithUserLike({
+		wordId,
+		userId,
+	}: {
+		wordId: string;
+		userId?: string;
+	}) {
 		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')
@@ -119,15 +121,17 @@ export class WordRepository {
 		return await queryBuilder.groupBy('word.id').getRawOne();
 	}
 
-	async findByNameWithUserLike(
-		wordDetailWithNameDto: RequestWordDetailWithNameDto,
-	) {
-		const { name: wordName, userId } = wordDetailWithNameDto;
-
+	async findByNameWithUserLike({
+		name,
+		userId,
+	}: {
+		name: string;
+		userId?: string;
+	}) {
 		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')
-			.where('word.name = :wordName', { wordName })
+			.where('word.name = :wordName', { wordName: name })
 			.select([
 				'word.id',
 				'word.name',

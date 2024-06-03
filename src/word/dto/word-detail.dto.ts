@@ -4,22 +4,39 @@ import { Expose, Transform } from 'class-transformer';
 import {
 	IsArray,
 	IsBoolean,
+	IsIn,
 	IsNumber,
 	IsOptional,
 	IsString,
 	IsUUID,
 } from 'class-validator';
 
-export class RequestWordDetailWithNameDto {
+import {
+	WORD_DETAIL_SEARCH_OPTION,
+	type WordDetailSearchOption,
+} from '../interface/word-search-type.interface';
+
+export class RequestWordDetailDto {
 	@IsUUID()
 	@IsOptional()
 	userId?: string;
 
+	@IsOptional()
+	@IsIn(WORD_DETAIL_SEARCH_OPTION)
+	@ApiProperty({
+		type: 'enum',
+		enum: WORD_DETAIL_SEARCH_OPTION,
+	})
+	searchType: WordDetailSearchOption = 'NAME';
+
 	@IsString()
-	name: string;
+	@ApiProperty({
+		description: 'searchType 이 NAME 일 경우 단어 명을, ID 일 경우 단어 id 를 받습니다.'
+	})
+	searchValue: string;
 }
 
-export class ResponseWordDetailWithNameDto {
+export class ResponseWordDetailDto {
 	@IsUUID()
 	@Transform(({ obj }) => obj.word_id)
 	@Expose({ name: 'id' })

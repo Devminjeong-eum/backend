@@ -2,8 +2,6 @@ import {
 	Controller,
 	Get,
 	HttpStatus,
-	Param,
-	ParseUUIDPipe,
 	Patch,
 	Query,
 	UseGuards,
@@ -22,7 +20,7 @@ import { User } from '#databases/entities/user.entity';
 import {
 	RequestWordDetailDto,
 	ResponseWordDetailDto,
-} from './dto/word-detail-with-id.dto';
+} from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
 	RequestWordRelatedSearchDto,
@@ -37,7 +35,6 @@ import {
 	ResponseWordUserLikeDto,
 } from './dto/word-user-like.dto';
 import { WordService } from './word.service';
-import { RequestWordDetailWithNameDto, ResponseWordDetailWithNameDto } from './dto/word-detail-with-name.dto';
 
 @ApiTags('Word')
 @Controller('word')
@@ -144,44 +141,17 @@ export class WordController {
 			schema: ResponseWordDetailDto,
 		},
 	})
-	@Get('/:wordId')
+	@Get('/detail')
 	@UseInterceptors(UserInformationInterceptor)
 	async findById(
 		@AuthenticatedUser() user: User,
-		@Param('wordId', new ParseUUIDPipe({ version: undefined }))
-		wordId: string,
+		@Query() requestWordDetailDto: RequestWordDetailDto,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
 			userId: user?.id,
-			wordId,
+			...requestWordDetailDto,
 		});
-		return await this.wordService.getWordById(wordDetailDto);
-	}
-
-	@ApiDocs({
-		summary: '단어 이름을 기반으로 상세 정보를 열람합니다.',
-		params: {
-			name: 'wordName',
-			required: true,
-			description: '조회할 단어 명',
-		},
-		response: {
-			statusCode: HttpStatus.OK,
-			schema: ResponseWordDetailWithNameDto,
-		},
-	})
-	@Get('/:wordName')
-	@UseInterceptors(UserInformationInterceptor)
-	async findByName(
-		@AuthenticatedUser() user: User,
-		@Param('wordName')
-		wordName: string,
-	) {
-		const wordDetailWithNameDto = plainToInstance(RequestWordDetailWithNameDto, {
-			userId: user?.id,
-			wordName,
-		});
-		return await this.wordService.getWordByName(wordDetailWithNameDto);
+		return await this.wordService.getWordDetail(wordDetailDto);
 	}
 
 	@ApiDocs({
