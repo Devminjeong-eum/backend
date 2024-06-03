@@ -5,7 +5,6 @@ import { DataSource, Repository } from 'typeorm';
 
 import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
-import { RequestWordDetailDto } from '#/word/dto/word-detail.dto';
 import { RequestWordListDto } from '#/word/dto/word-list.dto';
 import { RequestWordRelatedSearchDto } from '#/word/dto/word-related-search.dto';
 import { RequestWordSearchDto } from '#/word/dto/word-search.dto';
@@ -87,13 +86,52 @@ export class WordRepository {
 		return await queryBuilder.groupBy('word.id').getRawMany();
 	}
 
-	async findByIdWithUserLike(wordDetailDto: RequestWordDetailDto) {
-		const { wordId, userId } = wordDetailDto;
-
+	async findByIdWithUserLike({
+		wordId,
+		userId,
+	}: {
+		wordId: string;
+		userId?: string;
+	}) {
 		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')
 			.where('word.id = :wordId', { wordId })
+			.select([
+				'word.id',
+				'word.name',
+				'word.description',
+				'word.diacritic',
+				'word.pronunciation',
+				'word.wrongPronunciations',
+				'word.exampleSentence',
+				'COUNT(like.id) AS likeCount',
+			]);
+
+		if (userId) {
+			queryBuilder
+				.addSelect([
+					'SUM(CASE WHEN like.userId = :userId THEN 1 ELSE 0 END) > 0 AS isLike',
+				])
+				.setParameters({ userId });
+		} else {
+			queryBuilder.addSelect(['false AS isLike']);
+		}
+
+		return await queryBuilder.groupBy('word.id').getRawOne();
+	}
+
+	async findByNameWithUserLike({
+		name,
+		userId,
+	}: {
+		name: string;
+		userId?: string;
+	}) {
+		const queryBuilder = this.wordRepository
+			.createQueryBuilder('word')
+			.leftJoin('word.likes', 'like')
+			.where('word.name = :wordName', { wordName: name })
 			.select([
 				'word.id',
 				'word.name',

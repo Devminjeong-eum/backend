@@ -16,10 +16,10 @@ export class Like {
 	@PrimaryGeneratedColumn()
 	id: string;
 
-	@ManyToOne(() => Word, (word) => word.likes)
+	@ManyToOne(() => Word, (word) => word.likes, { onDelete: 'CASCADE' })
 	word: Word;
 
-	@ManyToOne(() => User, (user) => user.likes)
+	@ManyToOne(() => User, (user) => user.likes, { onDelete: 'CASCADE' })
 	user: User;
 
 	@Expose()

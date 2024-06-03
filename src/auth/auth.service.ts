@@ -86,8 +86,7 @@ export class AuthService {
 			}
 			throw new InternalServerErrorException({
 				error,
-				message:
-					'인증 토큰을 파싱하는 과정에서 에러가 발생했습니다.',
+				message: '인증 토큰을 파싱하는 과정에서 에러가 발생했습니다.',
 			});
 		}
 	}
@@ -122,8 +121,7 @@ export class AuthService {
 			}
 			throw new InternalServerErrorException({
 				error,
-				message:
-					'인증 토큰을  파싱하는 과정에서 에러가 발생했습니다.',
+				message: '인증 토큰을  파싱하는 과정에서 에러가 발생했습니다.',
 			});
 		}
 	}
