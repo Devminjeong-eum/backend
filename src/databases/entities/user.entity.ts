@@ -33,7 +33,7 @@ export class User {
 	@ApiProperty()
 	socialType: string;
 
-	@OneToMany(() => Like, (like) => like.user)
+	@OneToMany(() => Like, (like) => like.user, { cascade: ['soft-remove'] })
 	likes: Like[];
 
 	@CreateDateColumn({ type: 'timestamp' })

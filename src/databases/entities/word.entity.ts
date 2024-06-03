@@ -21,12 +21,6 @@ export class Word {
 	id: string;
 
 	@ApiProperty({
-		description: '단어 별로 부여되는 고유 Sequence 값입니다.',
-	})
-	@PrimaryGeneratedColumn()
-	sequence: number;
-
-	@ApiProperty({
 		description: '단어의 이름입니다.',
 	})
 	@Column({ type: 'varchar', unique: true })
@@ -63,7 +57,7 @@ export class Word {
 	exampleSentence: string;
 
 	@Exclude()
-	@OneToMany(() => Like, (like) => like.word)
+	@OneToMany(() => Like, (like) => like.word, { cascade: ['soft-remove'] })
 	likes: Like[];
 
 	@Exclude()
