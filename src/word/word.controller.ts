@@ -131,11 +131,6 @@ export class WordController {
 
 	@ApiDocs({
 		summary: '특정 Word Id 를 가진 단어의 상세 정보를 열람합니다.',
-		params: {
-			name: 'wordId',
-			required: true,
-			description: '조회할 Word UUID (id)',
-		},
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordDetailDto,

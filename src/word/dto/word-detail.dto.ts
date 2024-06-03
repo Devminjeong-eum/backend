@@ -31,7 +31,8 @@ export class RequestWordDetailDto {
 
 	@IsString()
 	@ApiProperty({
-		description: 'searchType 이 NAME 일 경우 단어 명을, ID 일 경우 단어 id 를 받습니다.'
+		description:
+			'searchType 이 NAME 일 경우 단어 명을, ID 일 경우 단어 id 를 받습니다.',
 	})
 	searchValue: string;
 }
