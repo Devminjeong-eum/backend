@@ -25,6 +25,7 @@ export class AuthService {
 		secure: true,
 		sameSite: 'none',
 		path: '/',
+		domain: '.dev-malssami.site'
 	} as const;
 
 	private readonly ACCESS_TOKEN_MAX_AGE = 5 * 60 * 1000;
