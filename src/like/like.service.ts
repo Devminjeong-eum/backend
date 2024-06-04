@@ -1,8 +1,4 @@
-import {
-	BadRequestException,
-	Injectable,
-	InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { instanceToPlain } from 'class-transformer';
 
@@ -57,8 +53,8 @@ export class LikeService {
 		const revertResult = await this.likeRepository.softDelete(word, user);
 
 		if (!revertResult.affected) {
-			throw new InternalServerErrorException(
-				'좋아요가 정상적으로 취소되지 않았습니다.',
+			throw new BadRequestException(
+				'해당 단어에 아직 좋아요를 누르지 않은 상태입니다.',
 			);
 		}
 
