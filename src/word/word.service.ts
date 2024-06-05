@@ -38,7 +38,7 @@ export class WordService {
 	private readonly SPREAD_SHEET_NAME = 'word';
 	private readonly UUID_REGEX =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-	private readonly NAME_REGEX = /^[a-z0-9]$/i;
+	private readonly NAME_REGEX = /^[a-z0-9]+$/i;
 
 	private parseWordFromSpreadSheet = (
 		[
