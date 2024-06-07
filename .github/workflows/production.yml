@@ -7,50 +7,13 @@ on:
       - feature/DEV-74
 
 jobs:
-  check-lint:
+  build-image:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run Eslint
-        run: pnpm lint
-
-
-  docker-image:
-    needs: check-lint
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -67,10 +30,11 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          platforms: linux/amd64,linux/arm64/v8
           file: ./docker/backend/Dockerfile 
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
 
-  deploy:
+  deploy-application:
     needs: docker-image
     runs-on: ubuntu-latest
     steps:

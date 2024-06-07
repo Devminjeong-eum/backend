@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: ${DOCKER_HUB_USERNAME}/devminjeong-eum-backend:latest
+    image: rookieanddocker/devminjeong-eum-backend:latest
     container_name: backend
     env_file:
       - .env.production
