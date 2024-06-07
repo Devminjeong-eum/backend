@@ -41,13 +41,33 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Copy Docker Compose Configuration to AWS EC2
+    - name: Create Environment Variable File
+      run: |
+        cat <<EOF > .env.production
+        DB_HOST=${{ secrets.DB_HOST }}
+        DB_PORT=${{ secrets.DB_PORT }}
+        DB_USERNAME=${{ secrets.DB_USERNAME }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        DB_DATABASE=${{ secrets.DB_DATABASE }}
+        JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+        KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+        KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+        KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}
+        GOOGLE_API_EMAIL=${{ secrets.GOOGLE_API_EMAIL }}
+        GOOGLE_PRIVATE_KEY="${{ secrets.GOOGLE_PRIVATE_KEY }}"
+        GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}
+        SERVER_PORT=${{ secrets.SERVER_PORT }}
+        TEST_ADMIN_KEY=${{ secrets.TEST_ADMIN_KEY }}
+        DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}
+        EOF
+
+    - name: Copy Configuration Files to AWS EC2
       uses: appleboy/scp-action@v0.1.7
       with: 
         host: ${{ secrets.EC2_SSH_HOST }}
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "./docker-compose.yml"
+        source: "./docker-compose.yml,./.env.production"
         target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
 
     - name: Deploy to AWS EC2
