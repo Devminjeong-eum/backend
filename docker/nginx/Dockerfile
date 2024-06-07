@@ -1,5 +1,8 @@
 FROM nginx:latest
 
+# Default Configuration 파일 삭제
+RUN rm /etc/nginx/conf.d/default.conf
+
 # Configuration 파일 복사
 COPY ./config/backend.conf /etc/nginx/conf.d/backend.conf
 COPY ./config/frontend.conf /etc/nginx/conf.d/frontend.conf
