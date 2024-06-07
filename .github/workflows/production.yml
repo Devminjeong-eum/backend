@@ -45,6 +45,9 @@ jobs:
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
+          scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_PRIVATE_KEY }} docker-compose.yml ${{ secrets.EC2_SSH_USER }}@${{ secrets.EC2_SSH_HOST }}:/home/${{ secrets.EC2_SSH_USER }}/docker-compose.yml
+          cd /home/${{ secrets.EC2_SSH_USER }}
+
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.production
           echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.production
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.production
