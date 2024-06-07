@@ -6,50 +6,13 @@ on:
       - main
 
 jobs:
-  check-lint:
+  build-image:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run Eslint
-        run: pnpm lint
-
-
-  docker-image:
-    needs: check-lint
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -66,13 +29,47 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          # platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64/v8
+          file: ./docker/backend/Dockerfile 
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
 
-  deploy:
-    needs: docker-image
+  deploy-application:
+    needs: build-image
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Create Environment Variable File
+      run: |
+        cat <<EOF > env.production
+        DB_HOST=${{ secrets.DB_HOST }}
+        DB_PORT=${{ secrets.DB_PORT }}
+        DB_USERNAME=${{ secrets.DB_USERNAME }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        DB_DATABASE=${{ secrets.DB_DATABASE }}
+        JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+        KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+        KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+        KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}
+        GOOGLE_API_EMAIL=${{ secrets.GOOGLE_API_EMAIL }}
+        GOOGLE_PRIVATE_KEY="${{ secrets.GOOGLE_PRIVATE_KEY }}"
+        GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}
+        SERVER_PORT=${{ secrets.SERVER_PORT }}
+        REDIS_PORT=${{ secrets.REDIS_PORT }}
+        TEST_ADMIN_KEY=${{ secrets.TEST_ADMIN_KEY }}
+        DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}
+        EOF
+
+    - name: Copy Configuration Files
+      uses: appleboy/scp-action@v0.1.7
+      with: 
+        host: ${{ secrets.EC2_SSH_HOST }}
+        username: ${{ secrets.EC2_SSH_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: "./docker-compose.yml,./env.production,./docker"
+        target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
+
     - name: Deploy to AWS EC2
       uses: appleboy/ssh-action@master
       with:
@@ -80,29 +77,13 @@ jobs:
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
+          cd /home/${{ secrets.EC2_SSH_USER }}/dev-malssami
+          sudo docker system prune -a --volumes -f
+
           if [ "$(sudo docker ps | grep backend)" ]; then
-            sudo docker stop backend
-            sudo docker rm backend
+            sudo docker-compose -f ./docker-compose.yml --env-file ./env.production stop backend || echo "No containers to stop"
+            sudo docker-compose -f ./docker-compose.yml --env-file ./env.production rm -f backend
           fi
 
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.production
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.production
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.production
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.production
-          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env.production
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.production
-          echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> .env.production
-          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.production
-          echo "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}" >> .env.production
-          echo "GOOGLE_API_EMAIL=${{ secrets.GOOGLE_API_EMAIL }}" >> .env.production
-          echo "GOOGLE_PRIVATE_KEY=${{ secrets.GOOGLE_PRIVATE_KEY }}" >> .env.production
-          echo "GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}" >> .env.production
-          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env.production
-          echo "TEST_ADMIN_KEY"=${{ secrets.TEST_ADMIN_KEY }} >> .env.production
-          echo "DISCORD_WEBHOOK_URL"=${{ secrets.DISCORD_WEBHOOK_URL }} >> .env.production
-
-          sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
-          sudo docker run -p 8080:8080 \
-          --name backend \
-          --env-file ./.env.production \
-          -d ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
+          sudo docker compose pull -q
+          sudo docker-compose -f ./docker-compose.yml --env-file ./env.production up -d --build --no-recreate --quiet-pull backend

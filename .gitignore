@@ -15,6 +15,9 @@ lerna-debug.log*
 # .env
 .env.*
 
+# redis rdb
+dump.rdb
+
 # OS
 .DS_Store
 
