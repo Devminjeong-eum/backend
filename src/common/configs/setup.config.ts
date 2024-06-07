@@ -1,7 +1,7 @@
 import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import type { Application } from 'express';
 
 import { DiscordWebhookService } from '#/discord/discord.service';
