@@ -7,6 +7,7 @@ import {
 	Entity,
 	OneToMany,
 	PrimaryColumn,
+	type Relation,
 	UpdateDateColumn,
 } from 'typeorm';
 
@@ -34,7 +35,7 @@ export class User {
 	socialType: string;
 
 	@OneToMany(() => Like, (like) => like.user, { cascade: ['soft-remove'] })
-	likes: Like[];
+	likes: Relation<Like>[];
 
 	@CreateDateColumn({ type: 'timestamp' })
 	createdAt?: Date;

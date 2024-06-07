@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { postAsync } from '#/common/apis';

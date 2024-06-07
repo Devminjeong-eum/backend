@@ -7,6 +7,7 @@ import {
 	Entity,
 	OneToMany,
 	PrimaryGeneratedColumn,
+	type Relation,
 	UpdateDateColumn,
 } from 'typeorm';
 
@@ -58,7 +59,7 @@ export class Word {
 
 	@Exclude()
 	@OneToMany(() => Like, (like) => like.word, { cascade: ['soft-remove'] })
-	likes: Like[];
+	likes: Relation<Like>[];
 
 	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })

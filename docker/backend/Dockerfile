@@ -17,7 +17,7 @@ RUN pnpm build
 
 FROM base AS runner
 COPY --from=builder --chown=node:node /app/dist ./dist
-COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+RUN pnpm install --prod --prefer-offline --frozen-lockfile
 
 ENV NODE_ENV production
 USER node
