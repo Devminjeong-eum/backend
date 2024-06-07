@@ -5,7 +5,7 @@ services:
     env_file:
       - .env.production
     ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+      - "${SERVER_PORT}:${SERVER_PORT}"
     labels:
       - "name=backend"
       - "mode=production"
@@ -14,7 +14,7 @@ services:
     image: redis:alpine
     container_name: redis
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - ./redis/data:/data
       - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
