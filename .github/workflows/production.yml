@@ -68,7 +68,7 @@ jobs:
         host: ${{ secrets.EC2_SSH_HOST }}
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "./docker-compose.yml,./env.production"
+        source: "./docker-compose.yml,./env.production,./docker"
         target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
 
     - name: Deploy to AWS EC2
