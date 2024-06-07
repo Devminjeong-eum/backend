@@ -66,7 +66,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          # platforms: linux/amd64,linux/arm64
+          file: ./docker/backend/Dockerfile 
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
 
   deploy:
@@ -80,11 +80,6 @@ jobs:
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          if [ "$(sudo docker ps | grep backend)" ]; then
-            sudo docker stop backend
-            sudo docker rm backend
-          fi
-
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.production
           echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.production
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.production
@@ -101,8 +96,7 @@ jobs:
           echo "TEST_ADMIN_KEY"=${{ secrets.TEST_ADMIN_KEY }} >> .env.production
           echo "DISCORD_WEBHOOK_URL"=${{ secrets.DISCORD_WEBHOOK_URL }} >> .env.production
 
-          sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
-          sudo docker run -p 8080:8080 \
-          --name backend \
-          --env-file ./.env.production \
-          -d ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
+          sudo docker system prune -a --volumes -f
+          sudo docker-compose down || echo "No containers to stop"
+          sudo docker compose pull -q
+          sudo docker-compose --env-file .env.production up -d --build --no-recreate --quiet-pull
