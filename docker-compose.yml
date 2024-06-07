@@ -6,7 +6,8 @@ services:
     container_name: backend
     env_file:
       - .env.production
-    command: pnpm run start:prod
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
     labels:
       - "name=backend"
       - "mode=production"
@@ -15,7 +16,7 @@ services:
     image: redis:alpine
     container_name: redis
     ports:
-      - 6379:6379
+      - ${REDIS_PORT}:${REDIS_PORT}
     volumes:
       - ./redis/data:/data
       - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
@@ -26,7 +27,7 @@ services:
     restart: always
   nginx:
     build:
-      context: /docker/nginx
+      context: ./docker/nginx
       dockerfile: Dockerfile
     container_name: nginx
     ports:
@@ -41,4 +42,4 @@ services:
       - ./docker/nginx/config/nginx.conf:/etc/nginx/nginx.conf
       - ./docker/nginx/config/backend.conf:/etc/nginx/conf.d/backend.conf
       - ./docker/nginx/config/frontend.conf:/etc/nginx/conf.d/frontend.conf
-    restart: always
+    restart: "on-failure"
