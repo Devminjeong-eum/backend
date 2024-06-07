@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/DEV-77
 
 jobs:
   build-image:
