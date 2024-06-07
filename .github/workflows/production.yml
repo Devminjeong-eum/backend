@@ -43,7 +43,7 @@ jobs:
 
     - name: Create Environment Variable File
       run: |
-        cat <<EOF > .env.production
+        cat <<EOF > env.production
         DB_HOST=${{ secrets.DB_HOST }}
         DB_PORT=${{ secrets.DB_PORT }}
         DB_USERNAME=${{ secrets.DB_USERNAME }}
@@ -57,32 +57,19 @@ jobs:
         GOOGLE_PRIVATE_KEY="${{ secrets.GOOGLE_PRIVATE_KEY }}"
         GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}
         SERVER_PORT=${{ secrets.SERVER_PORT }}
+        REDIS_PORT=${{ secrets.REDIS_PORT }}
         TEST_ADMIN_KEY=${{ secrets.TEST_ADMIN_KEY }}
         DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}
         EOF
 
-    - name: List Root Directory Contents
-      run: |
-        ls -la
-
-    - name: Copy Docker Compose Configuration Files
+    - name: Copy Configuration Files
       uses: appleboy/scp-action@v0.1.7
       with: 
         host: ${{ secrets.EC2_SSH_HOST }}
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "./docker-compose.yml"
+        source: "./docker-compose.yml,./env.production"
         target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
-
-    - name: Copy Environment Variable Files
-      uses: appleboy/scp-action@v0.1.7
-      with: 
-        host: ${{ secrets.EC2_SSH_HOST }}
-        username: ${{ secrets.EC2_SSH_USER }}
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: ".env.production"
-        target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
-
 
     - name: Deploy to AWS EC2
       uses: appleboy/ssh-action@master
@@ -96,4 +83,4 @@ jobs:
           sudo docker system prune -a --volumes -f
           sudo docker-compose down || echo "No containers to stop"
           sudo docker compose pull -q
-          sudo docker-compose --env-file .env.production up -d --build --no-recreate --quiet-pull
+          sudo docker-compose --env-file env.production up -d --build --no-recreate --quiet-pull
