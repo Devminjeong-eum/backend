@@ -35,7 +35,7 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
 
   deploy-application:
-    needs: docker-image
+    needs: build-image
     runs-on: ubuntu-latest
     steps:
     - name: Deploy to AWS EC2
