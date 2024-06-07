@@ -5,6 +5,7 @@ import {
 	Entity,
 	ManyToOne,
 	PrimaryGeneratedColumn,
+	type Relation,
 	UpdateDateColumn,
 } from 'typeorm';
 
@@ -17,10 +18,10 @@ export class Like {
 	id: string;
 
 	@ManyToOne(() => Word, (word) => word.likes, { onDelete: 'CASCADE' })
-	word: Word;
+	word: Relation<Word>;
 
 	@ManyToOne(() => User, (user) => user.likes, { onDelete: 'CASCADE' })
-	user: User;
+	user: Relation<User>;
 
 	@Expose()
 	@CreateDateColumn({ type: 'timestamp' })

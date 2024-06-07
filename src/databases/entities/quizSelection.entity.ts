@@ -4,6 +4,7 @@ import {
 	JoinColumn,
 	OneToOne,
 	PrimaryGeneratedColumn,
+	type Relation,
 } from 'typeorm';
 
 import { Word } from './word.entity';
@@ -15,7 +16,7 @@ export class QuizSelection {
 
 	@OneToOne(() => Word, { eager: true })
 	@JoinColumn()
-	word: Word;
+	word: Relation<Word>;
 
 	@Column({ type: 'varchar' })
 	correct: string;
