@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/DEV-77
 
 jobs:
   build-image:
@@ -42,7 +43,8 @@ jobs:
 
     - name: Create Environment Variable File
       run: |
-        cat <<EOF > env.production
+        mkdir -p ./src/config
+        cat <<EOF > ./src/config/env.production
         DB_HOST=${{ secrets.DB_HOST }}
         DB_PORT=${{ secrets.DB_PORT }}
         DB_USERNAME=${{ secrets.DB_USERNAME }}
@@ -67,7 +69,7 @@ jobs:
         host: ${{ secrets.EC2_SSH_HOST }}
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "./docker-compose.yml,./env.production,./docker"
+        source: "./docker-compose.yml,./src/config,./docker"
         target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
 
     - name: Deploy to AWS EC2
