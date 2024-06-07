@@ -1,24 +1,21 @@
 FROM node:20.12.2-alpine3.18 AS base
 LABEL maintainer="gwangin1999@naver.com"
-
 RUN npm install -g pnpm
-
-FROM base as deps
 WORKDIR /app
-COPY --chown=node:node package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-
-USER node
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnmcache,target=/var/pnpm/store \
+    --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
+    pnpm config set store-dir /var/pnpm/store && \
+    pnpm config set package-import-method copy && \
+    pnpm install --prefer-offline --ignore-scripts --frozen-lockfile
 
 FROM base as builder
-WORKDIR /app
-
-COPY --chown=node:node --from=deps /app/node_modules ./node_modules
-COPY --chown=node:node . .
+COPY . . 
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm build
 
 FROM base AS runner
-WORKDIR /app
 COPY --from=builder --chown=node:node /app/dist ./dist
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 
