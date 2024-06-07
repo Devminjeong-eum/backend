@@ -78,23 +78,7 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
           cd /home/${{ secrets.EC2_SSH_USER }}/dev-malssami
-
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.production
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.production
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.production
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.production
-          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env.production
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.production
-          echo "KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}" >> .env.production
-          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.production
-          echo "KAKAO_SECRET_KEY=${{ secrets.KAKAO_SECRET_KEY }}" >> .env.production
-          echo "GOOGLE_API_EMAIL=${{ secrets.GOOGLE_API_EMAIL }}" >> .env.production
-          echo "GOOGLE_PRIVATE_KEY=${{ secrets.GOOGLE_PRIVATE_KEY }}" >> .env.production
-          echo "GOOGLE_SPREAD_SHEET_ID=${{ secrets.GOOGLE_SPREAD_SHEET_ID }}" >> .env.production
-          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env.production
-          echo "TEST_ADMIN_KEY"=${{ secrets.TEST_ADMIN_KEY }} >> .env.production
-          echo "DISCORD_WEBHOOK_URL"=${{ secrets.DISCORD_WEBHOOK_URL }} >> .env.production
-
+          
           sudo docker system prune -a --volumes -f
           sudo docker-compose down || echo "No containers to stop"
           sudo docker compose pull -q
