@@ -18,9 +18,9 @@ import { UserService } from '#/user/user.service';
 
 import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
+import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
-import { AuthenticationGuard } from './guard/auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -74,9 +74,7 @@ export class AuthController {
 	})
 	@UseGuards(AuthenticationGuard)
 	@Delete('logout')
-	async logout(
-		@Res({ passthrough: true }) response: Response,
-	) {
+	async logout(@Res({ passthrough: true }) response: Response) {
 		this.authService.removeAuthenticateCookie(response);
 		return true;
 	}

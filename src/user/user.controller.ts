@@ -52,9 +52,7 @@ export class UserController {
 	})
 	@Get(':userId')
 	@UseGuards(AuthenticationGuard)
-	getUserInformation(
-		@Param('userId') userId: string,
-	) {
+	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation(userId);
 	}
 
@@ -68,9 +66,7 @@ export class UserController {
 	})
 	@UseGuards(AuthenticationGuard)
 	@Delete(':userId')
-	unregisterUser(
-		@Param('userId') userId: string,
-	) {
+	unregisterUser(@Param('userId') userId: string) {
 		return this.userService.removeUserInformation(userId);
 	}
 

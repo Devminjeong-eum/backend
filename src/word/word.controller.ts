@@ -130,7 +130,8 @@ export class WordController {
 	}
 
 	@ApiDocs({
-		summary: '특정 단어의 상세 정보를 ID 혹은 이름으로 검색하여 열람합니다.',
+		summary:
+			'특정 단어의 상세 정보를 ID 혹은 이름으로 검색하여 열람합니다.',
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordDetailDto,
