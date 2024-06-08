@@ -86,5 +86,5 @@ jobs:
             sudo docker-compose -f ./docker-compose.yml --env-file ./env.production rm -f backend
           fi
 
-          sudo docker compose pull -q
+          sudo docker compose -f ./docker-compose.yml --env-file ./env.production pull -q
           sudo docker-compose -f ./docker-compose.yml --env-file ./env.production up -d --build --no-recreate --quiet-pull backend
