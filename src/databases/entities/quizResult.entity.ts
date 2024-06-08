@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryColumn,
+	type Relation,
+} from 'typeorm';
 
 import { User } from '#databases/entities/user.entity';
 
@@ -9,7 +16,7 @@ export class QuizResult {
 
 	@ManyToOne(() => User)
 	@JoinColumn({ name: 'userId' })
-	user: User;
+	user: Relation<User>;
 
 	@Column('uuid', { array: true })
 	correctWordIds: string[];

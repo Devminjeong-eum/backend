@@ -1,10 +1,10 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpStatus,
 	Param,
-	ParseUUIDPipe,
 	Patch,
 	UseGuards,
 } from '@nestjs/common';
@@ -43,7 +43,7 @@ export class UserController {
 		params: {
 			name: 'userId',
 			required: true,
-			description: '조회할 유저 UUID (id)',
+			description: '정보를 조회할 유저 ID',
 		},
 		response: {
 			statusCode: HttpStatus.OK,
@@ -51,16 +51,29 @@ export class UserController {
 		},
 	})
 	@Get(':userId')
-	getUserInformation(
-		@Param('userId', new ParseUUIDPipe({ version: undefined }))
-		userId: string,
-	) {
+	@UseGuards(AuthenticationGuard)
+	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation(userId);
+	}
+
+	@ApiDocs({
+		summary: '유저를 조회한 후 회원탈퇴를 진행합니다.',
+		params: {
+			name: 'userId',
+			required: true,
+			description: '탈퇴를 진행할 유저 ID',
+		},
+	})
+	@UseGuards(AuthenticationGuard)
+	@Delete(':userId')
+	unregisterUser(@Param('userId') userId: string) {
+		return this.userService.removeUserInformation(userId);
 	}
 
 	@ApiDocs({
 		summary: '특정 ID 를 가진 유저의 닉네임을 수정합니다',
 	})
+	@UseGuards(AuthenticationGuard)
 	@Patch('/nickname')
 	patchChangeNickname(
 		@Body() requestChangeNicknameDto: RequestChangeNicknameDto,

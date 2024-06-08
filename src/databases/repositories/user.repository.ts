@@ -25,8 +25,21 @@ export class UserRepository {
 			.getExists();
 	}
 
+	deleteOne(user: User) {
+		return this.userRepository.softRemove(user);
+	}
+
 	findById(userId: string) {
-		return this.userRepository.findOne({ where: { id: userId } });
+		return this.userRepository.findOne({
+			where: { id: userId },
+		});
+	}
+
+	findByIdWithLikeRelation(userId: string) {
+		return this.userRepository.findOne({
+			where: { id: userId },
+			relations: ['likes'],
+		});
 	}
 
 	findByIdWithLikeCount(userId: string) {

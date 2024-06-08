@@ -24,7 +24,7 @@ import { WordModule } from './word/word.module';
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: `.env.${process.env.NODE_ENV}`,
+			envFilePath: `./src/config/.env.${process.env.NODE_ENV}`,
 		}),
 		TypeOrmModule.forRootAsync({
 			useClass: TypeOrmConfig,

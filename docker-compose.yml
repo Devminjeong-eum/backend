@@ -1,0 +1,45 @@
+services:
+  backend:
+    image: rookieanddocker/devminjeong-eum-backend:latest
+    container_name: backend
+    env_file:
+      - .env.production
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    labels:
+      - "name=backend"
+      - "mode=production"
+    restart: on-failure
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    command: redis-server /usr/local/conf/redis.conf
+    restart: always
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - backend
+    labels:
+      - "name=backend"
+      - "mode=production"
+    volumes:
+      - ./docker/nginx/config/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/config/backend.conf:/etc/nginx/conf.d/backend.conf
+      - ./docker/nginx/config/frontend.conf:/etc/nginx/conf.d/frontend.conf
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: on-failure
