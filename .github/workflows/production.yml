@@ -4,37 +4,36 @@ on:
   push:
     branches:
       - main
-      - feature/DEV-79
 
 jobs:
-  # build-image:
-  #   runs-on: ubuntu-latest
+  build-image:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Login to DockerHub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
-  #         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-  #     - name: Build and Push Docker image
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         push: true
-  #         # platforms: linux/amd64,linux/arm64/v8
-  #         file: ./docker/backend/Dockerfile 
-  #         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
-  #         cache-from: type=gha
-  #         cache-to: type=gha,mode=max
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          # platforms: linux/amd64,linux/arm64/v8
+          file: ./docker/backend/Dockerfile 
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devminjeong-eum-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy-application:
-    # needs: build-image
+    needs: build-image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -107,30 +106,30 @@ jobs:
 
         IFS=','; echo "CHANGE_DIFF=${CHANGE_DIFF[*]}" >> $GITHUB_ENV
 
-    # - name: Copy Configuration Files
-    #   if: ${{ env.CHANGE_DIFF != '' }}
-    #   uses: appleboy/scp-action@v0.1.7
-    #   with: 
-    #     host: ${{ secrets.EC2_SSH_HOST }}
-    #     username: ${{ secrets.EC2_SSH_USER }}
-    #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-    #     source: ${{ env.CHANGE_DIFF }}
-    #     target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
+    - name: Copy Configuration Files
+      if: ${{ env.CHANGE_DIFF != '' }}
+      uses: appleboy/scp-action@v0.1.7
+      with: 
+        host: ${{ secrets.EC2_SSH_HOST }}
+        username: ${{ secrets.EC2_SSH_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: ${{ env.CHANGE_DIFF }}
+        target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
 
-    # - name: Deploy Project to AWS EC2
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.EC2_SSH_HOST }}
-    #     username: ${{ secrets.EC2_SSH_USER }}
-    #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-    #     script: |
-    #       cd /home/${{ secrets.EC2_SSH_USER }}/dev-malssami
-    #       sudo docker system prune -a --volumes -f
+    - name: Deploy Project to AWS EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_SSH_HOST }}
+        username: ${{ secrets.EC2_SSH_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          cd /home/${{ secrets.EC2_SSH_USER }}/dev-malssami
+          sudo docker system prune -a --volumes -f
 
-    #       if [ "$(sudo docker ps -q -f name=backend)" ]; then
-    #         sudo docker-compose -f ./docker-compose.yml --env-file ./env.production stop backend
-    #         sudo docker-compose -f ./docker-compose.yml --env-file ./env.production rm -f backend
-    #       fi
+          if [ "$(sudo docker ps -q -f name=backend)" ]; then
+            sudo docker-compose -f ./docker-compose.yml --env-file ./env.production stop backend
+            sudo docker-compose -f ./docker-compose.yml --env-file ./env.production rm -f backend
+          fi
 
-    #       sudo docker-compose -f ./docker-compose.yml --env-file ./env.production pull -q
-    #       sudo docker-compose -f ./docker-compose.yml --env-file ./env.production up -d --build backend
+          sudo docker-compose -f ./docker-compose.yml --env-file ./env.production pull -q
+          sudo docker-compose -f ./docker-compose.yml --env-file ./env.production up -d --build backend
