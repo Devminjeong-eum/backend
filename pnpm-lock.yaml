@@ -11,6 +11,9 @@ importers:
       '@nestjs/common':
         specifier: ^10.0.0
         version: 10.3.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+      '@nestjs/config':
+        specifier: ^3.2.2
+        version: 3.2.2(@nestjs/common@10.3.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(rxjs@7.8.1)
       '@nestjs/core':
         specifier: ^10.0.0
         version: 10.3.7(@nestjs/common@10.3.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.3.7)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -32,6 +35,12 @@ importers:
       axios:
         specifier: ^1.6.8
         version: 1.6.8
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.1
+        version: 0.14.1
       cookie-parser:
         specifier: ^1.4.6
         version: 1.4.6
@@ -63,9 +72,6 @@ importers:
       '@nestjs/cli':
         specifier: ^10.0.0
         version: 10.3.2(@swc/cli@0.3.12(@swc/core@1.5.25)(chokidar@3.6.0))(@swc/core@1.5.25)
-      '@nestjs/config':
-        specifier: ^3.2.2
-        version: 3.2.2(@nestjs/common@10.3.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(rxjs@7.8.1)
       '@nestjs/schematics':
         specifier: ^10.0.0
         version: 10.1.1(chokidar@3.6.0)(typescript@5.4.5)
@@ -102,12 +108,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^6.0.0
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.5)
-      class-transformer:
-        specifier: ^0.5.1
-        version: 0.5.1
-      class-validator:
-        specifier: ^0.14.1
-        version: 0.14.1
       eslint:
         specifier: ^8.42.0
         version: 8.57.0

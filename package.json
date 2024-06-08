@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.0.0",
@@ -29,6 +30,8 @@
     "@nestjs/typeorm": "^10.0.2",
     "axios": "^1.6.8",
     "cookie-parser": "^1.4.6",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "dayjs": "^1.11.11",
     "googleapis": "^135.1.0",
     "nanoid": "3.3.7",
@@ -40,7 +43,6 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
-    "@nestjs/config": "^3.2.2",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@swc/cli": "^0.3.12",
@@ -53,8 +55,6 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.1",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "google-auth-library": "^9.9.0",
