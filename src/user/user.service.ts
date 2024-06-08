@@ -41,7 +41,7 @@ export class UserService {
 
 	async removeUserInformation(userId: string) {
 		const user =
-			await this.userRepository.findById(userId);
+			await this.userRepository.findByIdWithLikeRelation(userId);
 
 		if (!user) {
 			throw new BadRequestException('존재하지 않는 유저입니다');

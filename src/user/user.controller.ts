@@ -5,7 +5,6 @@ import {
 	Get,
 	HttpStatus,
 	Param,
-	ParseUUIDPipe,
 	Patch,
 	UseGuards,
 } from '@nestjs/common';
@@ -44,7 +43,7 @@ export class UserController {
 		params: {
 			name: 'userId',
 			required: true,
-			description: '조회할 유저 UUID (id)',
+			description: '정보를 조회할 유저 ID',
 		},
 		response: {
 			statusCode: HttpStatus.OK,
@@ -53,8 +52,7 @@ export class UserController {
 	})
 	@Get(':userId')
 	getUserInformation(
-		@Param('userId', new ParseUUIDPipe({ version: undefined }))
-		userId: string,
+		@Param('userId') userId: string,
 	) {
 		return this.userService.getUserInformation(userId);
 	}
@@ -64,19 +62,14 @@ export class UserController {
 		params: {
 			name: 'userId',
 			required: true,
-			description: '탈퇴를 진행할 유저 UUID (id)',
-		},
-		response: {
-			statusCode: HttpStatus.OK,
-			schema: Boolean,
+			description: '탈퇴를 진행할 유저 ID',
 		},
 	})
 	@Delete(':userId')
 	unregisterUser(
-		@Param('userId', new ParseUUIDPipe({ version: undefined }))
-		userId: string,
+		@Param('userId') userId: string,
 	) {
-		return this.userService.getUserInformation(userId);
+		return this.userService.removeUserInformation(userId);
 	}
 
 	@ApiDocs({
