@@ -90,14 +90,17 @@ jobs:
           CHANGE_DIFF+=("./docker")
         fi
 
-        if [ ! -f ${{ steps.cache-env-file.outputs.cache-hit }} ]; then
-          echo "Cache miss: Cached Environment Variables not exists"
-          ENV_FILES_CHANGED=true
-        elif cmp -s ./src/config/env.production ${{ steps.cache-env-file.outputs.cache-hit }}; then
-          echo "Cache hit: Cached Environment Variables have not changed"
-          ENV_FILES_CHANGED=false
+        CACHE_HIT=${{ steps.cache-env-file.outputs.cache-hit }}
+        if [ "$CACHE_HIT" = "true" ]; then
+          if cmp -s ./src/config/env.production $CACHE_HIT; then
+            echo "Cache hit: Cached Environment Variables have not changed"
+            ENV_FILES_CHANGED=false
+          else
+            echo "Cache miss: Cached Environment Variables have changed"
+            ENV_FILES_CHANGED=true
+          fi
         else
-          echo "Cache miss: Cached Environment Variables have changed"
+          echo "Cache miss: Cached Environment Variables not exists"
           ENV_FILES_CHANGED=true
         fi
 
