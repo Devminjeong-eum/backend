@@ -34,12 +34,12 @@ jobs:
     needs: build-image
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout Repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
 
-    - name: Set up cache
+    - name: Setup Environment Variable Cache
       id: cache-env-file
       uses: actions/cache@v4
       with:
@@ -70,7 +70,7 @@ jobs:
         DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}
         EOF
 
-    - name: Check Configuration File Change
+    - name: Check Configuration File Changes
       run: |
         git fetch origin main
         DIFF_DOCKER_COMPOSE=$(git diff --name-only HEAD HEAD~1 -- ./docker-compose.yml)
@@ -78,10 +78,12 @@ jobs:
         CHANGE_DIFF=()
 
         if [ -n "$DIFF_DOCKER_COMPOSE" ]; then
+          echo "Cache miss: Docker Compose Configuration file have changed"
           CHANGE_DIFF+=("./docker-compose.yml")
         fi
 
         if [ -n "$DIFF_DOCKER_CONFIGS" ]; then
+          echo "Cache miss: One of Docker Configuration files have changed"
           CHANGE_DIFF+=("./docker")
         fi
 
@@ -112,7 +114,7 @@ jobs:
         source: ${{ env.CHANGE_DIFF }}
         target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
 
-    - name: Deploy to AWS EC2
+    - name: Deploy Project to AWS EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_SSH_HOST }}
@@ -122,10 +124,10 @@ jobs:
           cd /home/${{ secrets.EC2_SSH_USER }}/dev-malssami
           sudo docker system prune -a --volumes -f
 
-          if [ "$(sudo docker ps | grep backend)" ]; then
-            sudo docker-compose -f ./docker-compose.yml --env-file ./env.production stop backend || echo "No containers to stop"
+          if [ "$(sudo docker ps -q -f name=backend)" ]; then
+            sudo docker-compose -f ./docker-compose.yml --env-file ./env.production stop backend
             sudo docker-compose -f ./docker-compose.yml --env-file ./env.production rm -f backend
           fi
 
-          sudo docker compose -f ./docker-compose.yml --env-file ./env.production pull -q
-          sudo docker-compose -f ./docker-compose.yml --env-file ./env.production up -d --build --no-recreate --quiet-pull backend
+          sudo docker-compose -f ./docker-compose.yml --env-file ./env.production pull -q
+          sudo docker-compose -f ./docker-compose.yml --env-file ./env.production up -d --build backend
