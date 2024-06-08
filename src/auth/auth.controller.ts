@@ -1,5 +1,6 @@
 import {
 	Controller,
+	Delete,
 	Get,
 	HttpStatus,
 	Patch,
@@ -19,6 +20,7 @@ import { AuthService } from './auth.service';
 import { AuthenticatedUser } from './decorator/auth.decorator';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
+import { AuthenticationGuard } from './guard/auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -59,6 +61,24 @@ export class AuthController {
 		);
 
 		return user;
+	}
+
+	@ApiDocs({
+		summary: '유저의 로그아웃을 진행합니다.',
+		headers: {
+			name: 'Cookie',
+			description:
+				'서버로부터 발급 받은 AccessToken 과 RefreshToken 이 필요합니다.',
+			required: true,
+		},
+	})
+	@UseGuards(AuthenticationGuard)
+	@Delete('logout')
+	async logout(
+		@Res({ passthrough: true }) response: Response,
+	) {
+		this.authService.removeAuthenticateCookie(response);
+		return true;
 	}
 
 	@ApiDocs({
