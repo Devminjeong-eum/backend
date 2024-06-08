@@ -25,7 +25,7 @@ export class UserRepository {
 			.getExists();
 	}
 
-	deleteById(user: User) {
+	deleteOne(user: User) {
 		return this.userRepository.softRemove(user);
 	}
 

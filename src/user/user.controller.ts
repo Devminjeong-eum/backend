@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpStatus,
 	Param,
@@ -52,6 +53,26 @@ export class UserController {
 	})
 	@Get(':userId')
 	getUserInformation(
+		@Param('userId', new ParseUUIDPipe({ version: undefined }))
+		userId: string,
+	) {
+		return this.userService.getUserInformation(userId);
+	}
+
+	@ApiDocs({
+		summary: '유저를 조회한 후 회원탈퇴를 진행합니다.',
+		params: {
+			name: 'userId',
+			required: true,
+			description: '탈퇴를 진행할 유저 UUID (id)',
+		},
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: Boolean,
+		},
+	})
+	@Delete(':userId')
+	unregisterUser(
 		@Param('userId', new ParseUUIDPipe({ version: undefined }))
 		userId: string,
 	) {

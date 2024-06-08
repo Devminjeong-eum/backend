@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -37,6 +37,23 @@ export class UserService {
 		);
 
 		return responseUserInformationDto;
+	}
+
+	async removeUserInformation(userId: string) {
+		const user =
+			await this.userRepository.findById(userId);
+
+		if (!user) {
+			throw new BadRequestException('존재하지 않는 유저입니다');
+		}
+
+		const deleteResult = await this.userRepository.deleteOne(user);
+
+		if (!deleteResult) {
+			throw new InternalServerErrorException('유저 정보가 정상적으로 삭제되지 않았습니다.')
+		}
+
+		return true;
 	}
 
 	async changeUserNickname(changeNickNameDto: RequestChangeNicknameDto) {
