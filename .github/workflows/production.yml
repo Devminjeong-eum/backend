@@ -69,9 +69,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ./src/config/env.production
-        key: ${{ runner.os }}-env-${{ hashFiles('./src/config/env.production') }}
-        restore-keys: |
-          ${{ runner.os }}-env-
+        key: ${{ runner.os }}-env-file
 
     - name: Check Configuration File Changes
       run: |
