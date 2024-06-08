@@ -25,6 +25,10 @@ export class UserRepository {
 			.getExists();
 	}
 
+	deleteById(user: User) {
+		return this.userRepository.softRemove(user);
+	}
+
 	findById(userId: string) {
 		return this.userRepository.findOne({ where: { id: userId } });
 	}
