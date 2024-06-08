@@ -51,6 +51,7 @@ export class UserController {
 		},
 	})
 	@Get(':userId')
+	@UseGuards(AuthenticationGuard)
 	getUserInformation(
 		@Param('userId') userId: string,
 	) {
@@ -65,6 +66,7 @@ export class UserController {
 			description: '탈퇴를 진행할 유저 ID',
 		},
 	})
+	@UseGuards(AuthenticationGuard)
 	@Delete(':userId')
 	unregisterUser(
 		@Param('userId') userId: string,
@@ -75,6 +77,7 @@ export class UserController {
 	@ApiDocs({
 		summary: '특정 ID 를 가진 유저의 닉네임을 수정합니다',
 	})
+	@UseGuards(AuthenticationGuard)
 	@Patch('/nickname')
 	patchChangeNickname(
 		@Body() requestChangeNicknameDto: RequestChangeNicknameDto,
