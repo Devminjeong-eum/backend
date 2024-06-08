@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/DEV-79
 
 jobs:
   build-image:
@@ -40,6 +41,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Set up cache
+      id: cache-env-file
+      uses: actions/cache@v4
+      with:
+        path: ./src/config/env.production
+        key: secret-file-${{ github.sha }}
+        restore-keys: |
+          secret-file-
+
     - name: Create Environment Variable File
       run: |
         mkdir -p ./src/config
@@ -62,13 +72,46 @@ jobs:
         DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}
         EOF
 
+    - name: Check Configuration File Change
+      run: |
+        git fetch origin main
+        DIFF_DOCKER_COMPOSE=$(git diff --name-only HEAD HEAD~1 -- ./docker-compose.yml)
+        DIFF_DOCKER_CONFIGS=$(git diff --name-only HEAD HEAD~1 -- ./docker)
+        CHANGE_DIFF=()
+
+        if [ -n "$DIFF_DOCKER_COMPOSE" ]; then
+          CHANGE_DIFF+=("./docker-compose.yml")
+        fi
+
+        if [ -n "$DIFF_DOCKER_CONFIGS" ]; then
+          CHANGE_DIFF+=("./docker")
+        fi
+
+        if [ ! -f ${{ steps.cache-env-file.outputs.cache-hit }} ]; then
+          echo "Cache miss: Cached Env file not exists"
+          ENV_FILES_CHANGED=true
+        elif cmp -s ./src/config/env.production ${{ steps.cache-env-file.outputs.cache-hit }}; then
+          echo "Cache hit: Cached Env file have not changed"
+          ENV_FILES_CHANGED=false
+        else
+          echo "Cache miss: Cached Env file have changed"
+          ENV_FILES_CHANGED=true
+        fi
+
+        if [ "$ENV_FILES_CHANGED" = true ]; then
+          CHANGE_DIFF+=("./src/config/env.production")
+        fi
+
+        IFS=','; echo "CHANGE_DIFF=${CHANGE_DIFF[*]}" >> $GITHUB_ENV
+
     - name: Copy Configuration Files
+      if: ${{ env.CHANGE_DIFF != '' }}
       uses: appleboy/scp-action@v0.1.7
       with: 
         host: ${{ secrets.EC2_SSH_HOST }}
         username: ${{ secrets.EC2_SSH_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "./docker-compose.yml,./src/config,./docker"
+        source: ${{ env.CHANGE_DIFF }}
         target: "/home/${{ secrets.EC2_SSH_USER }}/dev-malssami"
 
     - name: Deploy to AWS EC2
