@@ -68,7 +68,7 @@ export class Word {
 
 	@Exclude()
 	@OneToMany(() => Ranking, (ranking) => ranking.word)
-	rankings: Ranking[];
+	rankings: Relation<Ranking>[];
 
 	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })

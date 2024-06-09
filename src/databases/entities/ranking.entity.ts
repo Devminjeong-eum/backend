@@ -5,6 +5,7 @@ import {
 	Entity,
 	ManyToOne,
 	PrimaryGeneratedColumn,
+	type Relation,
 	UpdateDateColumn,
 } from 'typeorm';
 
@@ -31,7 +32,7 @@ export class Ranking {
 	rankChange: number | null;
 
 	@ManyToOne(() => Word, (word) => word.rankings)
-	word: Word;
+	word: Relation<Word>;
 
 	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })
