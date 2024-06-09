@@ -23,6 +23,7 @@ import { UserModule } from './user/user.module';
 import { WordSearchModule } from './word-search/word-search.module';
 import { WordModule } from './word/word.module';
 import { RankingModule } from './ranking/ranking.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
 	imports: [
