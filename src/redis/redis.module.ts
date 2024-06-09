@@ -4,6 +4,16 @@ import { createClient } from 'redis';
 
 export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
 
+const redisConnectionFactory = async (configService: ConfigService) => {
+    const REDIS_PORT = configService.get<string>('REDIS_PORT');
+    const client = createClient({
+        url: `redis://localhost:${REDIS_PORT}`
+    })
+    await client.connect();
+    console.log(client);
+    return client;
+}
+
 @Global()
 @Module({})
 export class RedisModule {
@@ -15,14 +25,7 @@ export class RedisModule {
                 {
                     provide: REDIS_CLIENT,
                     inject: [ConfigService],
-                    useFactory: async (configService: ConfigService) => {
-                        const REDIS_PORT = configService.get<string>('REDIS_PORT');
-                        const client = createClient({
-                            url: `redis://redis:${REDIS_PORT}`
-                        })
-                        await client.connect()
-                        return client;
-                    }
+                    useFactory: redisConnectionFactory
                 }
             ],
             exports: [REDIS_CLIENT]
