@@ -19,7 +19,6 @@ import { LikeModule } from './like/like.module';
 import { QuizModule } from './quiz/quiz.module';
 import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
-import { RankingModule } from './ranking/ranking.module';
 import { RedisModule } from './redis/redis.module';
 
 @Module({
