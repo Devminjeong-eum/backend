@@ -19,6 +19,7 @@ import { LikeModule } from './like/like.module';
 import { QuizModule } from './quiz/quiz.module';
 import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
 	imports: [
@@ -29,6 +30,7 @@ import { WordModule } from './word/word.module';
 		TypeOrmModule.forRootAsync({
 			useClass: TypeOrmConfig,
 		}),
+		RedisModule.forRootAsync(),
 		WinstonLoggerModule,
 		ScheduleModule.forRoot(),
 		DiscordWebhookModule,
