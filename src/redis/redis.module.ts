@@ -8,7 +8,7 @@ export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
 const redisConnectionFactory = async (configService: ConfigService) => {
 	const REDIS_PORT = configService.get<string>('REDIS_PORT');
 	return await createClient({
-		url: `redis://localhost:${REDIS_PORT}`,
+		url: `redis://redis:${REDIS_PORT}`,
 	}).connect();
 };
 

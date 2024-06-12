@@ -9,7 +9,6 @@ services:
     labels:
       - "name=backend"
       - "mode=production"
-    restart: on-failure
   redis:
     image: redis:alpine
     container_name: redis
