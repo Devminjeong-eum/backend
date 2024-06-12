@@ -6,10 +6,14 @@ import {
 	HttpStatus,
 	Param,
 	Patch,
+	Res,
 	UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import type { Response } from 'express';
+
+import { AuthService } from '#/auth/auth.service';
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
 import { ApiDocs } from '#/common/decorators/swagger.decorator';
@@ -22,7 +26,10 @@ import { UserService } from './user.service';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(
+		private readonly userService: UserService,
+		private readonly authService: AuthService,
+	) {}
 
 	@ApiDocs({
 		summary: '자기 자신의 유저 정보를 열람합니다',
@@ -66,7 +73,11 @@ export class UserController {
 	})
 	@UseGuards(AuthenticationGuard)
 	@Delete(':userId')
-	unregisterUser(@Param('userId') userId: string) {
+	unregisterUser(
+		@Param('userId') userId: string,
+		@Res({ passthrough: true }) response: Response,
+	) {
+		this.authService.removeAuthenticateCookie(response);
 		return this.userService.removeUserInformation(userId);
 	}
 
