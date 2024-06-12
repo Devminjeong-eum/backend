@@ -9,7 +9,6 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { plainToInstance } from 'class-transformer';
 
 import { User } from '#/databases/entities/user.entity';
-import { UserRepository } from '#/databases/repositories/user.repository';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
 import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
 import { QuizSelectionRepository } from '#databases/repositories/quizSelection.repository';
@@ -33,13 +32,13 @@ export class QuizService {
 		private readonly spreadSheetService: SpreadSheetService,
 		private readonly quizResultRepository: QuizResultRepository,
 		private readonly quizSelectionRepository: QuizSelectionRepository,
-		private readonly userRepository: UserRepository,
 		private readonly wordRepository: WordRepository,
 	) {}
 
 	private readonly MAX_QUIZ_AMOUNT = 10;
 	private readonly SPREAD_SHEET_UUID_ROW = 'D';
 	private readonly SPREAD_SHEET_NAME = 'quizSelection';
+
 	private readonly parseQuizSelectionFromSheet = (
 		[name, correct, rawIncorrectList, uuid]: string[],
 		index: number,
@@ -115,8 +114,8 @@ export class QuizService {
 		name: 'update-quiz-selections',
 		timeZone: 'Asia/Seoul',
 	})
-	async updateQuizSelectionListBatch() {
-		return await this.updateQuizSelectionList();
+	updateQuizSelectionListBatch() {
+		return this.updateQuizSelectionList();
 	}
 
 	async createQuizResult(
