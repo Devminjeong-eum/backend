@@ -24,6 +24,7 @@ export class AuthService {
 	private cookieOption = {
 		secure: true,
 		sameSite: 'none',
+		httpOnly: true,
 		path: '/',
 		domain: '.dev-malssami.site',
 	} as const;
