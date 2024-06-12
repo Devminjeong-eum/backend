@@ -3,7 +3,7 @@ services:
     image: rookieanddocker/devminjeong-eum-backend:latest
     container_name: backend
     env_file:
-      - .env.production
+      - env.production
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     labels:
