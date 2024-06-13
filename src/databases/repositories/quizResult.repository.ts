@@ -22,7 +22,10 @@ export class QuizResultRepository {
 		let isAlreadyUsed: boolean;
 
 		do {
-			id = generateNanoId(this.QUIZ_RESULT_ID_LENGTH);
+			id = generateNanoId({
+				allowedOption: ['UPPERCASE', 'NUMBER'],
+				length: this.QUIZ_RESULT_ID_LENGTH,
+			});
 			isAlreadyUsed = await this.quizResultRepository.exists({
 				where: { id },
 			});
