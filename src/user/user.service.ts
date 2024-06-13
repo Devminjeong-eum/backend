@@ -17,7 +17,11 @@ export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	async oAuthLogin(createUserDto: RequestCreateUserDto) {
-		let user = await this.userRepository.findById(createUserDto.id);
+		const { socialPlatformId, socialType } = createUserDto;
+		let user = await this.userRepository.findBySocialPlatformId({
+			socialPlatformId,
+			socialType,
+		});
 
 		if (!user) {
 			user = await this.userRepository.create(createUserDto);

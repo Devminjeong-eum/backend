@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class RequestCreateUserDto {
 	@IsNotEmpty()
-	id: string;
+	socialPlatformId: string;
 
 	@IsNotEmpty()
 	profileImage: string;
