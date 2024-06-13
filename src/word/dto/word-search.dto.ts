@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Expose, Transform } from 'class-transformer';
 import {
-	IsAlpha,
 	IsArray,
 	IsBoolean,
 	IsOptional,
 	IsString,
 	IsUUID,
+	Matches,
 	MinLength,
 } from 'class-validator';
 
@@ -19,7 +19,7 @@ export class RequestWordSearchDto extends PaginationOptionDto {
 	userId?: string;
 
 	@IsString()
-	@IsAlpha()
+	@Matches(/^[a-zA-Z0-9]+$/)
 	@MinLength(3)
 	@ApiProperty({
 		description: '검색할 단어 키워드',

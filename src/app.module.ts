@@ -17,9 +17,9 @@ import { AuthModule } from './auth/auth.module';
 import { DiscordWebhookModule } from './discord/discord.module';
 import { LikeModule } from './like/like.module';
 import { QuizModule } from './quiz/quiz.module';
+import { RedisModule } from './redis/redis.module';
 import { UserModule } from './user/user.module';
 import { WordModule } from './word/word.module';
-import { RedisModule } from './redis/redis.module';
 
 @Module({
 	imports: [

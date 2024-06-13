@@ -46,8 +46,8 @@ export class AuthController {
 		const { nickname, profileImage, id } = authenticatedUser;
 		const user = await this.userService.oAuthLogin({
 			name: nickname,
-			id: `kakao_${id}`,
 			profileImage,
+			socialPlatformId: id,
 			socialType: 'kakao',
 		});
 
