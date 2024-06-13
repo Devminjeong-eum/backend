@@ -34,6 +34,9 @@ export class User {
 	@ApiProperty()
 	socialType: string;
 
+	@Column({ type: 'varchar' })
+	socialPlatformId: string;
+
 	@OneToMany(() => Like, (like) => like.user, { cascade: ['soft-remove'] })
 	likes: Relation<Like>[];
 
