@@ -75,6 +75,49 @@ export class SpreadSheetService {
 		return response.data.updatedCells ?? 0;
 	}
 
+	async insertRow({
+		sheetName,
+		range,
+		value,
+	}: {
+		sheetName: string;
+		range: string;
+		value: any[][];
+	}) {
+		const sheets = this.getGoogleSheetConnect();
+		const response = await sheets.spreadsheets.values.update({
+			spreadsheetId: this.spreadSheetId,
+			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
+			valueInputOption: 'USER_ENTERED',
+			requestBody: {
+				values: value,
+			},
+		});
+		return response.data.updatedCells ?? 0;
+	}
+
+	async appendRow({
+		sheetName,
+		range,
+		row,
+	}: {
+		sheetName: string;
+		range: string;
+		row: any[][];
+	}) {
+		const sheets = this.getGoogleSheetConnect();
+		const response = await sheets.spreadsheets.values.append({
+			spreadsheetId: this.spreadSheetId,
+			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
+			valueInputOption: 'USER_ENTERED',
+			insertDataOption: 'INSERT_ROWS',
+			requestBody: {
+				values: row,
+			},
+		});
+		return response.data.updates?.updatedCells ?? 0;
+	}
+
 	async parseSpreadSheet<T extends (...args: any[]) => any>({
 		sheetName,
 		range,
