@@ -31,7 +31,7 @@ import { WordModule } from './word/word.module';
 		TypeOrmModule.forRootAsync({
 			useClass: TypeOrmConfig,
 		}),
-		RedisModule.forRootAsync(),
+		// RedisModule.forRootAsync(),
 		WinstonLoggerModule,
 		ScheduleModule.forRoot(),
 		DiscordWebhookModule,

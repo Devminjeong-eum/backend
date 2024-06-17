@@ -1,24 +1,25 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class RequestResearchBeforeQuitDto {
 	@IsString()
 	userId: string;
 
-    @IsString()
+	@IsString()
 	userName: string;
 
-    @IsString()
-    @IsNotEmpty()
+	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({
 		description: '첫번째 객관식 질문에 대해 유저가 선택한 답변',
 	})
-    question1: string;
+	question1: string;
 
-    @IsString()
-    @IsOptional()
-    @ApiProperty({
+	@IsString()
+	@IsOptional()
+	@ApiProperty({
 		description: '두번째 객관식 질문에 대해 유저가 작성한 답변',
 	})
-    question2?: string;
+	question2?: string;
 }

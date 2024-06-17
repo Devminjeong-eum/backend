@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
@@ -18,9 +18,8 @@ export class ResearchController {
 
 	@ApiDocs({
 		summary: '탈퇴 전 진행하는 서비스 만족도 설문을 제출합니다.',
-		response: {
-			statusCode: HttpStatus.OK,
-			schema: Boolean,
+		body: {
+			type: RequestResearchBeforeQuitDto,
 		},
 	})
 	@UseGuards(AuthenticationGuard)

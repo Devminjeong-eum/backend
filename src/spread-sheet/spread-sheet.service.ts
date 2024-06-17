@@ -110,10 +110,10 @@ export class SpreadSheetService {
 			spreadsheetId: this.spreadSheetId,
 			range: `${sheetName}-${process.env.NODE_ENV}!${range}`,
 			valueInputOption: 'USER_ENTERED',
-            insertDataOption: 'INSERT_ROWS',
+			insertDataOption: 'INSERT_ROWS',
 			requestBody: {
-                values: row,
-            },
+				values: row,
+			},
 		});
 		return response.data.updates?.updatedCells ?? 0;
 	}

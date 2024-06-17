@@ -13,8 +13,12 @@ export class ResearchService {
 	async sendBeforeQuitResearch(
 		researchBeforeQuitDto: RequestResearchBeforeQuitDto,
 	) {
-		const { userId, userName, question1, question2 = '' } =
-			researchBeforeQuitDto;
+		const {
+			userId,
+			userName,
+			question1,
+			question2 = '',
+		} = researchBeforeQuitDto;
 
 		const appendResult = await this.spreadSheetService.appendRow({
 			sheetName: this.SPREAD_SHEET_NAME,
@@ -28,6 +32,6 @@ export class ResearchService {
 			);
 		}
 
-        return true;
+		return true;
 	}
 }
