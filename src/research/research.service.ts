@@ -13,7 +13,7 @@ export class ResearchService {
 	async sendBeforeQuitResearch(
 		researchBeforeQuitDto: RequestResearchBeforeQuitDto,
 	) {
-		const { userId, userName, question1, question2 } =
+		const { userId, userName, question1, question2 = '' } =
 			researchBeforeQuitDto;
 
 		const appendResult = await this.spreadSheetService.appendRow({

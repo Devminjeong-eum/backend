@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class RequestResearchBeforeQuitDto {
 	@IsString()
@@ -16,9 +16,9 @@ export class RequestResearchBeforeQuitDto {
     question1: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     @ApiProperty({
 		description: '두번째 객관식 질문에 대해 유저가 작성한 답변',
 	})
-    question2: string;
+    question2?: string;
 }
