@@ -5,6 +5,7 @@ import { SpreadSheetModule } from '#/spread-sheet/spread-sheet.module';
 import { UserModule } from '#/user/user.module';
 
 import { ResearchService } from './research.service';
+import { ResearchController } from './research.controller';
 
 @Module({
 	imports: [
@@ -12,6 +13,7 @@ import { ResearchService } from './research.service';
 		AuthModule,
 		UserModule,
 	],
+	controllers: [ResearchController],
 	providers: [
 		// Service
 		ResearchService,
