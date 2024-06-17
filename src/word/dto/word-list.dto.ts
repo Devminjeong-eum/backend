@@ -20,7 +20,7 @@ import {
 
 export class RequestWordListDto extends PaginationOptionDto {
 	@IsOptional()
-	@IsUUID()
+	@IsString()
 	userId?: string;
 
 	@IsOptional()
