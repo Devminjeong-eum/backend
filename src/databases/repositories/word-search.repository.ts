@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 
 import { RequestWordRelatedSearchDto } from '#/word-search/dto/word-related-search.dto';
 import { RequestWordSearchDto } from '#/word-search/dto/word-search.dto';
-import { Word } from '#databases/entities/word.entity';
 import { WordSearch } from '#databases/entities/word-search.entity';
+import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
 export class WordSearchRepository {
@@ -16,7 +16,10 @@ export class WordSearchRepository {
 	) {}
 
 	async create(word: Word, keyword: string) {
-		const createdWordSearch = this.wordSearchRepository.create({ word, keyword });
+		const createdWordSearch = this.wordSearchRepository.create({
+			word,
+			keyword,
+		});
 		return await this.wordSearchRepository.save(createdWordSearch);
 	}
 
@@ -26,7 +29,7 @@ export class WordSearchRepository {
 			.update(WordSearch)
 			.set({ keyword })
 			.where('wordId = :wordId', { wordId })
-			.execute()
+			.execute();
 	}
 
 	async findByRelatedSearchWord(
@@ -34,14 +37,21 @@ export class WordSearchRepository {
 	) {
 		const { keyword } = requestWordRelatedSearchDto;
 
-		const [words, totalCount] = await this.wordSearchRepository
+		const queryBuilder = this.wordSearchRepository
 			.createQueryBuilder('wordSearch')
-			.where('wordSearch.keyword like :keyword', { keyword: `${keyword}%` })
-			.innerJoin('wordSearch.word', 'word')
-			.select(['word.id', 'word.name', 'word.diacritic'])
-			.skip(requestWordRelatedSearchDto.getSkip())
-			.take(requestWordRelatedSearchDto.limit)
-			.getManyAndCount();
+			.where('wordSearch.keyword like :keyword', {
+				keyword: `${keyword}%`,
+			});
+
+		const [words, totalCount] = await Promise.all([
+			queryBuilder
+				.leftJoin('wordSearch.word', 'word')
+				.select(['word.id', 'word.name', 'word.diacritic'])
+				.offset(requestWordRelatedSearchDto.getSkip())
+				.limit(requestWordRelatedSearchDto.limit)
+				.getRawMany(),
+			queryBuilder.getCount(),
+		]);
 
 		return { words, totalCount };
 	}
@@ -51,7 +61,9 @@ export class WordSearchRepository {
 
 		const queryBuilder = this.wordSearchRepository
 			.createQueryBuilder('wordSearch')
-			.where('wordSearch.keyword like :keyword', { keyword: `${keyword}%` });
+			.where('wordSearch.keyword like :keyword', {
+				keyword: `${keyword}%`,
+			});
 
 		const [words, totalCount] = await Promise.all([
 			queryBuilder
