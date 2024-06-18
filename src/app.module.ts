@@ -20,6 +20,7 @@ import { QuizModule } from './quiz/quiz.module';
 import { RedisModule } from './redis/redis.module';
 import { ResearchModule } from './research/research.module';
 import { UserModule } from './user/user.module';
+import { WordSearchModule } from './word-search/word-search.module';
 import { WordModule } from './word/word.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { WordModule } from './word/word.module';
 		LikeModule,
 		QuizModule,
 		ResearchModule,
+		WordSearchModule,
 	],
 	controllers: [AppController],
 	providers: [Logger],
