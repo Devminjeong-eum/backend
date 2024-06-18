@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { Repository } from 'typeorm';
 
 import { RequestCreateQuizResultDto } from '#/quiz/dto/create-quiz-result.dto';
-import { QuizResult } from '#databases/entities/quizResult.entity';
+import { QuizResult } from '#databases/entities/quiz-result.entity';
 import { User } from '#databases/entities/user.entity';
 import { generateNanoId } from '#utils/nanoid';
 
@@ -53,7 +53,14 @@ export class QuizResultRepository {
 	async findById(quizResultId: string) {
 		return await this.quizResultRepository
 			.createQueryBuilder('quizResult')
+			.leftJoin('quizResult.user', 'user')
 			.where('quizResult.id = :quizResultId', { quizResultId })
+			.select([
+				'user.name',
+				'quizResult.id',
+				'quizResult.correctWordIds',
+				'quizResult.incorrectWordIds',
+			])
 			.getOne();
 	}
 }

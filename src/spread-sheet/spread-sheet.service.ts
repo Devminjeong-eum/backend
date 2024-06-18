@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { JWT } from 'google-auth-library';
@@ -31,6 +35,47 @@ export class SpreadSheetService {
 
 	private getGoogleSheetConnect(): sheets_v4.Sheets {
 		return google.sheets({ version: 'v4', auth: this.jwtClient });
+	}
+
+	private async getSheetIdByName(sheetName: string) {
+		const sheets = this.getGoogleSheetConnect();
+		const response = await sheets.spreadsheets.get({
+			spreadsheetId: this.spreadSheetId,
+		});
+
+		const sheet = response.data.sheets?.find(
+			(sheet) => sheet.properties?.title === sheetName,
+		);
+		return sheet ? sheet.properties?.sheetId || null : null;
+	}
+
+	private a1ToGridRange(a1Notation: string, sheetId: number) {
+		const match = a1Notation.match(/^([A-Z]+)(\d+)$/);
+
+		if (!match) {
+			throw new BadRequestException('유효하지 않은 A1 표기법입니다.');
+		}
+
+		const column =
+			match[1]
+				.split('')
+				.reduce(
+					(result, char) =>
+						result * 26 +
+						char.charCodeAt(0) -
+						'A'.charCodeAt(0) +
+						1,
+					0,
+				) - 1;
+		const row = parseInt(match[2], 10) - 1;
+
+		return {
+			sheetId,
+			startRowIndex: row,
+			endRowIndex: row + 1,
+			startColumnIndex: column,
+			endColumnIndex: column + 1,
+		};
 	}
 
 	async getRangeCellData({
@@ -118,6 +163,52 @@ export class SpreadSheetService {
 		return response.data.updates?.updatedCells ?? 0;
 	}
 
+	async batchUpdate({
+		sheetName,
+		updatedCells,
+	}: {
+		sheetName: string;
+		updatedCells: { cell: string; data: any }[];
+	}) {
+		const sheets = this.getGoogleSheetConnect();
+		const sheetId = await this.getSheetIdByName(
+			`${sheetName}-${process.env.NODE_ENV}`,
+		);
+
+		if (!sheetId) {
+			throw new BadRequestException(
+				`${sheetName} 이름을 가진 시트는 존재하지 않습니다.`,
+			);
+		}
+
+		const requests = updatedCells.map((updatedCell) => ({
+			updateCells: {
+				range: this.a1ToGridRange(updatedCell.cell, sheetId),
+				rows: [
+					{
+						values: [
+							{
+								userEnteredValue: {
+									stringValue: updatedCell.data,
+								},
+							},
+						],
+					},
+				],
+				fields: 'userEnteredValue',
+			},
+		}));
+
+		const response = await sheets.spreadsheets.batchUpdate({
+			spreadsheetId: this.spreadSheetId,
+			requestBody: {
+				requests,
+			},
+		});
+
+		return response.data;
+	}
+
 	async parseSpreadSheet<T extends (...args: any[]) => any>({
 		sheetName,
 		range,
@@ -128,7 +219,6 @@ export class SpreadSheetService {
 		parseCallback: T;
 	}): Promise<Array<ReturnType<T>>> {
 		const sheetCellList = await this.getRangeCellData({ sheetName, range });
-
 		return sheetCellList.length ? sheetCellList.map(parseCallback) : [];
 	}
 }

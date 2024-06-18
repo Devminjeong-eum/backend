@@ -54,6 +54,12 @@ export class ResponseQuizResultDto {
 	@ApiProperty()
 	quizResultId: string;
 
+	@IsString()
+	@Length(6)
+	@Expose()
+	@ApiProperty()
+	userName: string;
+
 	@IsNumber()
 	@Expose()
 	@ApiProperty()

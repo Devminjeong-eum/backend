@@ -9,9 +9,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { plainToInstance } from 'class-transformer';
 
 import { User } from '#/databases/entities/user.entity';
+import { QuizSelectionRepository } from '#/databases/repositories/quiz-selection.repository';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
-import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
-import { QuizSelectionRepository } from '#databases/repositories/quizSelection.repository';
+import { QuizResultRepository } from '#databases/repositories/quiz-result.repository';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import {
@@ -36,11 +36,11 @@ export class QuizService {
 	) {}
 
 	private readonly MAX_QUIZ_AMOUNT = 10;
-	private readonly SPREAD_SHEET_UUID_ROW = 'D';
+	private readonly SPREAD_SHEET_UUID_ROW = 'E';
 	private readonly SPREAD_SHEET_NAME = 'quizSelection';
 
 	private readonly parseQuizSelectionFromSheet = (
-		[name, correct, rawIncorrectList, uuid]: string[],
+		[name, wordId, correct, rawIncorrectList, uuid]: string[],
 		index: number,
 	) => {
 		const incorrectList = rawIncorrectList
@@ -49,6 +49,7 @@ export class QuizService {
 
 		return {
 			name,
+			wordId,
 			correct,
 			incorrectList,
 			uuid,
@@ -66,21 +67,24 @@ export class QuizService {
 
 		if (!parsedSheetDataList.length) return true;
 
+		const batchUpdatedList: { cell: string; data: string }[] = [];
+
 		for await (const {
 			name,
+			wordId,
 			correct,
 			incorrectList,
 			uuid,
 			index,
 		} of parsedSheetDataList) {
-			const word = await this.wordRepository.findByName(name);
+			const word = await this.wordRepository.findById(wordId);
 
 			if (!word)
 				throw new InternalServerErrorException(
 					`${name} 단어는 현재 Word 에 저장되어 있지 않습니다.`,
 				);
 
-			const isExist = await this.quizSelectionRepository.findById(uuid);
+			const isExist = uuid && await this.quizSelectionRepository.findById(uuid);
 
 			const quizSelectionEntity = isExist
 				? await this.quizSelectionRepository.update(
@@ -99,12 +103,18 @@ export class QuizService {
 					);
 
 			if (!isExist) {
-				await this.spreadSheetService.insertCellData({
-					sheetName: this.SPREAD_SHEET_NAME,
-					range: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
-					value: quizSelectionEntity.id,
+				batchUpdatedList.push({
+					cell: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					data: `${quizSelectionEntity.id}`,
 				});
 			}
+		}
+
+		if (batchUpdatedList.length) {
+			await this.spreadSheetService.batchUpdate({
+				sheetName: this.SPREAD_SHEET_NAME,
+				updatedCells: batchUpdatedList,
+			});
 		}
 
 		return true;
@@ -201,6 +211,7 @@ export class QuizService {
 			ResponseQuizResultDto,
 			{
 				quizResultId,
+				userName: quizResult.user.name,
 				score,
 				correctWords,
 				incorrectWords,
