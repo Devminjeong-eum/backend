@@ -15,14 +15,6 @@ import {
 } from './dto/word-detail.dto';
 import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
 import {
-	RequestWordRelatedSearchDto,
-	ResponseWordRelatedSearchDto,
-} from './dto/word-related-search.dto';
-import {
-	RequestWordSearchDto,
-	ResponseWordSearchDto,
-} from './dto/word-search.dto';
-import {
 	RequestWordUserLikeDto,
 	ResponseWordUserLikeDto,
 } from './dto/word-user-like.dto';
@@ -180,44 +172,5 @@ export class WordService {
 		);
 
 		return responseWordDetailWithNameDto;
-	}
-
-	async getWordByKeyword(requestWordSearchDto: RequestWordSearchDto) {
-		const { words, totalCount } =
-			await this.wordRepository.findBySearchWord(requestWordSearchDto);
-
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordSearchDto,
-			totalCount,
-		});
-
-		const responseWordSearchDto = plainToInstance(
-			ResponseWordSearchDto,
-			words,
-			{ excludeExtraneousValues: true },
-		);
-
-		return new PaginationDto(responseWordSearchDto, paginationMeta);
-	}
-
-	async getWordByRelatedKeyword(
-		requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
-	) {
-		const { words, totalCount } =
-			await this.wordRepository.findByRelatedSearchWord(
-				requestWordRelatedSearchDto,
-			);
-
-		const paginationMeta = new PaginationMetaDto({
-			paginationOption: requestWordRelatedSearchDto,
-			totalCount,
-		});
-
-		const responseWordRelatedSearchDto = plainToInstance(
-			ResponseWordRelatedSearchDto,
-			words,
-		);
-
-		return new PaginationDto(responseWordRelatedSearchDto, paginationMeta);
 	}
 }
