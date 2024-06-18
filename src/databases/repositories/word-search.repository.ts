@@ -28,13 +28,11 @@ export class WordSearchRepository {
 		const [words, totalCount] = await this.wordSearchRepository
 			.createQueryBuilder('wordSearch')
 			.where('wordSearch.keyword like :keyword', { keyword: `${keyword}%` })
-			.leftJoin('wordSearches.word', 'word')
+			.innerJoin('wordSearch.word', 'word')
 			.select(['word.id', 'word.name', 'word.diacritic'])
 			.skip(requestWordRelatedSearchDto.getSkip())
 			.take(requestWordRelatedSearchDto.limit)
 			.getManyAndCount();
-
-		console.log(words);
 
 		return { words, totalCount };
 	}
@@ -48,7 +46,7 @@ export class WordSearchRepository {
 
 		const [words, totalCount] = await Promise.all([
 			queryBuilder
-				.leftJoin('wordSearches.word', 'word')
+				.innerJoin('wordSearch.word', 'word')
 				.leftJoinAndSelect(
 					'word.likes',
 					'like',
