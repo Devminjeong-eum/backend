@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '#/auth/auth.module';
 import { SpreadSheetModule } from '#/spread-sheet/spread-sheet.module';
 import { UserModule } from '#/user/user.module';
+import { WordSearchModule } from '#/word-search/word-search.module';
 import { Word } from '#databases/entities/word.entity';
 import { WordRepository } from '#databases/repositories/word.repository';
 
@@ -16,6 +17,7 @@ import { WordService } from './word.service';
 		SpreadSheetModule,
 		AuthModule,
 		UserModule,
+		WordSearchModule,
 	],
 	controllers: [WordController],
 	providers: [
