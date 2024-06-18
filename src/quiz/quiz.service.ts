@@ -201,6 +201,7 @@ export class QuizService {
 			ResponseQuizResultDto,
 			{
 				quizResultId,
+				userName: quizResult.user.name,
 				score,
 				correctWords,
 				incorrectWords,
