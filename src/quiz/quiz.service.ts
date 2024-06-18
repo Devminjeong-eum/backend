@@ -36,11 +36,11 @@ export class QuizService {
 	) {}
 
 	private readonly MAX_QUIZ_AMOUNT = 10;
-	private readonly SPREAD_SHEET_UUID_ROW = 'D';
+	private readonly SPREAD_SHEET_UUID_ROW = 'E';
 	private readonly SPREAD_SHEET_NAME = 'quizSelection';
 
 	private readonly parseQuizSelectionFromSheet = (
-		[name, correct, rawIncorrectList, uuid]: string[],
+		[name, wordId, correct, rawIncorrectList, uuid]: string[],
 		index: number,
 	) => {
 		const incorrectList = rawIncorrectList
@@ -49,6 +49,7 @@ export class QuizService {
 
 		return {
 			name,
+			wordId,
 			correct,
 			incorrectList,
 			uuid,
@@ -66,14 +67,17 @@ export class QuizService {
 
 		if (!parsedSheetDataList.length) return true;
 
+		const batchUpdatedList: { cell: string; data: string }[] = [];
+
 		for await (const {
 			name,
+			wordId,
 			correct,
 			incorrectList,
 			uuid,
 			index,
 		} of parsedSheetDataList) {
-			const word = await this.wordRepository.findByName(name);
+			const word = await this.wordRepository.findById(wordId);
 
 			if (!word)
 				throw new InternalServerErrorException(
@@ -99,12 +103,18 @@ export class QuizService {
 					);
 
 			if (!isExist) {
-				await this.spreadSheetService.insertCellData({
-					sheetName: this.SPREAD_SHEET_NAME,
-					range: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
-					value: quizSelectionEntity.id,
+				batchUpdatedList.push({
+					cell: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					data: quizSelectionEntity.id,
 				});
 			}
+		}
+
+		if (batchUpdatedList.length) {
+			await this.spreadSheetService.batchUpdate({
+				sheetName: this.SPREAD_SHEET_NAME,
+				updatedCells: batchUpdatedList,
+			});
 		}
 
 		return true;
