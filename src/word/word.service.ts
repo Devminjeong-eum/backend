@@ -77,12 +77,12 @@ export class WordService {
 			...wordInformation
 		} of parsedSheetDataList) {
 			const wordName = wordInformation.name;
-			const isExist = await this.wordRepository.findByName(wordName);
+			const previousWord = await this.wordRepository.findByName(wordName);
 
 			let wordEntity: Word;
 			const searchKeyword = wordName.toLowerCase();
 
-			if (!isExist) {
+			if (!previousWord) {
 				wordEntity = await this.wordRepository.create(
 					plainToInstance(RequestCreateWordDto, wordInformation),
 				);
@@ -100,7 +100,7 @@ export class WordService {
 					plainToInstance(RequestUpdateWordDto, wordInformation),
 				);
 				await this.wordSearchRepository.updateKeyword(
-					wordEntity.id,
+					previousWord.id,
 					searchKeyword,
 				);
 			}

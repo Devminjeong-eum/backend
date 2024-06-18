@@ -54,6 +54,7 @@ export class WordSearchService {
 		const responseWordRelatedSearchDto = plainToInstance(
 			ResponseWordRelatedSearchDto,
 			words,
+			{ excludeExtraneousValues: true },
 		);
 
 		return new PaginationDto(responseWordRelatedSearchDto, paginationMeta);
