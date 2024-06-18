@@ -53,7 +53,14 @@ export class QuizResultRepository {
 	async findById(quizResultId: string) {
 		return await this.quizResultRepository
 			.createQueryBuilder('quizResult')
+			.leftJoin('quizResult.user', 'user')
 			.where('quizResult.id = :quizResultId', { quizResultId })
+			.select([
+				'user.name',
+				'quizResult.id',
+				'quizResult.correctWordIds',
+				'quizResult.incorrectWordIds',
+			])
 			.getOne();
 	}
 }
