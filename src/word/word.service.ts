@@ -4,6 +4,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { plainToInstance } from 'class-transformer';
 
 import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
+import { Word } from '#/databases/entities/word.entity';
+import { WordSearchRepository } from '#/databases/repositories/word-search.repository';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
 import { WordRepository } from '#databases/repositories/word.repository';
 
@@ -23,6 +25,7 @@ import {
 export class WordService {
 	constructor(
 		private readonly wordRepository: WordRepository,
+		private readonly wordSearchRepository: WordSearchRepository,
 		private readonly spreadSheetService: SpreadSheetService,
 	) {}
 
@@ -44,7 +47,7 @@ export class WordService {
 		]: string[],
 		index: number,
 	) => ({
-		name: name.toLowerCase(),
+		name,
 		description,
 		diacritic: diacritic.split(','),
 		pronunciation: pronunciation.split(',').map((word) => word.trim()),
@@ -66,31 +69,48 @@ export class WordService {
 
 		if (!parsedSheetDataList.length) return true;
 
+		const batchUpdatedList: { cell: string; data: string }[] = [];
+
 		for await (const {
 			uuid,
 			index,
 			...wordInformation
 		} of parsedSheetDataList) {
-			const isExist = await this.wordRepository.findByName(
-				wordInformation.name,
-			);
+			const wordName = wordInformation.name;
+			const isExist = await this.wordRepository.findByName(wordName);
 
-			const wordEntity = isExist
-				? await this.wordRepository.update(
-						uuid,
-						plainToInstance(RequestUpdateWordDto, wordInformation),
-					)
-				: await this.wordRepository.create(
-						plainToInstance(RequestCreateWordDto, wordInformation),
-					);
+			let wordEntity: Word;
+			const searchKeyword = wordName.toLowerCase();
 
 			if (!isExist) {
-				await this.spreadSheetService.insertCellData({
-					sheetName: this.SPREAD_SHEET_NAME,
-					range: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
-					value: wordEntity.id,
+				wordEntity = await this.wordRepository.create(
+					plainToInstance(RequestCreateWordDto, wordInformation),
+				);
+				await this.wordSearchRepository.create(
+					wordEntity,
+					searchKeyword,
+				);
+				batchUpdatedList.push({
+					cell: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
+					data: wordEntity.id,
 				});
+			} else {
+				wordEntity = await this.wordRepository.update(
+					uuid,
+					plainToInstance(RequestUpdateWordDto, wordInformation),
+				);
+				await this.wordSearchRepository.updateKeyword(
+					wordEntity.id,
+					searchKeyword,
+				);
 			}
+		}
+
+		if (batchUpdatedList.length) {
+			await this.spreadSheetService.batchUpdate({
+				sheetName: this.SPREAD_SHEET_NAME,
+				updatedCells: batchUpdatedList,
+			});
 		}
 
 		return true;
