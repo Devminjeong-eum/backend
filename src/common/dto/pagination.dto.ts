@@ -97,7 +97,7 @@ export class PaginationMetaDto {
 		this.skip = (this.page - 1) * this.limit;
 		this.totalCount = totalCount;
 		this.pageSize = Math.ceil(totalCount / paginationOption.limit);
-		this.isLast = this.page  * this.limit >= totalCount;
+		this.isLast = this.page * this.limit >= totalCount;
 	}
 }
 

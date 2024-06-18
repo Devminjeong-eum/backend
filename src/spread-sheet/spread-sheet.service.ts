@@ -171,7 +171,9 @@ export class SpreadSheetService {
 		updatedCells: { cell: string; data: any }[];
 	}) {
 		const sheets = this.getGoogleSheetConnect();
-		const sheetId = await this.getSheetIdByName(`${sheetName}-${process.env.NODE_ENV}`);
+		const sheetId = await this.getSheetIdByName(
+			`${sheetName}-${process.env.NODE_ENV}`,
+		);
 
 		if (!sheetId) {
 			throw new BadRequestException(
