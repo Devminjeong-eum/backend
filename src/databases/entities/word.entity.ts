@@ -62,6 +62,10 @@ export class Word {
 	likes: Relation<Like>[];
 
 	@Exclude()
+	@OneToMany(() => Like, (like) => like.word, { cascade: ['soft-remove'] })
+	wordSearches: Relation<Like>[];
+
+	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })
 	createdAt?: Date;
 
