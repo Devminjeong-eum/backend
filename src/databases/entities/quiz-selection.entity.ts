@@ -11,8 +11,8 @@ import { Word } from './word.entity';
 
 @Entity()
 export class QuizSelection {
-	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	@PrimaryGeneratedColumn()
+	id: number;
 
 	@OneToOne(() => Word, { eager: true })
 	@JoinColumn()

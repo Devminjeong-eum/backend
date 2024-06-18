@@ -84,7 +84,7 @@ export class QuizService {
 					`${name} 단어는 현재 Word 에 저장되어 있지 않습니다.`,
 				);
 
-			const isExist = await this.quizSelectionRepository.findById(uuid);
+			const isExist = uuid && await this.quizSelectionRepository.findById(uuid);
 
 			const quizSelectionEntity = isExist
 				? await this.quizSelectionRepository.update(
@@ -105,7 +105,7 @@ export class QuizService {
 			if (!isExist) {
 				batchUpdatedList.push({
 					cell: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
-					data: quizSelectionEntity.id,
+					data: `${quizSelectionEntity.id}`,
 				});
 			}
 		}
