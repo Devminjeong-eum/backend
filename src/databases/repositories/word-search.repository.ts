@@ -20,6 +20,11 @@ export class WordSearchRepository {
 		return await this.wordSearchRepository.save(createdWordSearch);
 	}
 
+	async updateKeyword(word: Word, keyword: string) {
+		const result = await this.wordSearchRepository.update({ word }, { keyword });
+		return result.raw;
+	}
+
 	async findByRelatedSearchWord(
 		requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
 	) {
