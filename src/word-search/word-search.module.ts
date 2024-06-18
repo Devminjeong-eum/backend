@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '#/auth/auth.module';
-import { WordSearch } from '#/databases/entities/wordSearch.entity';
-import { WordSearchRepository } from '#/databases/repositories/wordSearch.repository';
+import { WordSearch } from '#/databases/entities/word-search.entity';
+import { WordSearchRepository } from '#/databases/repositories/word-search.repository';
 import { UserModule } from '#/user/user.module';
 
 import { WordSearchController } from './word-search.controller';

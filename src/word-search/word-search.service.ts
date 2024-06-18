@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
 import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
-import { WordSearchRepository } from '#/databases/repositories/wordSearch.repository';
+import { WordSearchRepository } from '#/databases/repositories/word-search.repository';
 
 import {
 	RequestWordRelatedSearchDto,

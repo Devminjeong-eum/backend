@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { RequestWordRelatedSearchDto } from '#/word-search/dto/word-related-search.dto';
 import { RequestWordSearchDto } from '#/word-search/dto/word-search.dto';
 import { Word } from '#databases/entities/word.entity';
-import { WordSearch } from '#databases/entities/wordSearch.entity';
+import { WordSearch } from '#databases/entities/word-search.entity';
 
 @Injectable()
 export class WordSearchRepository {

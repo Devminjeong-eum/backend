@@ -5,6 +5,7 @@ import {
 	Query,
 	UseInterceptors,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -23,6 +24,7 @@ import {
 } from './dto/word-search.dto';
 import { WordSearchService } from './word-search.service';
 
+@ApiTags('WordSearch')
 @Controller('search')
 export class WordSearchController {
 	constructor(private readonly wordSearchService: WordSearchService) {}

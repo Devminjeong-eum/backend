@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 
 import { RequestCreateQuizSelectDto } from '#/quiz/dto/create-quiz-selection.dto';
 import { RequestUpdateQuizSelectDto } from '#/quiz/dto/update-quiz-selection.dto';
-import { QuizSelection } from '#databases/entities/quizSelection.entity';
+import { QuizSelection } from '#databases/entities/quiz-selection.entity';
 import { Word } from '#databases/entities/word.entity';
 
 @Injectable()
