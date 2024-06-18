@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { RequestCreateWordDto } from '#/word/dto/create-word.dto';
 import { RequestUpdateWordDto } from '#/word/dto/update-word.dto';
 import { RequestWordListDto } from '#/word/dto/word-list.dto';
-import { RequestWordRelatedSearchDto } from '#/word/dto/word-related-search.dto';
-import { RequestWordSearchDto } from '#/word/dto/word-search.dto';
 import { RequestWordUserLikeDto } from '#/word/dto/word-user-like.dto';
 import { WORD_SORTING_TYPE } from '#/word/interface/word-list-sorting.interface';
 import { Word } from '#databases/entities/word.entity';
@@ -17,7 +15,6 @@ export class WordRepository {
 	constructor(
 		@InjectRepository(Word)
 		private readonly wordRepository: Repository<Word>,
-		private readonly dataSource: DataSource,
 	) {}
 
 	async create(createWordDto: RequestCreateWordDto) {
@@ -154,59 +151,6 @@ export class WordRepository {
 		}
 
 		return await queryBuilder.groupBy('word.id').getRawOne();
-	}
-
-	async findByRelatedSearchWord(
-		requestWordRelatedSearchDto: RequestWordRelatedSearchDto,
-	) {
-		const { keyword } = requestWordRelatedSearchDto;
-
-		const [words, totalCount] = await this.wordRepository
-			.createQueryBuilder('word')
-			.where('word.name like :keyword', { keyword: `${keyword}%` })
-			.select(['word.id', 'word.name', 'word.diacritic'])
-			.skip(requestWordRelatedSearchDto.getSkip())
-			.take(requestWordRelatedSearchDto.limit)
-			.getManyAndCount();
-
-		console.log(words);
-
-		return { words, totalCount };
-	}
-
-	async findBySearchWord(requestWordSearchDto: RequestWordSearchDto) {
-		const { keyword, userId } = requestWordSearchDto;
-
-		const queryBuilder = this.wordRepository
-			.createQueryBuilder('word')
-			.where('word.name like :keyword', { keyword: `${keyword}%` });
-
-		const [words, totalCount] = await Promise.all([
-			queryBuilder
-				.leftJoinAndSelect(
-					'word.likes',
-					'like',
-					userId ? 'like.userId = :userId' : '',
-					{ userId },
-				)
-				.select([
-					'word.id',
-					'word.name',
-					'word.pronunciation',
-					'word.diacritic',
-					'word.description',
-					'word.createdAt',
-					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
-				])
-				.orderBy('word.createdAt', 'ASC')
-				.distinct(true)
-				.offset(requestWordSearchDto.getSkip())
-				.limit(requestWordSearchDto.limit)
-				.getRawMany(),
-			queryBuilder.getCount(),
-		]);
-
-		return { words, totalCount };
 	}
 
 	async findWithList(requestWordListDto: RequestWordListDto) {

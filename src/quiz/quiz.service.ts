@@ -9,9 +9,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { plainToInstance } from 'class-transformer';
 
 import { User } from '#/databases/entities/user.entity';
+import { QuizSelectionRepository } from '#/databases/repositories/quiz-selection.repository';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
-import { QuizResultRepository } from '#databases/repositories/quizResult.repository';
-import { QuizSelectionRepository } from '#databases/repositories/quizSelection.repository';
+import { QuizResultRepository } from '#databases/repositories/quiz-result.repository';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import {

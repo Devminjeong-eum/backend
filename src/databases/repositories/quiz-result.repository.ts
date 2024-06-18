@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { Repository } from 'typeorm';
 
 import { RequestCreateQuizResultDto } from '#/quiz/dto/create-quiz-result.dto';
-import { QuizResult } from '#databases/entities/quizResult.entity';
+import { QuizResult } from '#databases/entities/quiz-result.entity';
 import { User } from '#databases/entities/user.entity';
 import { generateNanoId } from '#utils/nanoid';
 

@@ -16,13 +16,26 @@ export class RequestWordRelatedSearchDto extends PaginationOptionDto {
 
 export class ResponseWordRelatedSearchDto {
 	@IsUUID()
-	@Expose()
+	@Transform(({ obj }) => obj.word_id)
+	@Expose({ name: 'id' })
+	@ApiProperty({
+		description: '단어 Id',
+	})
 	id: string;
 
 	@IsString()
+	@Transform(({ obj }) => obj.word_name)
+	@Expose({ name: 'name' })
+	@ApiProperty({
+		description: '단어 명',
+	})
 	name: string;
 
 	@IsString()
-	@Transform(({ value }) => value[0])
+	@Transform(({ obj }) => obj.word_diacritic[0])
+	@Expose({ name: 'diacritic' })
+	@ApiProperty({
+		description: '단어 설명',
+	})
 	diacritic: string;
 }
