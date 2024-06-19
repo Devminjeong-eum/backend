@@ -128,7 +128,7 @@ export class WordRepository {
 		const queryBuilder = this.wordRepository
 			.createQueryBuilder('word')
 			.leftJoin('word.likes', 'like')
-			.where('word.name = :wordName', { wordName: name })
+			.where('word.name ILIKE :wordName', { wordName: name.toLowerCase() })
 			.select([
 				'word.id',
 				'word.name',
