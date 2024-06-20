@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import { AuthenticatedUser } from '#/auth/decorator/auth.decorator';
+import { AdminGuard } from '#/auth/guard/admin.guard';
 import { AuthenticationGuard } from '#/auth/guard/auth.guard';
 import { ApiDocs } from '#/common/decorators/swagger.decorator';
 import { UserInformationInterceptor } from '#/user/interceptors/user-information.interceptor';
@@ -106,7 +107,7 @@ export class QuizController {
 			description: '어드민 전용 Api Key',
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseGuards(AdminGuard)
 	@Patch('/selection/spread-sheet')
 	patchUpdateSpreadSheet() {
 		return this.quizService.updateQuizSelectionList();
