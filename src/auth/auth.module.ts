@@ -8,6 +8,7 @@ import { User } from '#databases/entities/user.entity';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AdminGuard } from './guard/admin.guard';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 
@@ -25,6 +26,7 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 		AuthService,
 		// Guard
 		AuthenticationGuard,
+		AdminGuard,
 		KakaoAuthGuard,
 		// Config
 		JwtConfig,
