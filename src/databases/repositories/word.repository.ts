@@ -77,7 +77,7 @@ export class WordRepository {
 				])
 				.setParameters({ userId });
 		} else {
-			queryBuilder.addSelect(['false AS isLike']);
+			queryBuilder.addSelect(['false::boolean AS isLike']);
 		}
 
 		return await queryBuilder.groupBy('word.id').getRawMany();
@@ -112,7 +112,7 @@ export class WordRepository {
 				])
 				.setParameters({ userId });
 		} else {
-			queryBuilder.addSelect(['false AS isLike']);
+			queryBuilder.addSelect(['false::boolean AS isLike']);
 		}
 
 		return await queryBuilder.groupBy('word.id').getRawOne();
@@ -147,7 +147,7 @@ export class WordRepository {
 				])
 				.setParameters({ userId });
 		} else {
-			queryBuilder.addSelect(['false AS isLike']);
+			queryBuilder.addSelect(['false::boolean AS isLike']);
 		}
 
 		return await queryBuilder.groupBy('word.id').getRawOne();
@@ -179,7 +179,7 @@ export class WordRepository {
 				])
 				.setParameters({ userId });
 		} else {
-			queryBuilder.addSelect(['false AS isLike']);
+			queryBuilder.addSelect(['false::boolean AS isLike']);
 		}
 
 		const words = await queryBuilder
