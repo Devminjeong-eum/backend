@@ -33,7 +33,6 @@ export class WordService {
 	private readonly SPREAD_SHEET_NAME = 'word';
 	private readonly UUID_REGEX =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-	private readonly NAME_REGEX = /^[a-z0-9]+$/i;
 
 	private parseWordFromSpreadSheet = (
 		[
@@ -160,12 +159,6 @@ export class WordService {
 		if (searchType === 'ID' && !searchValue.match(this.UUID_REGEX)) {
 			throw new BadRequestException(
 				'searchType 이 ID 인 경우 searchValue 에는 유효한 UUID 가 와야 합니다.',
-			);
-		}
-
-		if (searchType === 'NAME' && !searchValue.match(this.NAME_REGEX)) {
-			throw new BadRequestException(
-				'searchType 이 NAME 인 경우 searchValue 에는 유효한 단어 명이 와야 합니다.',
 			);
 		}
 
