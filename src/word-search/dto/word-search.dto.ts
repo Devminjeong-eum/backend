@@ -7,7 +7,6 @@ import {
 	IsOptional,
 	IsString,
 	IsUUID,
-	Matches,
 	MinLength,
 } from 'class-validator';
 
@@ -15,11 +14,10 @@ import { PaginationOptionDto } from '#/common/dto/pagination.dto';
 
 export class RequestWordSearchDto extends PaginationOptionDto {
 	@IsOptional()
-	@IsUUID()
+	@IsString()
 	userId?: string;
 
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/)
 	@MinLength(3)
 	@ApiProperty({
 		description: '검색할 단어 키워드',
