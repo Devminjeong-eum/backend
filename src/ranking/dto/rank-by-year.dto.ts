@@ -12,7 +12,7 @@ export class RequestRankingByYearDto {
 }
 
 export class ResponseRankingByYearDto {
-	@Type(() => Number) 
+	@Type(() => Number)
 	@Expose()
 	@ApiProperty()
 	rank: number;

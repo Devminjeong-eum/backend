@@ -39,7 +39,7 @@ export class RankingService {
 		const responseWeekRankingDto = plainToInstance(
 			ResponseRankingByWeekDto,
 			ranking,
-			{ excludeExtraneousValues: true,  },
+			{ excludeExtraneousValues: true },
 		);
 		return responseWeekRankingDto;
 	}

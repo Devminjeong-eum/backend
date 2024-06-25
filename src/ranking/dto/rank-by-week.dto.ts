@@ -17,7 +17,7 @@ export class RequestRankingByWeekDto {
 }
 
 export class ResponseRankingByWeekDto {
-	@Type(() => Number) 
+	@Type(() => Number)
 	@Expose()
 	@ApiProperty()
 	rank: number;

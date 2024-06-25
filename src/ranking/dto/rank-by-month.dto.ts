@@ -17,7 +17,7 @@ export class RequestRankingByMonthDto {
 }
 
 export class ResponseRankingByMonthDto {
-	@Type(() => Number) 
+	@Type(() => Number)
 	@Expose()
 	@ApiProperty()
 	rank: number;
