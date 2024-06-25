@@ -6,11 +6,13 @@ import { IsInt, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 export class ResponseCurrentRankingDto {
 	@IsNumber()
 	@Expose()
+	@ApiProperty()
 	rank: number;
 
 	@IsInt()
 	@IsOptional()
 	@Expose()
+	@ApiProperty()
 	rankChange: number;
 
 	@IsUUID()
@@ -34,10 +36,12 @@ export class ResponseCurrentRankingDto {
 	@IsString()
 	@Transform(({ obj }) => obj.word.diacritic[0])
 	@Expose({ name: 'diacritic' })
+	@ApiProperty()
 	diacritic: string;
 
 	@IsString()
 	@Transform(({ obj }) => obj.word.pronunciation[0])
 	@Expose({ name: 'pronunciation' })
+	@ApiProperty()
 	pronunciation: string;
 }

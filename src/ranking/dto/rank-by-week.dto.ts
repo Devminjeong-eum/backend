@@ -19,6 +19,7 @@ export class RequestRankingByWeekDto {
 export class ResponseRankingByWeekDto {
 	@Type(() => Number) 
 	@Expose()
+	@ApiProperty()
 	rank: number;
 
 	@IsUUID()
@@ -42,10 +43,12 @@ export class ResponseRankingByWeekDto {
 	@IsString()
 	@Transform(({ obj }) => obj.word_diacritic[0])
 	@Expose({ name: 'diacritic' })
+	@ApiProperty()
 	diacritic: string;
 
 	@IsString()
 	@Transform(({ obj }) => obj.word_pronunciation[0])
 	@Expose({ name: 'pronunciation' })
+	@ApiProperty()
 	pronunciation: string;
 }
