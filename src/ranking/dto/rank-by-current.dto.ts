@@ -1,25 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Expose, Transform } from 'class-transformer';
-import { IsNumber, IsString, IsUUID, Max, Min } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
-export class RequestRankingByMonthDto {
-	@Transform(({ value }) => parseInt(value, 10))
-	@IsNumber()
-	@Min(2024) // NOTE : 서비스 시작 년도 2024년도
-	@Max(new Date().getFullYear())
-	year: number;
-
-	@IsNumber()
-	@Min(1)
-	@Max(12)
-	month: number;
-}
-
-export class ResponseRankingByMonthDto {
+export class ResponseCurrentRankingDto {
 	@IsNumber()
 	@Expose()
 	rank: number;
+
+	@IsInt()
+	@IsOptional()
+	@Expose()
+	rankChange: number;
 
 	@IsUUID()
 	@Transform(({ obj }) => obj.word.id)
