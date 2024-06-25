@@ -22,6 +22,8 @@ import { ResearchModule } from './research/research.module';
 import { UserModule } from './user/user.module';
 import { WordSearchModule } from './word-search/word-search.module';
 import { WordModule } from './word/word.module';
+import { RankingModule } from './ranking/ranking.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
 	imports: [
@@ -40,6 +42,7 @@ import { WordModule } from './word/word.module';
 		AuthModule,
 		WordModule,
 		LikeModule,
+		RankingModule,
 		QuizModule,
 		ResearchModule,
 		WordSearchModule,
