@@ -35,10 +35,11 @@ export class RankingService {
 	async findSpecificWeekRanking(rankingByWeekDto: RequestRankingByWeekDto) {
 		const ranking =
 			await this.rankingRepository.findBySpecificWeek(rankingByWeekDto);
+
 		const responseWeekRankingDto = plainToInstance(
 			ResponseRankingByWeekDto,
 			ranking,
-			{ excludeExtraneousValues: true },
+			{ excludeExtraneousValues: true,  },
 		);
 		return responseWeekRankingDto;
 	}

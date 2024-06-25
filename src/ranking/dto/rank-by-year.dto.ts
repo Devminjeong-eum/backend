@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsNumber, IsString, IsUUID, Max, Min } from 'class-validator';
 
 export class RequestRankingByYearDto {
@@ -12,35 +12,35 @@ export class RequestRankingByYearDto {
 }
 
 export class ResponseRankingByYearDto {
-	@IsNumber()
+	@Type(() => Number) 
 	@Expose()
 	rank: number;
 
 	@IsUUID()
-	@Transform(({ obj }) => obj.word.id)
+	@Transform(({ obj }) => obj.word_id)
 	@Expose()
 	@ApiProperty()
 	id: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.name)
+	@Transform(({ obj }) => obj.word_name)
 	@Expose()
 	@ApiProperty()
 	name: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.description)
+	@Transform(({ obj }) => obj.word_description)
 	@Expose({ name: 'description' })
 	@ApiProperty()
 	description: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.diacritic[0])
+	@Transform(({ obj }) => obj.word_diacritic[0])
 	@Expose({ name: 'diacritic' })
 	diacritic: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.pronunciation[0])
+	@Transform(({ obj }) => obj.word_pronunciation[0])
 	@Expose({ name: 'pronunciation' })
 	pronunciation: string;
 }

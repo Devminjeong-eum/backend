@@ -35,7 +35,7 @@ export class RankingRepository {
 				'word.name',
 				'word.description',
 				'word.pronunciation',
-				'word.diacritic'
+				'word.diacritic',
 			])
 			.orderBy('ranking.rank')
 			.getMany();
@@ -44,55 +44,62 @@ export class RankingRepository {
 	findBySpecificWeek({ year, week }: RequestRankingByWeekDto) {
 		return this.rankingRepository
 			.createQueryBuilder('ranking')
-			.where('ranking.year = :year', { year })
-			.andWhere('ranking.week = :week', { week })
-			.leftJoin('ranking.word', 'word')
 			.select([
-				'ranking.rank',
+				'ranking.id',
+				'ranking.score',
 				'word.id',
 				'word.name',
 				'word.description',
 				'word.pronunciation',
-				'word.diacritic'
+				'word.diacritic',
+				'ROW_NUMBER() OVER (ORDER BY ranking.score) as rank',
 			])
-			.orderBy('ranking.rank')
-			.getMany();
+			.leftJoin('ranking.word', 'word')
+			.where('ranking.year = :year', { year })
+			.andWhere('ranking.week = :week', { week })
+			.orderBy('ranking.score')
+			.take(10)
+			.getRawMany();
 	}
 
 	findBySpecificMonth({ year, month }: RequestRankingByMonthDto) {
 		return this.rankingRepository
 			.createQueryBuilder('ranking')
-			.where('ranking.year = :year', { year })
-			.andWhere('ranking.month = :month', { month })
-			.leftJoin('ranking.word', 'word')
 			.select([
+				'ranking.id',
 				'ranking.score',
 				'word.id',
 				'word.name',
 				'word.description',
 				'word.pronunciation',
-				'word.diacritic'
+				'word.diacritic',
+				'ROW_NUMBER() OVER (ORDER BY ranking.score) as rank',
 			])
+			.leftJoin('ranking.word', 'word')
+			.where('ranking.year = :year', { year })
+			.andWhere('ranking.month = :month', { month })
 			.orderBy('ranking.score')
 			.take(10)
-			.getMany();
+			.getRawMany();
 	}
 
 	findBySpecificYear({ year }: RequestRankingByYearDto) {
 		return this.rankingRepository
 			.createQueryBuilder('ranking')
-			.where('ranking.year = :year', { year })
-			.leftJoin('ranking.word', 'word')
 			.select([
+				'ranking.id',
 				'ranking.score',
 				'word.id',
 				'word.name',
 				'word.description',
 				'word.pronunciation',
-				'word.diacritic'
+				'word.diacritic',
+				'ROW_NUMBER() OVER (ORDER BY ranking.score) as rank',
 			])
+			.leftJoin('ranking.word', 'word')
+			.where('ranking.year = :year', { year })
 			.orderBy('ranking.score')
 			.take(10)
-			.getMany();
+			.getRawMany();
 	}
 }
