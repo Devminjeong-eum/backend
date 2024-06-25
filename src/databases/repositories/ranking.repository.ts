@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
+import { RequestRankingByMonthDto } from '#/ranking/dto/rank-by-month.dto';
 import { RequestRankingByWeekDto } from '#/ranking/dto/rank-by-week.dto';
 import { RequestRankingByYearDto } from '#/ranking/dto/rank-by-year.dto';
 import { Ranking } from '#databases/entities/ranking.entity';
 import dayjs from '#utils/dayjs';
-import { RequestRankingByMonthDto } from '#/ranking/dto/rank-by-month.dto';
 
 @Injectable()
 export class RankingRepository {
@@ -17,14 +17,17 @@ export class RankingRepository {
 	) {}
 
 	findByCurrentWeek() {
-		const currentWeek = dayjs().week();
-		const currentYear = dayjs().year();
+		const startDayOfPreviousWeek = dayjs()
+			.startOf('week')
+			.subtract(1, 'week');
+		const previousWeek = startDayOfPreviousWeek.week();
+		const currentYear = startDayOfPreviousWeek.year();
 
 		return this.rankingRepository
 			.createQueryBuilder('ranking')
 			.where('ranking.year = :currentYear', { currentYear })
-			.andWhere('ranking.week = :currentWeek', { currentWeek })
-			.leftJoin('ranking.words', 'word')
+			.andWhere('ranking.week = :previousWeek', { previousWeek })
+			.leftJoin('ranking.word', 'word')
 			.select([
 				'ranking.rank',
 				'ranking.rankChange',
@@ -42,10 +45,9 @@ export class RankingRepository {
 			.createQueryBuilder('ranking')
 			.where('ranking.year = :year', { year })
 			.andWhere('ranking.week = :week', { week })
-			.leftJoin('ranking.words', 'word')
+			.leftJoin('ranking.word', 'word')
 			.select([
 				'ranking.rank',
-				'ranking.rankChange',
 				'word.id',
 				'word.name',
 				'word.description',
@@ -60,10 +62,9 @@ export class RankingRepository {
 			.createQueryBuilder('ranking')
 			.where('ranking.year = :year', { year })
 			.andWhere('ranking.month = :month', { month })
-			.leftJoin('ranking.words', 'word')
+			.leftJoin('ranking.word', 'word')
 			.select([
 				'ranking.score',
-				'ranking.rankChange',
 				'word.id',
 				'word.name',
 				'word.description',
@@ -78,10 +79,9 @@ export class RankingRepository {
 		return this.rankingRepository
 			.createQueryBuilder('ranking')
 			.where('ranking.year = :year', { year })
-			.leftJoin('ranking.words', 'word')
+			.leftJoin('ranking.word', 'word')
 			.select([
 				'ranking.score',
-				'ranking.rankChange',
 				'word.id',
 				'word.name',
 				'word.description',
