@@ -31,6 +31,15 @@ export class Ranking {
 	@Column({ type: 'smallint', nullable: true })
 	rankChange: number | null;
 
+	@Column({ type: 'integer' })
+	score: number;
+
+	@Column({ type: 'integer' })
+	viewCount: number;
+
+	@Column({ type: 'integer' })
+	addLikeCount: number;
+
 	@ManyToOne(() => Word, (word) => word.rankings)
 	word: Relation<Word>;
 
