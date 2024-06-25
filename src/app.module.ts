@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
 import { DiscordWebhookModule } from './discord/discord.module';
 import { LikeModule } from './like/like.module';
 import { QuizModule } from './quiz/quiz.module';
+import { RankingModule } from './ranking/ranking.module';
 import { RedisModule } from './redis/redis.module';
 import { ResearchModule } from './research/research.module';
 import { UserModule } from './user/user.module';
@@ -40,6 +41,7 @@ import { WordModule } from './word/word.module';
 		AuthModule,
 		WordModule,
 		LikeModule,
+		RankingModule,
 		QuizModule,
 		ResearchModule,
 		WordSearchModule,
