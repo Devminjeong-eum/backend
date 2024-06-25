@@ -35,6 +35,7 @@ export class RankingRepository {
 				'word.name',
 				'word.description',
 				'word.pronunciation',
+				'word.diacritic'
 			])
 			.orderBy('ranking.rank')
 			.getMany();
@@ -52,6 +53,7 @@ export class RankingRepository {
 				'word.name',
 				'word.description',
 				'word.pronunciation',
+				'word.diacritic'
 			])
 			.orderBy('ranking.rank')
 			.getMany();
@@ -69,6 +71,7 @@ export class RankingRepository {
 				'word.name',
 				'word.description',
 				'word.pronunciation',
+				'word.diacritic'
 			])
 			.orderBy('ranking.score')
 			.take(10)
@@ -86,6 +89,7 @@ export class RankingRepository {
 				'word.name',
 				'word.description',
 				'word.pronunciation',
+				'word.diacritic'
 			])
 			.orderBy('ranking.score')
 			.take(10)

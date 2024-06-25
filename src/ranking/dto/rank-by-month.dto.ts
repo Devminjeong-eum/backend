@@ -43,4 +43,9 @@ export class ResponseRankingByMonthDto {
 	@Transform(({ obj }) => obj.word.diacritic[0])
 	@Expose({ name: 'diacritic' })
 	diacritic: string;
+
+	@IsString()
+	@Transform(({ obj }) => obj.word.pronunciation[0])
+	@Expose({ name: 'pronunciation' })
+	pronunciation: string;
 }
