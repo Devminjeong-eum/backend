@@ -81,7 +81,9 @@ export class WordSearchRepository {
 					'word.diacritic',
 					'word.description',
 					'word.createdAt',
-					'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike',
+					userId
+						? 'CASE WHEN like.id IS NOT NULL THEN true ELSE false END AS isLike'
+						: 'false::boolean AS isLike',
 				])
 				.orderBy('word.createdAt', 'ASC')
 				.distinct(true)
@@ -90,6 +92,8 @@ export class WordSearchRepository {
 				.getRawMany(),
 			queryBuilder.getCount(),
 		]);
+
+		console.log({ words });
 
 		return { words, totalCount };
 	}

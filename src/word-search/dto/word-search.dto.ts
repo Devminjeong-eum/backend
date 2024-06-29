@@ -82,5 +82,5 @@ export class ResponseWordSearchDto {
 		description: '유저 좋아요 여부 (비로그인 일 시 false)',
 		type: Boolean,
 	})
-	isLike: boolean;
+	isLike: boolean = false;
 }
