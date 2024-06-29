@@ -93,8 +93,6 @@ export class WordSearchRepository {
 			queryBuilder.getCount(),
 		]);
 
-		console.log({ words });
-
 		return { words, totalCount };
 	}
 }
