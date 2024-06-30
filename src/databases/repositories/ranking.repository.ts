@@ -17,11 +17,12 @@ export class RankingRepository {
 	) {}
 
 	findByCurrentWeek() {
-		const startDayOfPreviousWeek = dayjs()
-			.startOf('week')
-			.subtract(1, 'week');
-		const previousWeek = startDayOfPreviousWeek.week();
-		const currentYear = startDayOfPreviousWeek.year();
+		const requestTime = dayjs.tz();
+		const currentWeek = requestTime.week();
+		const currentYear = requestTime.year();
+
+		const isSunday = requestTime.day() === 0;
+		const previousWeek = isSunday ? currentWeek - 2 : currentWeek - 1;
 
 		return this.rankingRepository
 			.createQueryBuilder('ranking')
