@@ -86,7 +86,7 @@ export class AuthService {
 					'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
 				);
 			}
-			throw new InternalServerErrorException({
+			throw new UnauthorizedException({
 				error,
 				message: '인증 토큰을 파싱하는 과정에서 에러가 발생했습니다.',
 			});
