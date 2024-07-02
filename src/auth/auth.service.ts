@@ -80,8 +80,8 @@ export class AuthService {
 
 			return userId;
 		} catch (error) {
+			this.removeAuthenticateCookie(response);
 			if (error instanceof TokenExpiredError) {
-				this.removeAuthenticateCookie(response);
 				throw new UnauthorizedException(
 					'유저 정보가 만료되었습니다. 로그인을 진행해주세요.',
 				);
