@@ -17,8 +17,11 @@ export class TextToSpeech {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
+	@Column({ type: 'text' })
 	audioFileUri: string;
+
+	@Column({ type: 'varchar' })
+	text: string;
 
 	@OneToOne(() => Word, (word) => word.audioFile, { onDelete: 'CASCADE' })
 	@JoinColumn()
