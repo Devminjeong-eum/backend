@@ -14,7 +14,7 @@ import {
 
 import { Like } from './like.entity';
 import { Ranking } from './ranking.entity';
-import { TextToSpeech } from './text-to-speech';
+import { TextToSpeech } from './text-to-speech.entity';
 
 @Entity()
 export class Word {
