@@ -22,6 +22,12 @@ export const createAwsPollyClientFactory = (configService: ConfigService) => {
 		throw new RequireEnvironmentVariableException(notExistsVariables);
 	}
 
-	const pollyClient = new PollyClient({ region: REGION });
+	const pollyClient = new PollyClient({
+		region: REGION,
+		credentials: {
+			accessKeyId: iamAccessKey,
+			secretAccessKey: iamSecretAccessKey,
+		},
+	});
 	return pollyClient;
 };
