@@ -19,6 +19,7 @@ export class TextToSpeechService {
 	) {
 		const s3BucketName =
 			this.configService.get<string>('AWS_S3_BUCKET_NAME');
+
 		if (!s3BucketName)
 			throw new InternalServerErrorException(
 				'AWS_S3_BUCKET_NAME 환경 변수가 존재하지 않습니다.',

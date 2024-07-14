@@ -14,5 +14,6 @@ const AwsPollyProvider: Provider<PollyClient> = {
 
 @Module({
 	providers: [TextToSpeechService, AwsPollyProvider],
+	exports: [TextToSpeechService]
 })
 export class TextToSpeechModule {}
