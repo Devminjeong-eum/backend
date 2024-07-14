@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import {
@@ -6,8 +10,14 @@ import {
 	StartSpeechSynthesisTaskCommand,
 	type StartSpeechSynthesisTaskCommandInput,
 } from '@aws-sdk/client-polly';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+import { TextToSpeechRepository } from '#/databases/repositories/text-to-speech.repository';
+import { WordRepository } from '#/databases/repositories/word.repository';
 
 import { InjectPollyClient } from './decorators/inject-polly-client.decorator';
+import { InjectS3Bucket } from './decorators/inject-s3-bucket.decorator';
 
 @Injectable()
 export class TextToSpeechService {
@@ -15,6 +25,9 @@ export class TextToSpeechService {
 
 	constructor(
 		@InjectPollyClient() private readonly pollyClient: PollyClient,
+		@InjectS3Bucket() private readonly s3Client: S3Client,
+		private readonly wordRepository: WordRepository,
+		private readonly textToSpeechRepository: TextToSpeechRepository,
 		private readonly configService: ConfigService,
 	) {
 		const s3BucketName =
@@ -54,6 +67,32 @@ export class TextToSpeechService {
 			);
 		}
 
-        return response.SynthesisTask.OutputUri;
+		return response.SynthesisTask.OutputUri;
+	}
+
+	async generateAudioPresignedUrl(wordId: string) {
+		const word = await this.wordRepository.findById(wordId);
+
+		if (!word)
+			throw new BadRequestException(
+				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
+			);
+
+		const textToSpeech =
+			await this.textToSpeechRepository.findByWordId(wordId);
+
+		if (!textToSpeech)
+			throw new BadRequestException(
+				'해당 단어는 아직 TTS 가 생성되지 않았습니다.',
+			);
+
+		const putCommand = new GetObjectCommand({
+			Bucket: this.outputS3BucketName,
+			Key: textToSpeech.audioFileUri,
+		});
+		const presignedUrl = await getSignedUrl(this.s3Client, putCommand, {
+			expiresIn: 5,
+		});
+		return presignedUrl;
 	}
 }

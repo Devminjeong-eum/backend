@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { PollyClient } from '@aws-sdk/client-polly';
 import { S3Client } from '@aws-sdk/client-s3';
 
+import { TextToSpeechRepository } from '#/databases/repositories/text-to-speech.repository';
+import { WordModule } from '#/word/word.module';
+
 import { AWS_POLLY_CLIENT, AWS_S3_BUCKET } from './constant';
 import { createAwsPollyClientFactory } from './factory/polly-client-factory';
 import { createAwsS3BucketFactory } from './factory/s3-bucket-factory';
@@ -22,7 +25,13 @@ const AwsS3BucketProvider: Provider<S3Client> = {
 };
 
 @Module({
-	providers: [TextToSpeechService, AwsPollyProvider, AwsS3BucketProvider],
-	exports: [TextToSpeechService],
+	imports: [WordModule],
+	providers: [
+		TextToSpeechService,
+		TextToSpeechRepository,
+		AwsPollyProvider,
+		AwsS3BucketProvider,
+	],
+	exports: [TextToSpeechService, TextToSpeechRepository],
 })
 export class TextToSpeechModule {}
