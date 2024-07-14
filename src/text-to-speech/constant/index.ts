@@ -1,0 +1,1 @@
+export const AWS_POLLY_CLIENT = Symbol('AWS_POLLY_CLIENT');
