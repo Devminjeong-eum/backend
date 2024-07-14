@@ -86,11 +86,11 @@ export class TextToSpeechService {
 				'해당 단어는 아직 TTS 가 생성되지 않았습니다.',
 			);
 
-		const putCommand = new GetObjectCommand({
+		const getCommand = new GetObjectCommand({
 			Bucket: this.outputS3BucketName,
 			Key: textToSpeech.audioFileUri,
 		});
-		const presignedUrl = await getSignedUrl(this.s3Client, putCommand, {
+		const presignedUrl = await getSignedUrl(this.s3Client, getCommand, {
 			expiresIn: 5,
 		});
 		return presignedUrl;
