@@ -73,7 +73,9 @@ export class Word {
 	rankings: Relation<Ranking>[];
 
 	@Exclude()
-	@OneToOne(() => Ranking, (textToSpeech) => textToSpeech.word, { cascade: ['soft-remove'] })
+	@OneToOne(() => Ranking, (textToSpeech) => textToSpeech.word, {
+		cascade: ['soft-remove'],
+	})
 	audioFile: Relation<TextToSpeech>;
 
 	@Exclude()

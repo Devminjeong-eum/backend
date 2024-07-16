@@ -20,10 +20,10 @@ import { QuizModule } from './quiz/quiz.module';
 import { RankingModule } from './ranking/ranking.module';
 import { RedisModule } from './redis/redis.module';
 import { ResearchModule } from './research/research.module';
+import { TextToSpeechModule } from './text-to-speech/text-to-speech.module';
 import { UserModule } from './user/user.module';
 import { WordSearchModule } from './word-search/word-search.module';
 import { WordModule } from './word/word.module';
-import { TextToSpeechModule } from './text-to-speech/text-to-speech.module';
 
 @Module({
 	imports: [

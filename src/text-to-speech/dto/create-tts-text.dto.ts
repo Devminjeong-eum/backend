@@ -9,7 +9,7 @@ export class RequestCreateWordTextToSpeechDto {
 	@ApiProperty()
 	wordId: string;
 
-    @IsString()
+	@IsString()
 	@Expose()
 	@ApiProperty()
 	text: string;
