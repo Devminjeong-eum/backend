@@ -22,13 +22,13 @@ export class TextToSpeechRepository {
 		text: string;
 		audioFileUri: string;
 	}) {
-		const quizResult = this.textToSpeechRepository.create({
+		const textToSpeech = this.textToSpeechRepository.create({
 			word,
 			text,
 			audioFileUri,
 		});
 
-		return this.textToSpeechRepository.save(quizResult);
+		return this.textToSpeechRepository.save(textToSpeech);
 	}
 
 	async update({
@@ -62,7 +62,7 @@ export class TextToSpeechRepository {
 				'word.id = :wordId',
 				{ wordId },
 			)
-			.select(['textToSpeech.audioUri', 'word.name', 'word.id'])
+			.select(['textToSpeech.audioFileUri', 'word.name', 'word.id'])
 			.getOne();
 	}
 }
