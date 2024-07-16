@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { Module, Provider, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -29,7 +29,11 @@ const AwsS3BucketProvider: Provider<S3Client> = {
 };
 
 @Module({
-	imports: [TypeOrmModule.forFeature([TextToSpeech]), WordModule, AuthModule],
+	imports: [
+		TypeOrmModule.forFeature([TextToSpeech]),
+		AuthModule,
+		forwardRef(() => WordModule),
+	],
 	controllers: [TextToSpeechController],
 	providers: [
 		// Service

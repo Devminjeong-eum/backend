@@ -56,31 +56,31 @@ export class TextToSpeechService {
 		return {
 			OutputFormat: 'mp3',
 			OutputS3BucketName: this.outputS3BucketName,
-			OutputS3KeyPrefix: 'tts',
+			OutputS3KeyPrefix: `tts/${text}`,
 			Text: text,
 			VoiceId: 'Joanna',
 		};
 	}
 
-	async generateTextToSpeechAudio(word: string) {
+	async generateTextToSpeechAudio(text: string) {
 		const speechSyntesisTaskCommandInstance =
 			new StartSpeechSynthesisTaskCommand(
-				this.createSpeechSyntesisTaskCommandParams(word),
+				this.createSpeechSyntesisTaskCommandParams(text),
 			);
 
 		try {
 			const response = await this.pollyClient.send(
 				speechSyntesisTaskCommandInstance,
 			);
-			const audioFileUri = response.SynthesisTask?.OutputUri;
+			const taskId = response.SynthesisTask?.TaskId;
 
-			if (!audioFileUri) {
+			if (!taskId) {
 				throw new InternalServerErrorException(
 					response.$metadata,
 					`TTS 가 정상적으로 생성되지 않았습니다.`,
 				);
 			}
-			return audioFileUri;
+			return `tts/${text}.${taskId}.mp3`;
 		} catch (error) {
 			throw new InternalServerErrorException(
 				error,
@@ -89,7 +89,7 @@ export class TextToSpeechService {
 		}
 	}
 
-	async generateAudioPresignedUrl(wordId: string, delay: number = 5) {
+	async generateAudioPresignedUrl(wordId: string, delay: number = 20) {
 		const word = await this.wordRepository.findById(wordId);
 
 		if (!word)

@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '#/auth/auth.module';
 import { SpreadSheetModule } from '#/spread-sheet/spread-sheet.module';
+import { TextToSpeechModule } from '#/text-to-speech/text-to-speech.module';
 import { UserModule } from '#/user/user.module';
 import { WordSearchModule } from '#/word-search/word-search.module';
 import { Word } from '#databases/entities/word.entity';
@@ -18,6 +19,7 @@ import { WordService } from './word.service';
 		AuthModule,
 		UserModule,
 		WordSearchModule,
+		TextToSpeechModule,
 	],
 	controllers: [WordController],
 	providers: [
