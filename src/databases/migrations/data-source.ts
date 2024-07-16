@@ -15,8 +15,13 @@ export default new DataSource({
 	username: configService.get('DB_USERNAME'),
 	password: configService.get('DB_PASSWORD'),
 	database: configService.get('DB_DATABASE'),
-	synchronize: false,
 	entities: ['src/**/*.entity.ts'],
-	migrations: ['src/databases/migrations/*.ts'],
+	synchronize: false,
+	logging: true,
+	migrations: [],
 	migrationsTableName: 'db_migrations',
+	// TODO : 인증서를 적용하여 SSL 연결이 가능하도록 수정 필요
+	ssl: {
+		rejectUnauthorized: false,
+	},
 });
