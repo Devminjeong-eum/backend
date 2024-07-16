@@ -14,3 +14,13 @@ export class RequestUpdateWordTextToSpeechDto {
 	@ApiProperty()
 	text: string;
 }
+
+export class ResponseUpdateWordTextToSpeechDto {
+	@IsUUID()
+	@ApiProperty()
+	uri: string;
+
+	@IsString()
+	@ApiProperty()
+	wordName: string;
+}

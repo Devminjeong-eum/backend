@@ -13,17 +13,27 @@ import { ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from '#/auth/guard/admin.guard';
 import { ApiDocs } from '#/common/decorators/swagger.decorator';
 
-import { RequestUpdateWordTextToSpeechDto } from './dto/update-tts-text.dto';
+import {
+	RequestCreateWordTextToSpeechDto,
+	ResponseCreateWordTextToSpeechDto,
+} from './dto/create-tts-text.dto';
+import {
+	RequestUpdateWordTextToSpeechDto,
+	ResponseUpdateWordTextToSpeechDto,
+} from './dto/update-tts-text.dto';
 import { TextToSpeechService } from './text-to-speech.service';
-import { RequestCreateWordTextToSpeechDto } from './dto/create-tts-text.dto';
 
 @ApiTags('Text-To-Speech')
-@Controller('text-to-speech')
+@Controller('tts')
 export class TextToSpeechController {
 	constructor(private readonly textToSpeechService: TextToSpeechService) {}
 
 	@ApiDocs({
 		summary: '기존에 생성했던 단어 TTS 를 수정합니다.',
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseUpdateWordTextToSpeechDto,
+		},
 	})
 	@UseGuards(AdminGuard)
 	@Patch('/update')
@@ -35,8 +45,12 @@ export class TextToSpeechController {
 		);
 	}
 
-    @ApiDocs({
+	@ApiDocs({
 		summary: '기존에 생성했던 단어 TTS 를 수정합니다.',
+		response: {
+			statusCode: HttpStatus.OK,
+			schema: ResponseCreateWordTextToSpeechDto,
+		},
 	})
 	@UseGuards(AdminGuard)
 	@Post('/create')
@@ -52,8 +66,7 @@ export class TextToSpeechController {
 		summary: '단어 TTS 음성 파일을 받는 Presigned URL 을 생성합니다.',
 		response: {
 			statusCode: HttpStatus.OK,
-			schema: Boolean,
-			isPaginated: true,
+			schema: String,
 		},
 	})
 	@Get('/:wordId')

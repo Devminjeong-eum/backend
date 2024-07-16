@@ -12,14 +12,21 @@ import {
 } from '@aws-sdk/client-polly';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { plainToInstance } from 'class-transformer';
 
 import { TextToSpeechRepository } from '#/databases/repositories/text-to-speech.repository';
 import { WordRepository } from '#/databases/repositories/word.repository';
 
 import { InjectPollyClient } from './decorators/inject-polly-client.decorator';
 import { InjectS3Bucket } from './decorators/inject-s3-bucket.decorator';
-import { RequestCreateWordTextToSpeechDto } from './dto/create-tts-text.dto';
-import { RequestUpdateWordTextToSpeechDto } from './dto/update-tts-text.dto';
+import {
+	RequestCreateWordTextToSpeechDto,
+	ResponseCreateWordTextToSpeechDto,
+} from './dto/create-tts-text.dto';
+import {
+	RequestUpdateWordTextToSpeechDto,
+	ResponseUpdateWordTextToSpeechDto,
+} from './dto/update-tts-text.dto';
 
 @Injectable()
 export class TextToSpeechService {
@@ -130,10 +137,20 @@ export class TextToSpeechService {
 		const audioFileUri = await this.generateTextToSpeechAudio(text);
 		await this.textToSpeechRepository.create({ word, text, audioFileUri });
 
-		return await this.generateAudioPresignedUrl(
+		const presignedUrl = await this.generateAudioPresignedUrl(
 			wordId,
 			this.TEST_PRESIGNED_EXPIRED,
 		);
+
+		const responseCreateWordTextToSpeechDto = plainToInstance(
+			ResponseCreateWordTextToSpeechDto,
+			{
+				uri: presignedUrl,
+				wordName: word.name,
+			},
+		);
+
+		return responseCreateWordTextToSpeechDto;
 	}
 
 	async updateWordTextToSpeech(
@@ -164,9 +181,19 @@ export class TextToSpeechService {
 			audioFileUri,
 		});
 
-		return await this.generateAudioPresignedUrl(
+		const presignedUrl = await this.generateAudioPresignedUrl(
 			wordId,
 			this.TEST_PRESIGNED_EXPIRED,
 		);
+
+		const responseUpdateWordTextToSpeechDto = plainToInstance(
+			ResponseUpdateWordTextToSpeechDto,
+			{
+				uri: presignedUrl,
+				wordName: word.name,
+			},
+		);
+
+		return responseUpdateWordTextToSpeechDto;
 	}
 }
