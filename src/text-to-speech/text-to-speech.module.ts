@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { PollyClient } from '@aws-sdk/client-polly';
 import { S3Client } from '@aws-sdk/client-s3';
 
+import { AuthModule } from '#/auth/auth.module';
 import { TextToSpeechRepository } from '#/databases/repositories/text-to-speech.repository';
 import { WordModule } from '#/word/word.module';
 
@@ -25,7 +26,7 @@ const AwsS3BucketProvider: Provider<S3Client> = {
 };
 
 @Module({
-	imports: [WordModule],
+	imports: [WordModule, AuthModule],
 	providers: [
 		TextToSpeechService,
 		TextToSpeechRepository,

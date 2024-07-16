@@ -18,10 +18,13 @@ import { WordRepository } from '#/databases/repositories/word.repository';
 
 import { InjectPollyClient } from './decorators/inject-polly-client.decorator';
 import { InjectS3Bucket } from './decorators/inject-s3-bucket.decorator';
+import { RequestCreateWordTextToSpeechDto } from './dto/create-tts-text.dto';
+import { RequestUpdateWordTextToSpeechDto } from './dto/update-tts-text.dto';
 
 @Injectable()
 export class TextToSpeechService {
 	private readonly outputS3BucketName: string;
+	private readonly TEST_PRESIGNED_EXPIRED = 20;
 
 	constructor(
 		@InjectPollyClient() private readonly pollyClient: PollyClient,
@@ -57,20 +60,28 @@ export class TextToSpeechService {
 				this.createSpeechSyntesisTaskCommandParams(word),
 			);
 
-		const response = await this.pollyClient.send(
-			speechSyntesisTaskCommandInstance,
-		);
+		try {
+			const response = await this.pollyClient.send(
+				speechSyntesisTaskCommandInstance,
+			);
+			const audioFileUri = response.SynthesisTask?.OutputUri;
 
-		if (!response.SynthesisTask) {
+			if (!audioFileUri) {
+				throw new InternalServerErrorException(
+					response.$metadata,
+					`TTS 가 정상적으로 생성되지 않았습니다.`,
+				);
+			}
+			return audioFileUri;
+		} catch (error) {
 			throw new InternalServerErrorException(
-				`${word} 단어에 대한 TTS 가 정상적으로 생성되지 않았습니다.`,
+				error,
+				`AWS Polly 를 실행하는 과정에서 문제가 발생했습니다.`,
 			);
 		}
-
-		return response.SynthesisTask.OutputUri;
 	}
 
-	async generateAudioPresignedUrl(wordId: string) {
+	async generateAudioPresignedUrl(wordId: string, delay: number = 5) {
 		const word = await this.wordRepository.findById(wordId);
 
 		if (!word)
@@ -91,8 +102,71 @@ export class TextToSpeechService {
 			Key: textToSpeech.audioFileUri,
 		});
 		const presignedUrl = await getSignedUrl(this.s3Client, getCommand, {
-			expiresIn: 5,
+			expiresIn: delay,
 		});
 		return presignedUrl;
+	}
+
+	async createWordTextToSpeech(
+		createWordTextToSpeechDto: RequestCreateWordTextToSpeechDto,
+	) {
+		const { wordId, text } = createWordTextToSpeechDto;
+		const word = await this.wordRepository.findById(wordId);
+
+		if (!word)
+			throw new BadRequestException(
+				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
+			);
+
+		const textToSpeech =
+			await this.textToSpeechRepository.findByWordId(wordId);
+
+		if (textToSpeech) {
+			throw new BadRequestException(
+				'이미 해당 단어를 기반으로 생성된 TTS 가 존재합니다.',
+			);
+		}
+
+		const audioFileUri = await this.generateTextToSpeechAudio(text);
+		await this.textToSpeechRepository.create({ word, text, audioFileUri });
+
+		return await this.generateAudioPresignedUrl(
+			wordId,
+			this.TEST_PRESIGNED_EXPIRED,
+		);
+	}
+
+	async updateWordTextToSpeech(
+		updateWordTextToSpeechDto: RequestUpdateWordTextToSpeechDto,
+	) {
+		const { wordId, text } = updateWordTextToSpeechDto;
+		const word = await this.wordRepository.findById(wordId);
+
+		if (!word)
+			throw new BadRequestException(
+				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
+			);
+
+		const textToSpeech =
+			await this.textToSpeechRepository.findByWordId(wordId);
+
+		if (textToSpeech?.text === text) {
+			throw new BadRequestException(
+				'기존 TTS 에 설정된 Text 와 동일합니다.',
+			);
+		}
+
+		const audioFileUri = await this.generateTextToSpeechAudio(text);
+
+		await this.textToSpeechRepository.update({
+			wordId,
+			text,
+			audioFileUri,
+		});
+
+		return await this.generateAudioPresignedUrl(
+			wordId,
+			this.TEST_PRESIGNED_EXPIRED,
+		);
 	}
 }

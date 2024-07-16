@@ -31,6 +31,28 @@ export class TextToSpeechRepository {
 		return this.textToSpeechRepository.save(quizResult);
 	}
 
+	async update({
+		wordId,
+		text,
+		audioFileUri,
+	}: {
+		wordId: string;
+		text: string;
+		audioFileUri: string;
+	}) {
+		const updateResult = await this.textToSpeechRepository
+			.createQueryBuilder('textToSpeech')
+			.update(TextToSpeech)
+			.set({
+				audioFileUri,
+				text,
+			})
+			.where('textToSpeech.wordId = :wordId', { wordId })
+			.execute();
+
+		return updateResult;
+	}
+
 	async findByWordId(wordId: string) {
 		return this.textToSpeechRepository
 			.createQueryBuilder('textToSpeech')
