@@ -56,6 +56,9 @@ importers:
       dayjs:
         specifier: ^1.11.11
         version: 1.11.11
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       googleapis:
         specifier: ^135.1.0
         version: 135.1.0
