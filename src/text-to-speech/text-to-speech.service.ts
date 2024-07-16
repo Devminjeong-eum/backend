@@ -56,6 +56,7 @@ export class TextToSpeechService {
 		return {
 			OutputFormat: 'mp3',
 			OutputS3BucketName: this.outputS3BucketName,
+			OutputS3KeyPrefix: 'tts',
 			Text: text,
 			VoiceId: 'Joanna',
 		};
