@@ -6,6 +6,7 @@ import {
 	CreateDateColumn,
 	Entity,
 	OneToMany,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	type Relation,
 	UpdateDateColumn,
@@ -13,6 +14,7 @@ import {
 
 import { Like } from './like.entity';
 import { Ranking } from './ranking.entity';
+import { TextToSpeech } from './text-to-speech.entity';
 
 @Entity()
 export class Word {
@@ -69,6 +71,12 @@ export class Word {
 	@Exclude()
 	@OneToMany(() => Ranking, (ranking) => ranking.word)
 	rankings: Relation<Ranking>[];
+
+	@Exclude()
+	@OneToOne(() => Ranking, (textToSpeech) => textToSpeech.word, {
+		cascade: ['soft-remove'],
+	})
+	audioFile: Relation<TextToSpeech>;
 
 	@Exclude()
 	@CreateDateColumn({ type: 'timestamp' })

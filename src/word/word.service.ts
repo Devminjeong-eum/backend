@@ -5,8 +5,9 @@ import { plainToInstance } from 'class-transformer';
 
 import { PaginationDto, PaginationMetaDto } from '#/common/dto/pagination.dto';
 import { Word } from '#/databases/entities/word.entity';
-import { WordSearchRepository } from '#/databases/repositories/word-search.repository';
 import { SpreadSheetService } from '#/spread-sheet/spread-sheet.service';
+import { TextToSpeechService } from '#/text-to-speech/text-to-speech.service';
+import { WordSearchRepository } from '#databases/repositories/word-search.repository';
 import { WordRepository } from '#databases/repositories/word.repository';
 
 import { RequestCreateWordDto } from './dto/create-word.dto';
@@ -27,6 +28,7 @@ export class WordService {
 		private readonly wordRepository: WordRepository,
 		private readonly wordSearchRepository: WordSearchRepository,
 		private readonly spreadSheetService: SpreadSheetService,
+		private readonly textToSpeechService: TextToSpeechService,
 	) {}
 
 	private SPREAD_SHEET_UUID_ROW = 'G';
@@ -89,6 +91,10 @@ export class WordService {
 					wordEntity,
 					searchKeyword,
 				);
+				await this.textToSpeechService.createWordTextToSpeech({
+					wordId: wordEntity.id,
+					text: wordEntity.name,
+				});
 				batchUpdatedList.push({
 					cell: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
 					data: wordEntity.id,
