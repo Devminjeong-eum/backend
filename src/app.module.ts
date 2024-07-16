@@ -23,6 +23,7 @@ import { ResearchModule } from './research/research.module';
 import { UserModule } from './user/user.module';
 import { WordSearchModule } from './word-search/word-search.module';
 import { WordModule } from './word/word.module';
+import { TextToSpeechModule } from './text-to-speech/text-to-speech.module';
 
 @Module({
 	imports: [
@@ -45,6 +46,7 @@ import { WordModule } from './word/word.module';
 		QuizModule,
 		ResearchModule,
 		WordSearchModule,
+		TextToSpeechModule,
 	],
 	controllers: [AppController],
 	providers: [Logger],
