@@ -60,6 +60,9 @@ jobs:
         SERVER_PORT=${{ secrets.SERVER_PORT }}
         REDIS_PORT=${{ secrets.REDIS_PORT }}
         TEST_ADMIN_KEY=${{ secrets.TEST_ADMIN_KEY }}
+        AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
+        AWS_IAM_ACCESS_KEY=${{ secrets.AWS_IAM_ACCESS_KEY }}
+        AWS_IAM_SECRET_ACCESS_KEY=${{ secrets.AWS_IAM_SECRET_ACCESS_KEY }}
         DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}
         EOF
 
