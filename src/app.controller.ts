@@ -6,8 +6,6 @@ import { TextToSpeechService } from './text-to-speech/text-to-speech.service';
 @ApiTags('Test')
 @Controller()
 export class AppController {
-	constructor(private readonly textToSpeechService: TextToSpeechService) {}
-
 	@ApiOperation({
 		summary: '서버 Ping 조회용',
 	})
@@ -24,10 +22,5 @@ export class AppController {
 	@Get('/favicon.ico')
 	getPreventFavicon() {
 		return true;
-	}
-
-	@Get('/test')
-	generateTtsText() {
-		return this.textToSpeechService.generateAudioPresignedUrl();
 	}
 }
