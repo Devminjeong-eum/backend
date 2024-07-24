@@ -56,12 +56,8 @@ export class TextToSpeechRepository {
 	async findByWordId(wordId: string) {
 		return this.textToSpeechRepository
 			.createQueryBuilder('textToSpeech')
-			.leftJoinAndSelect(
-				'textToSpeech.word',
-				'word',
-				'word.id = :wordId',
-				{ wordId },
-			)
+			.leftJoin('textToSpeech.word', 'word')
+			.where('word.id = :wordId', { wordId })
 			.select(['textToSpeech.audioFileUri', 'word.name', 'word.id'])
 			.getOne();
 	}
