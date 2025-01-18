@@ -16,31 +16,31 @@ export class ResponseCurrentRankingDto {
 	rankChange: number;
 
 	@IsUUID()
-	@Transform(({ obj }) => obj.word.id)
+	@Transform(({ obj }) => obj.wordId)
 	@Expose()
 	@ApiProperty()
 	id: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.name)
+	@Transform(({ obj }) => obj.wordName)
 	@Expose()
 	@ApiProperty()
 	name: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.description)
+	@Transform(({ obj }) => obj.wordDescription)
 	@Expose({ name: 'description' })
 	@ApiProperty()
 	description: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.diacritic[0])
+	@Transform(({ obj }) => obj.wordDiacritic[0])
 	@Expose({ name: 'diacritic' })
 	@ApiProperty()
 	diacritic: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word.pronunciation[0])
+	@Transform(({ obj }) => obj.wordPronunciation[0])
 	@Expose({ name: 'pronunciation' })
 	@ApiProperty()
 	pronunciation: string;

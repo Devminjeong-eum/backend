@@ -3,13 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { and, eq, sql } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-// import { Repository } from 'typeorm';
 import type { RequestRankingByMonthDto } from '#/domain/ranking/dto/rank-by-month.dto';
 import type { RequestRankingByWeekDto } from '#/domain/ranking/dto/rank-by-week.dto';
 import type { RequestRankingByYearDto } from '#/domain/ranking/dto/rank-by-year.dto';
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
 import * as schema from '#/infrastructure/drizzle/schema';
-// import { Ranking } from '#/infrastructure/database/entities/ranking.entity';
 import dayjs from '#/shared/utils/dayjs';
 
 @Injectable()
@@ -50,7 +48,7 @@ export class RankingRepository {
 	}
 
 	async findBySpecificWeek({ year, week }: RequestRankingByWeekDto) {
-		const result = await this.db
+		return this.db
 			.select({
 				id: schema.ranking.id,
 				score: schema.ranking.score,
@@ -74,20 +72,22 @@ export class RankingRepository {
 			.orderBy(schema.ranking.score)
 			.limit(10)
 			.execute();
-
-		return result;
 	}
 
 	async findBySpecificMonth({ year, month }: RequestRankingByMonthDto) {
-		const result = await this.db
+		return this.db
 			.select({
 				id: schema.ranking.id,
 				score: schema.ranking.score,
 				wordId: schema.word.id,
 				wordName: schema.word.name,
 				wordDescription: schema.word.description,
-				wordPronunciation: schema.word.pronunciation,
-				wordDiacritic: schema.word.diacritic,
+				wordPronunciation: sql`${schema.word.pronunciation}[1]`.as(
+					'wordPronunciation',
+				),
+				wordDiacritic: sql`${schema.word.diacritic}[1]`.as(
+					'wordDiacritic',
+				),
 				rank: sql`ROW_NUMBER() OVER (ORDER BY ${schema.ranking.score})`.as(
 					'rank',
 				),
@@ -103,12 +103,10 @@ export class RankingRepository {
 			.orderBy(schema.ranking.score)
 			.limit(10)
 			.execute();
-
-		return result;
 	}
 
 	async findBySpecificYear({ year }: RequestRankingByYearDto) {
-		const result = await this.db
+		return this.db
 			.select({
 				id: schema.ranking.id,
 				score: schema.ranking.score,
@@ -127,7 +125,5 @@ export class RankingRepository {
 			.orderBy(schema.ranking.score)
 			.limit(10)
 			.execute();
-
-		return result;
 	}
 }

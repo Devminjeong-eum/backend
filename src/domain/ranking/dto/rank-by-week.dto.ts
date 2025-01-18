@@ -23,31 +23,31 @@ export class ResponseRankingByWeekDto {
 	rank: number;
 
 	@IsUUID()
-	@Transform(({ obj }) => obj.word_id)
+	@Transform(({ obj }) => obj.wordId)
 	@Expose()
 	@ApiProperty()
 	id: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word_name)
+	@Transform(({ obj }) => obj.wordName)
 	@Expose()
 	@ApiProperty()
 	name: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word_description)
+	@Transform(({ obj }) => obj.wordDescription)
 	@Expose({ name: 'description' })
 	@ApiProperty()
 	description: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word_diacritic[0])
+	@Transform(({ obj }) => obj.wordDiacritic[0])
 	@Expose({ name: 'diacritic' })
 	@ApiProperty()
 	diacritic: string;
 
 	@IsString()
-	@Transform(({ obj }) => obj.word_pronunciation[0])
+	@Transform(({ obj }) => obj.wordPronunciation[0])
 	@Expose({ name: 'pronunciation' })
 	@ApiProperty()
 	pronunciation: string;
