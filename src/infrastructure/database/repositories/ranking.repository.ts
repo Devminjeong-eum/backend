@@ -1,22 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { and, eq, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
+// import { Repository } from 'typeorm';
 import type { RequestRankingByMonthDto } from '#/domain/ranking/dto/rank-by-month.dto';
 import type { RequestRankingByWeekDto } from '#/domain/ranking/dto/rank-by-week.dto';
 import type { RequestRankingByYearDto } from '#/domain/ranking/dto/rank-by-year.dto';
-import { Ranking } from '#/infrastructure/database/entities/ranking.entity';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
+// import { Ranking } from '#/infrastructure/database/entities/ranking.entity';
 import dayjs from '#/shared/utils/dayjs';
 
 @Injectable()
 export class RankingRepository {
 	constructor(
-		@InjectRepository(Ranking)
-		private readonly rankingRepository: Repository<Ranking>,
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
 	) {}
 
-	findByCurrentWeek() {
+	async findByCurrentWeek() {
 		const requestTime = dayjs.tz();
 		const currentWeek = requestTime.week();
 		const currentYear = requestTime.year();
@@ -24,83 +27,107 @@ export class RankingRepository {
 		const isSunday = requestTime.day() === 0;
 		const previousWeek = isSunday ? currentWeek - 2 : currentWeek - 1;
 
-		return this.rankingRepository
-			.createQueryBuilder('ranking')
-			.where('ranking.year = :currentYear', { currentYear })
-			.andWhere('ranking.week = :previousWeek', { previousWeek })
-			.leftJoin('ranking.word', 'word')
-			.select([
-				'ranking.rank',
-				'ranking.rankChange',
-				'word.id',
-				'word.name',
-				'word.description',
-				'word.pronunciation',
-				'word.diacritic',
-			])
-			.orderBy('ranking.rank')
-			.getMany();
+		return this.db
+			.select({
+				rank: schema.ranking.rank,
+				rankChange: schema.ranking.rankChange,
+				wordId: schema.word.id,
+				wordName: schema.word.name,
+				wordDescription: schema.word.description,
+				wordPronunciation: schema.word.pronunciation,
+				wordDiacritic: schema.word.diacritic,
+			})
+			.from(schema.ranking)
+			.where(
+				and(
+					eq(schema.ranking.year, currentYear),
+					eq(schema.ranking.week, previousWeek),
+				),
+			)
+			.leftJoin(schema.word, eq(schema.ranking.wordId, schema.word.id))
+			.orderBy(schema.ranking.rank)
+			.execute();
 	}
 
-	findBySpecificWeek({ year, week }: RequestRankingByWeekDto) {
-		return this.rankingRepository
-			.createQueryBuilder('ranking')
-			.select([
-				'ranking.id',
-				'ranking.score',
-				'word.id',
-				'word.name',
-				'word.description',
-				'word.pronunciation',
-				'word.diacritic',
-				'ROW_NUMBER() OVER (ORDER BY ranking.score) as rank',
-			])
-			.leftJoin('ranking.word', 'word')
-			.where('ranking.year = :year', { year })
-			.andWhere('ranking.week = :week', { week })
-			.orderBy('ranking.score')
-			.take(10)
-			.getRawMany();
+	async findBySpecificWeek({ year, week }: RequestRankingByWeekDto) {
+		const result = await this.db
+			.select({
+				id: schema.ranking.id,
+				score: schema.ranking.score,
+				wordId: schema.word.id,
+				wordName: schema.word.name,
+				wordDescription: schema.word.description,
+				wordPronunciation: schema.word.pronunciation,
+				wordDiacritic: schema.word.diacritic,
+				rank: sql`ROW_NUMBER() OVER (ORDER BY ${schema.ranking.score})`.as(
+					'rank',
+				),
+			})
+			.from(schema.ranking)
+			.leftJoin(schema.word, eq(schema.ranking.wordId, schema.word.id))
+			.where(
+				and(
+					eq(schema.ranking.year, year),
+					eq(schema.ranking.week, week),
+				),
+			)
+			.orderBy(schema.ranking.score)
+			.limit(10)
+			.execute();
+
+		return result;
 	}
 
-	findBySpecificMonth({ year, month }: RequestRankingByMonthDto) {
-		return this.rankingRepository
-			.createQueryBuilder('ranking')
-			.select([
-				'ranking.id',
-				'ranking.score',
-				'word.id',
-				'word.name',
-				'word.description',
-				'word.pronunciation',
-				'word.diacritic',
-				'ROW_NUMBER() OVER (ORDER BY ranking.score) as rank',
-			])
-			.leftJoin('ranking.word', 'word')
-			.where('ranking.year = :year', { year })
-			.andWhere('ranking.month = :month', { month })
-			.orderBy('ranking.score')
-			.take(10)
-			.getRawMany();
+	async findBySpecificMonth({ year, month }: RequestRankingByMonthDto) {
+		const result = await this.db
+			.select({
+				id: schema.ranking.id,
+				score: schema.ranking.score,
+				wordId: schema.word.id,
+				wordName: schema.word.name,
+				wordDescription: schema.word.description,
+				wordPronunciation: schema.word.pronunciation,
+				wordDiacritic: schema.word.diacritic,
+				rank: sql`ROW_NUMBER() OVER (ORDER BY ${schema.ranking.score})`.as(
+					'rank',
+				),
+			})
+			.from(schema.ranking)
+			.leftJoin(schema.word, eq(schema.ranking.wordId, schema.word.id))
+			.where(
+				and(
+					eq(schema.ranking.year, year),
+					eq(schema.ranking.month, month),
+				),
+			)
+			.orderBy(schema.ranking.score)
+			.limit(10)
+			.execute();
+
+		return result;
 	}
 
-	findBySpecificYear({ year }: RequestRankingByYearDto) {
-		return this.rankingRepository
-			.createQueryBuilder('ranking')
-			.select([
-				'ranking.id',
-				'ranking.score',
-				'word.id',
-				'word.name',
-				'word.description',
-				'word.pronunciation',
-				'word.diacritic',
-				'ROW_NUMBER() OVER (ORDER BY ranking.score) as rank',
-			])
-			.leftJoin('ranking.word', 'word')
-			.where('ranking.year = :year', { year })
-			.orderBy('ranking.score')
-			.take(10)
-			.getRawMany();
+	async findBySpecificYear({ year }: RequestRankingByYearDto) {
+		const result = await this.db
+			.select({
+				id: schema.ranking.id,
+				score: schema.ranking.score,
+				wordId: schema.word.id,
+				wordName: schema.word.name,
+				wordDescription: schema.word.description,
+				wordPronunciation: schema.word.pronunciation,
+				wordDiacritic: schema.word.diacritic,
+				rank: sql`ROW_NUMBER() OVER (ORDER BY ${schema.ranking.score})`.as(
+					'rank',
+				),
+			})
+			.from(schema.ranking)
+			.leftJoin(schema.word, eq(schema.ranking.wordId, schema.word.id))
+			.where(eq(schema.ranking.year, year))
+			.orderBy(schema.ranking.score)
+			.limit(10)
+			.execute();
+
+		return result;
 	}
 }

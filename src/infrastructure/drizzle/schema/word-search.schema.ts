@@ -10,13 +10,13 @@ import {
 import { word } from './word.schema';
 
 export const wordSearch = pgTable('word_search', {
-	id: serial('id').primaryKey(),
-	keyword: varchar('keyword').notNull(),
-	wordId: integer('word_id')
+	id: serial().primaryKey(),
+	keyword: varchar().notNull(),
+	wordId: integer()
 		.notNull()
 		.references(() => word.id, { onDelete: 'cascade' }),
-	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
-	updatedAt: timestamp('updated_at', { mode: 'date' })
+	createdAt: timestamp({ mode: 'date' }).defaultNow(),
+	updatedAt: timestamp({ mode: 'date' })
 		.defaultNow()
 		.$onUpdate(() => new Date())
 		.notNull(),

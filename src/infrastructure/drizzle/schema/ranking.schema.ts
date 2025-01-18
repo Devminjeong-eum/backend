@@ -6,17 +6,17 @@ import { word } from './word.schema';
 
 export const ranking = pgTable('ranking', {
 	id: smallserial().primaryKey(),
-	year: smallint('year').notNull(),
-	month: smallint('month').notNull(),
-	week: smallint('week').notNull(),
-	rank: smallint('rank').notNull(),
-	rankChange: smallint('rank_change'),
-	score: integer('score').notNull(),
-	viewCount: integer('view_count').notNull(),
-	addLikeCount: integer('add_like_count').notNull(),
-	wordId: integer('word_id').references(() => word.id),
-	createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
-	updatedAt: timestamp('updated_at', { mode: 'date' })
+	year: smallint().notNull(),
+	month: smallint().notNull(),
+	week: smallint().notNull(),
+	rank: smallint().notNull(),
+	rankChange: smallint(),
+	score: integer().notNull(),
+	viewCount: integer().notNull(),
+	addLikeCount: integer().notNull(),
+	wordId: integer().references(() => word.id),
+	createdAt: timestamp('createdAt', { mode: 'date' }).defaultNow(),
+	updatedAt: timestamp('updatedAt', { mode: 'date' })
 		.defaultNow()
 		.$onUpdate(() => new Date())
 		.notNull(),
