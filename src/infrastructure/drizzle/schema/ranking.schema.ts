@@ -1,6 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, smallserial } from 'drizzle-orm/pg-core';
-import { integer, smallint, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, smallserial, uuid } from 'drizzle-orm/pg-core';
+import { integer, smallint } from 'drizzle-orm/pg-core';
+
+import { timestamps } from '../helper/timestamp.helper';
 
 import { word } from './word.schema';
 
@@ -14,12 +16,10 @@ export const ranking = pgTable('ranking', {
 	score: integer().notNull(),
 	viewCount: integer().notNull(),
 	addLikeCount: integer().notNull(),
-	wordId: integer().references(() => word.id),
-	createdAt: timestamp('createdAt', { mode: 'date' }).defaultNow(),
-	updatedAt: timestamp('updatedAt', { mode: 'date' })
-		.defaultNow()
-		.$onUpdate(() => new Date())
-		.notNull(),
+	wordId: uuid()
+		.notNull()
+		.references(() => word.id, { onDelete: 'cascade' }),
+	...timestamps,
 });
 
 export const rankingRelations = relations(ranking, ({ one }) => ({

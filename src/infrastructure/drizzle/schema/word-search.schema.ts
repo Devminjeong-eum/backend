@@ -1,29 +1,25 @@
 import { relations } from 'drizzle-orm';
 import {
-	integer,
 	pgTable,
 	serial,
-	timestamp,
+	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core';
 
 import { word } from './word.schema';
+import { timestamps } from '../helper/timestamp.helper';
 
 export const wordSearch = pgTable('word_search', {
 	id: serial().primaryKey(),
 	keyword: varchar().notNull(),
-	wordId: integer()
+	wordId: uuid()
 		.notNull()
 		.references(() => word.id, { onDelete: 'cascade' }),
-	createdAt: timestamp({ mode: 'date' }).defaultNow(),
-	updatedAt: timestamp({ mode: 'date' })
-		.defaultNow()
-		.$onUpdate(() => new Date())
-		.notNull(),
+	...timestamps,
 });
 
 export const wordSearchRelations = relations(wordSearch, ({ one }) => ({
-	word: one(word, {
+	wordId: one(word, {
 		fields: [wordSearch.wordId],
 		references: [word.id],
 	}),
