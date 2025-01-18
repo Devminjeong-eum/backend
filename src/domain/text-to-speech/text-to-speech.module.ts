@@ -1,12 +1,10 @@
 import type { Provider} from '@nestjs/common';
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import type { PollyClient } from '@aws-sdk/client-polly';
 import type { S3Client } from '@aws-sdk/client-s3';
 
-import { TextToSpeech } from '#/infrastructure/database/entities/text-to-speech.entity';
 import { TextToSpeechRepository } from '#/infrastructure/database/repositories/text-to-speech.repository';
 import { AuthModule } from '#/domain/auth/auth.module';
 import { WordModule } from '#/domain/word/word.module';
@@ -31,7 +29,6 @@ const AwsS3BucketProvider: Provider<S3Client> = {
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([TextToSpeech]),
 		AuthModule,
 		forwardRef(() => WordModule),
 	],

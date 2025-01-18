@@ -19,16 +19,10 @@ import { WordRepository } from '#/infrastructure/database/repositories/word.repo
 
 import { InjectPollyClient } from '../decorators/inject-polly-client.decorator';
 import { InjectS3Bucket } from '../decorators/inject-s3-bucket.decorator';
-import type {
-	RequestCreateWordTextToSpeechDto} from '../dto/create-tts-text.dto';
-import {
-	ResponseCreateWordTextToSpeechDto,
-} from '../dto/create-tts-text.dto';
-import type {
-	RequestUpdateWordTextToSpeechDto} from '../dto/update-tts-text.dto';
-import {
-	ResponseUpdateWordTextToSpeechDto,
-} from '../dto/update-tts-text.dto';
+import type { RequestCreateWordTextToSpeechDto } from '../dto/create-tts-text.dto';
+import { ResponseCreateWordTextToSpeechDto } from '../dto/create-tts-text.dto';
+import type { RequestUpdateWordTextToSpeechDto } from '../dto/update-tts-text.dto';
+import { ResponseUpdateWordTextToSpeechDto } from '../dto/update-tts-text.dto';
 
 @Injectable()
 export class TextToSpeechService {
@@ -42,17 +36,11 @@ export class TextToSpeechService {
 		private readonly textToSpeechRepository: TextToSpeechRepository,
 		private readonly configService: ConfigService,
 	) {
-		const s3BucketName =
-			this.configService.get<string>('AWS_S3_BUCKET_NAME');
-
-		if (!s3BucketName)
-			throw new InternalServerErrorException(
-				'AWS_S3_BUCKET_NAME 환경 변수가 존재하지 않습니다.',
-			);
-		this.outputS3BucketName = s3BucketName;
+		this.outputS3BucketName =
+			this.configService.getOrThrow<string>('AWS_S3_BUCKET_NAME');
 	}
 
-	private createSpeechSyntesisTaskCommandParams(
+	private createSpeechSynthesisTaskCommandParams(
 		text: string,
 	): StartSpeechSynthesisTaskCommandInput {
 		return {
@@ -67,7 +55,7 @@ export class TextToSpeechService {
 	async generateTextToSpeechAudio(text: string) {
 		const speechSyntesisTaskCommandInstance =
 			new StartSpeechSynthesisTaskCommand(
-				this.createSpeechSyntesisTaskCommandParams(text),
+				this.createSpeechSynthesisTaskCommandParams(text),
 			);
 
 		try {
