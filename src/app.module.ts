@@ -20,6 +20,7 @@ import { TextToSpeechModule } from '#/domain/text-to-speech/text-to-speech.modul
 import { UserModule } from '#/domain/user/user.module';
 import { WordSearchModule } from '#/domain/word-search/word-search.module';
 import { WordModule } from '#/domain/word/word.module';
+import { DrizzleModule } from '#/infrastructure/drizzle/drizzle.module';
 import { DiscordWebhookModule } from '#/infrastructure/discord/discord.module';
 import { RedisModule } from '#/infrastructure/redis/redis.module';
 import { winstonLoggerConfig } from '#/shared/configs/logger.config';
@@ -37,19 +38,20 @@ import { AppController } from './app.controller';
 		TypeOrmModule.forRootAsync({
 			useClass: TypeOrmConfig,
 		}),
+		DrizzleModule.forRoot(),
 		RedisModule.forRootAsync(),
 		WinstonModule.forRoot(winstonLoggerConfig),
 		ScheduleModule.forRoot(),
 		DiscordWebhookModule,
-		UserModule,
-		AuthModule,
-		WordModule,
-		LikeModule,
+		// UserModule,
+		// AuthModule,
+		// WordModule,
+		// LikeModule,
 		RankingModule,
-		QuizModule,
-		ResearchModule,
-		WordSearchModule,
-		TextToSpeechModule,
+		// QuizModule,
+		// ResearchModule,
+		// WordSearchModule,
+		// TextToSpeechModule,
 	],
 	controllers: [AppController],
 	providers: [Logger],
