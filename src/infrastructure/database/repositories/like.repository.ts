@@ -1,54 +1,78 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-import { Like } from '#/infrastructure/database/entities/like.entity';
-import type { User } from '#/infrastructure/database/entities/user.entity';
-import type { Word } from '#/infrastructure/database/entities/word.entity';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
 
 @Injectable()
 export class LikeRepository {
 	constructor(
-		@InjectRepository(Like)
-		private likeRepository: Repository<Like>,
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
 	) {}
 
-	async create(word: Word, user: User) {
-		const createdLikeEntity = this.likeRepository.create({
-			word,
-			user,
-		});
-		return await this.likeRepository.save(createdLikeEntity);
+	async create({ wordId, userId }: { wordId: string; userId: string }) {
+		return this.db
+			.insert(schema.like)
+			.values({
+				wordId: wordId,
+				userId: userId,
+			})
+			.returning();
 	}
 
-	async findByUserAndWord(word: Word, user: User) {
-		return await this.likeRepository.findOne({
-			where: {
-				word: { id: word.id },
-				user: { id: user.id },
-			},
-			relations: ['word', 'user'],
-		});
-	}
-
-	async restore(word: Word, user: User) {
-		return await this.likeRepository
-			.createQueryBuilder('like')
-			.update()
-			.restore()
-			.where('wordId = :wordId', { wordId: word.id })
-			.andWhere('userId = :userId', { userId: user.id })
+	async findByUserAndWord({
+		wordId,
+		userId,
+	}: {
+		wordId: string;
+		userId: string;
+	}) {
+		return this.db
+			.select()
+			.from(schema.like)
+			.where(
+				and(
+					isNull(schema.like.deletedAt),
+					eq(schema.like.wordId, wordId),
+					eq(schema.like.userId, userId),
+				),
+			)
+			.limit(1)
 			.execute();
 	}
 
-	async softDelete(word: Word, user: User) {
-		return await this.likeRepository
-			.createQueryBuilder('like')
-			.update()
-			.softDelete()
-			.where('wordId = :wordId', { wordId: word.id })
-			.andWhere('userId = :userId', { userId: user.id })
+	async restore({ wordId, userId }: { wordId: string; userId: string }) {
+		return this.db
+			.update(schema.like)
+			.set({
+				deletedAt: null,
+			})
+			.where(
+				and(
+					isNotNull(schema.like.deletedAt),
+					eq(schema.like.wordId, wordId),
+					eq(schema.like.userId, userId),
+				),
+			)
+			.execute();
+	}
+
+	async softDelete({ wordId, userId }: { wordId: string; userId: string }) {
+		return this.db
+			.update(schema.like)
+			.set({
+				deletedAt: sql`now()`,
+			})
+			.where(
+				and(
+					isNull(schema.like.deletedAt),
+					eq(schema.like.wordId, wordId),
+					eq(schema.like.userId, userId),
+				),
+			)
 			.execute();
 	}
 }

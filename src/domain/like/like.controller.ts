@@ -27,9 +27,9 @@ export class LikeController {
 	@UseGuards(AuthenticationGuard)
 	applyLike(
 		@AuthenticatedUser() user: User,
-		@Param() createLikeDto: RequestCreateLikeDto,
+		@Param() { wordId }: RequestCreateLikeDto,
 	) {
-		return this.likeService.applyUserLike(createLikeDto, user);
+		return this.likeService.applyUserLike({ wordId, userId: user.id });
 	}
 
 	@ApiDocs({
@@ -44,8 +44,8 @@ export class LikeController {
 	@UseGuards(AuthenticationGuard)
 	revertLike(
 		@AuthenticatedUser() user: User,
-		@Param() revertLikeDto: RequestRevertLikeDto,
+		@Param() { wordId }: RequestRevertLikeDto,
 	) {
-		return this.likeService.revertUserLike(revertLikeDto, user);
+		return this.likeService.revertUserLike({ wordId, userId: user.id });
 	}
 }

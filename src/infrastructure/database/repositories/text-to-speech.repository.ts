@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { eq } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-import { TextToSpeech } from '#/infrastructure/database/entities/text-to-speech.entity';
 import type { Word } from '#/infrastructure/database/entities/word.entity';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
 
 @Injectable()
 export class TextToSpeechRepository {
 	constructor(
-		@InjectRepository(TextToSpeech)
-		private readonly textToSpeechRepository: Repository<TextToSpeech>,
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
 	) {}
 
 	async create({
@@ -22,13 +23,14 @@ export class TextToSpeechRepository {
 		text: string;
 		audioFileUri: string;
 	}) {
-		const textToSpeech = this.textToSpeechRepository.create({
-			word,
-			text,
-			audioFileUri,
-		});
-
-		return this.textToSpeechRepository.save(textToSpeech);
+		return this.db
+			.insert(schema.textToSpeech)
+			.values({
+				wordId: word.id,
+				text,
+				audioFileUri,
+			})
+			.returning();
 	}
 
 	async update({
@@ -40,25 +42,24 @@ export class TextToSpeechRepository {
 		text: string;
 		audioFileUri: string;
 	}) {
-		const updateResult = await this.textToSpeechRepository
-			.createQueryBuilder('textToSpeech')
-			.update(TextToSpeech)
+		await this.db
+			.update(schema.textToSpeech)
 			.set({
 				audioFileUri,
 				text,
 			})
-			.where('textToSpeech.wordId = :wordId', { wordId })
+			.where(eq(schema.textToSpeech.wordId, wordId))
 			.execute();
-
-		return updateResult;
 	}
 
 	async findByWordId(wordId: string) {
-		return this.textToSpeechRepository
-			.createQueryBuilder('textToSpeech')
-			.leftJoin('textToSpeech.word', 'word')
-			.where('word.id = :wordId', { wordId })
-			.select(['textToSpeech.audioFileUri', 'word.name', 'word.id'])
-			.getOne();
+		const queryResult = await this.db
+			.select()
+			.from(schema.textToSpeech)
+			.where(eq(schema.textToSpeech.wordId, wordId))
+			.limit(1)
+			.execute();
+
+		return queryResult[0];
 	}
 }
