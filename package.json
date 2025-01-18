@@ -6,14 +6,15 @@
 	"private": true,
 	"license": "MIT",
 	"scripts": {
-		"build": "nest build",
-		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-		"start": "NODE_ENV=production nest start --builder swc",
+		"format": "prettier \"{src, test}/**/*.ts\" --check",
+		"format:fix": "prettier \"{src, test}/**/*.ts\" --write --check",
+		"lint": "eslint \"{src, test}/**/*.ts\"",
+		"lint:fix": "eslint \"{src, test}/**/*.ts\" --fix",
+		"build:prod": "NODE_ENV=production nest build",
+		"build:dev": "NODE_ENV=development nest build",
 		"start:dev": "NODE_ENV=development nest start --watch",
-		"start:dev:docker": "docker-compose -f ./docker-compose.yml --env-file .env.production up",
-		"start:debug": "nest start --debug --watch",
-		"start:prod": "node dist/main",
-		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+		"start:debug": "NODE_ENV=development nest start --debug --watch",
+		"start:prod": "NODE_ENV=production node dist/main",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:cov": "jest --coverage",
@@ -43,6 +44,7 @@
 		"cookie-parser": "^1.4.6",
 		"dayjs": "^1.11.11",
 		"dotenv": "^16.4.5",
+		"drizzle-orm": "^0.38.4",
 		"googleapis": "^135.1.0",
 		"nanoid": "3.3.7",
 		"nest-winston": "^1.9.4",
@@ -58,6 +60,7 @@
 		"@nestjs/testing": "^10.0.0",
 		"@swc/cli": "^0.3.12",
 		"@swc/core": "^1.5.25",
+		"@swc/jest": "^0.2.37",
 		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
 		"@types/cookie-parser": "^1.4.7",
 		"@types/express": "^4.17.17",
@@ -74,27 +77,6 @@
 		"reflect-metadata": "^0.2.2",
 		"source-map-support": "^0.5.21",
 		"supertest": "^6.3.3",
-		"ts-jest": "^29.1.0",
-		"ts-loader": "^9.4.3",
-		"ts-node": "^10.9.1",
-		"tsconfig-paths": "^4.2.0",
-		"typescript": "^5.1.3"
-	},
-	"jest": {
-		"moduleFileExtensions": [
-			"js",
-			"json",
-			"ts"
-		],
-		"rootDir": "src",
-		"testRegex": ".*\\.spec\\.ts$",
-		"transform": {
-			"^.+\\.(t|j)s$": "ts-jest"
-		},
-		"collectCoverageFrom": [
-			"**/*.(t|j)s"
-		],
-		"coverageDirectory": "../coverage",
-		"testEnvironment": "node"
+		"typescript": "^5"
 	}
 }
