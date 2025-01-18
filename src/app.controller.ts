@@ -1,8 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { TextToSpeechService } from './text-to-speech/text-to-speech.service';
-
 @ApiTags('Test')
 @Controller()
 export class AppController {

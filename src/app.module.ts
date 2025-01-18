@@ -1,29 +1,32 @@
+import type {
+	NestModule} from '@nestjs/common';
 import {
 	Logger,
 	type MiddlewareConsumer,
-	Module,
-	NestModule,
+	Module
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { WinstonLoggerModule } from '#/common/configs/logger.config';
-import { TypeOrmConfig } from '#configs/typeorm.configs';
-import { LoggerMiddleware } from '#middlewares/logger.middleware';
+import { WinstonModule } from 'nest-winston';
+
+import { AuthModule } from '#/domain/auth/auth.module';
+import { LikeModule } from '#/domain/like/like.module';
+import { QuizModule } from '#/domain/quiz/quiz.module';
+import { RankingModule } from '#/domain/ranking/ranking.module';
+import { ResearchModule } from '#/domain/research/research.module';
+import { TextToSpeechModule } from '#/domain/text-to-speech/text-to-speech.module';
+import { UserModule } from '#/domain/user/user.module';
+import { WordSearchModule } from '#/domain/word-search/word-search.module';
+import { WordModule } from '#/domain/word/word.module';
+import { DiscordWebhookModule } from '#/infrastructure/discord/discord.module';
+import { RedisModule } from '#/infrastructure/redis/redis.module';
+import { winstonLoggerConfig } from '#/shared/configs/logger.config';
+import { TypeOrmConfig } from '#/shared/configs/typeorm.configs';
+import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
-import { AuthModule } from './auth/auth.module';
-import { DiscordWebhookModule } from './discord/discord.module';
-import { LikeModule } from './like/like.module';
-import { QuizModule } from './quiz/quiz.module';
-import { RankingModule } from './ranking/ranking.module';
-import { RedisModule } from './redis/redis.module';
-import { ResearchModule } from './research/research.module';
-import { TextToSpeechModule } from './text-to-speech/text-to-speech.module';
-import { UserModule } from './user/user.module';
-import { WordSearchModule } from './word-search/word-search.module';
-import { WordModule } from './word/word.module';
 
 @Module({
 	imports: [
@@ -35,7 +38,7 @@ import { WordModule } from './word/word.module';
 			useClass: TypeOrmConfig,
 		}),
 		RedisModule.forRootAsync(),
-		WinstonLoggerModule,
+		WinstonModule.forRoot(winstonLoggerConfig),
 		ScheduleModule.forRoot(),
 		DiscordWebhookModule,
 		UserModule,

@@ -16,11 +16,6 @@
     "baseUrl": "./",
     "paths": {
       "#/*": ["src/*"],
-      "#apis/*": ["src/common/apis/*"],
-      "#configs/*": ["src/common/configs/*"],
-      "#databases/*": ["src/databases/*"],
-      "#middlewares/*": ["src/common/middlewares/*"],
-      "#utils/*": ["src/common/utils/*"]
     }
   }
 }
