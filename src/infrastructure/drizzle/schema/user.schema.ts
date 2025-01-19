@@ -17,3 +17,5 @@ export const user = pgTable('user', {
 export const userRelations = relations(user, ({ many }) => ({
 	likes: many(like),
 }));
+
+export type UserEntity = typeof user.$inferSelect;

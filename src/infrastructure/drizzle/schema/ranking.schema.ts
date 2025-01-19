@@ -28,3 +28,5 @@ export const rankingRelations = relations(ranking, ({ one }) => ({
 		references: [word.id],
 	}),
 }));
+
+export type RankingEntity = typeof ranking.$inferSelect;

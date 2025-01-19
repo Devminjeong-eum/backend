@@ -29,3 +29,5 @@ export const textToSpeechRelations = relations(
 		}),
 	}),
 );
+
+export type TextToSpeechEntity = typeof textToSpeech.$inferSelect;

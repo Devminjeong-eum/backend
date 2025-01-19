@@ -18,3 +18,5 @@ export const quizSelectionRelations = relations(quizSelection, ({ one }) => ({
 		references: [word.id],
 	}),
 }));
+
+export type QuizSelectionEntity = typeof quizSelection.$inferSelect;

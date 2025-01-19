@@ -24,3 +24,5 @@ export const wordSearchRelations = relations(wordSearch, ({ one }) => ({
 		references: [word.id],
 	}),
 }));
+
+export type WordSearchEntity = typeof wordSearch.$inferSelect;

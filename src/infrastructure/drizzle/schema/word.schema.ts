@@ -31,3 +31,5 @@ export const wordRelations = relations(word, ({ one, many }) => ({
 		references: [textToSpeech.wordId],
 	}),
 }));
+
+export type WordEntity = typeof word.$inferSelect;
