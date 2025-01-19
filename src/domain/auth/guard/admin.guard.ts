@@ -1,26 +1,36 @@
-import type {
-	CanActivate,
-	ExecutionContext} from '@nestjs/common';
-import {
-	ForbiddenException,
-	Injectable,
-} from '@nestjs/common';
+import type { CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { AuthService } from '#/domain/auth/service/auth.service';
+import type { Request } from 'express';
+
+import type { User } from '#/infrastructure/database/entities/user.entity';
+import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-	constructor(private readonly authService: AuthService) {}
+	private readonly TEST_ADMIN_KEY: string;
+	constructor(
+		private readonly configService: ConfigService,
+		private readonly userRepository: UserRepository,
+	) {
+		this.TEST_ADMIN_KEY =
+			this.configService.getOrThrow<string>('TEST_ADMIN_KEY');
+	}
 
 	async canActivate(context: ExecutionContext) {
-		const request = context.switchToHttp().getRequest();
-		const adminUser = await this.authService.checkIsAdminRequest(request);
+		const request: Request & { user: User } = context
+			.switchToHttp()
+			.getRequest();
+		const requestAdminKey = request.headers.authorization;
 
-		if (!adminUser) {
-			throw new ForbiddenException(
-				'해당 요청은 어드민만 접근이 가능합니다.',
-			);
-		}
+		if (requestAdminKey !== this.TEST_ADMIN_KEY) return false;
+
+		const adminUser = await this.userRepository.findById(
+			this.TEST_ADMIN_KEY,
+		);
+
+		if (!adminUser) return false;
 
 		request.user = adminUser;
 		return true;

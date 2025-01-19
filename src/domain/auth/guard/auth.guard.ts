@@ -9,7 +9,7 @@ import {
 
 import type { Response } from 'express';
 
-import { AuthService } from '#/domain/auth/service/auth.service';
+import { AuthService } from '#/domain/auth/service/auth-token.service';
 import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
 
 @Injectable()

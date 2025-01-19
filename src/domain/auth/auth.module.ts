@@ -10,7 +10,8 @@ import { AuthController } from './auth.controller';
 import { AdminGuard } from './guard/admin.guard';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
-import { AuthService } from './service/auth.service';
+import { AuthTokenService } from './service/auth-token.service';
+import { SocialAuthService } from './service/social-auth.service';
 
 @Module({
 	imports: [
@@ -23,7 +24,8 @@ import { AuthService } from './service/auth.service';
 	controllers: [AuthController],
 	providers: [
 		// Service
-		AuthService,
+		AuthTokenService,
+		SocialAuthService,
 		// Guard
 		AuthenticationGuard,
 		AdminGuard,
@@ -31,6 +33,6 @@ import { AuthService } from './service/auth.service';
 		// Config
 		JwtConfig,
 	],
-	exports: [AuthService, AuthenticationGuard],
+	exports: [SocialAuthService, AuthenticationGuard],
 })
 export class AuthModule {}

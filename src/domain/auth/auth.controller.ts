@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { type Request, type Response } from 'express';
+import { type CookieOptions, type Request, type Response } from 'express';
 
 import { ResponseUserInformationDto } from '#/domain/user/dto/user-information.dto';
 import { UserService } from '#/domain/user/service/user.service';
@@ -20,15 +20,27 @@ import { AuthenticatedUser } from './decorator/auth.decorator';
 import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
-import { AuthService } from './service/auth.service';
+import { AuthTokenService } from './service/auth-token.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 	constructor(
-		private readonly authService: AuthService,
+		private readonly authTokenService: AuthTokenService,
 		private readonly userService: UserService,
 	) {}
+
+	private readonly ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
+	private readonly REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+	private readonly ACCESS_TOKEN_MAX_AGE = 20 * 60 * 1000;
+	private readonly REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+	private AUTH_COOKIE_OPTION: CookieOptions = {
+		secure: true,
+		sameSite: 'none',
+		httpOnly: true,
+		path: '/',
+		domain: '.dev-malssami.site',
+	};
 
 	@ApiDocs({
 		summary: 'Kakao OAuth2 로그인을 진행합니다.',
@@ -52,13 +64,16 @@ export class AuthController {
 		});
 
 		const { accessToken, refreshToken } =
-			this.authService.getAuthenticateToken(user.id);
+			this.authTokenService.getAuthenticateToken({ userId: id });
 
-		this.authService.setAuthenticateCookie(
-			response,
-			accessToken,
-			refreshToken,
-		);
+		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: this.ACCESS_TOKEN_MAX_AGE,
+		});
+		response.cookie(this.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: this.REFRESH_TOKEN_MAX_AGE,
+		});
 
 		return user;
 	}
@@ -75,7 +90,14 @@ export class AuthController {
 	@UseGuards(AuthenticationGuard)
 	@Delete('logout')
 	async logout(@Res({ passthrough: true }) response: Response) {
-		this.authService.removeAuthenticateCookie(response);
+		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, '', {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: 0,
+		});
+		response.cookie(this.REFRESH_TOKEN_COOKIE_NAME, '', {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: 0,
+		});
 		return true;
 	}
 
@@ -94,7 +116,12 @@ export class AuthController {
 		@Res({ passthrough: true }) response: Response,
 	) {
 		const { refreshToken } = request.cookies ?? {};
-
-		return this.authService.reIssueAccessToken(response, refreshToken);
+		const reIssueAccessToken = this.authTokenService.reIssueAccessToken({
+			refreshToken,
+		});
+		response.cookie(this.REFRESH_TOKEN_COOKIE_NAME, reIssueAccessToken, {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: 0,
+		});
 	}
 }
