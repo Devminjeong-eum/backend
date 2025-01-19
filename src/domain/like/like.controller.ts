@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { User } from '#/infrastructure/database/entities/user.entity';
+import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { RequestCreateLikeDto } from './dto/create-like.dto';
@@ -26,10 +26,10 @@ export class LikeController {
 	@Patch(':wordId')
 	@UseGuards(AuthenticationGuard)
 	applyLike(
-		@AuthenticatedUser() user: User,
-		@Param() createLikeDto: RequestCreateLikeDto,
+		@AuthenticatedUser() user: UserEntity,
+		@Param() { wordId }: RequestCreateLikeDto,
 	) {
-		return this.likeService.applyUserLike(createLikeDto, user);
+		return this.likeService.applyUserLike({ wordId, userId: user.id });
 	}
 
 	@ApiDocs({
@@ -43,9 +43,9 @@ export class LikeController {
 	@Delete(':wordId')
 	@UseGuards(AuthenticationGuard)
 	revertLike(
-		@AuthenticatedUser() user: User,
-		@Param() revertLikeDto: RequestRevertLikeDto,
+		@AuthenticatedUser() user: UserEntity,
+		@Param() { wordId }: RequestRevertLikeDto,
 	) {
-		return this.likeService.revertUserLike(revertLikeDto, user);
+		return this.likeService.revertUserLike({ wordId, userId: user.id });
 	}
 }

@@ -1,0 +1,2 @@
+export const DRIZZLE_CLIENT = Symbol('DRIZZLE_CLIENT');
+export const DRIZZLE_CLIENT_OPTIONS = Symbol('DRIZZLE_CLIENT_OPTIONS');

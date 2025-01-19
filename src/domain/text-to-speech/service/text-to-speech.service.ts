@@ -14,21 +14,15 @@ import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { plainToInstance } from 'class-transformer';
 
-import { TextToSpeechRepository } from '#/infrastructure/database/repositories/text-to-speech.repository';
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { TextToSpeechRepository } from '#/infrastructure/drizzle/repository/text-to-speech.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 
 import { InjectPollyClient } from '../decorators/inject-polly-client.decorator';
 import { InjectS3Bucket } from '../decorators/inject-s3-bucket.decorator';
-import type {
-	RequestCreateWordTextToSpeechDto} from '../dto/create-tts-text.dto';
-import {
-	ResponseCreateWordTextToSpeechDto,
-} from '../dto/create-tts-text.dto';
-import type {
-	RequestUpdateWordTextToSpeechDto} from '../dto/update-tts-text.dto';
-import {
-	ResponseUpdateWordTextToSpeechDto,
-} from '../dto/update-tts-text.dto';
+import type { RequestCreateWordTextToSpeechDto } from '../dto/create-tts-text.dto';
+import { ResponseCreateWordTextToSpeechDto } from '../dto/create-tts-text.dto';
+import type { RequestUpdateWordTextToSpeechDto } from '../dto/update-tts-text.dto';
+import { ResponseUpdateWordTextToSpeechDto } from '../dto/update-tts-text.dto';
 
 @Injectable()
 export class TextToSpeechService {
@@ -42,17 +36,11 @@ export class TextToSpeechService {
 		private readonly textToSpeechRepository: TextToSpeechRepository,
 		private readonly configService: ConfigService,
 	) {
-		const s3BucketName =
-			this.configService.get<string>('AWS_S3_BUCKET_NAME');
-
-		if (!s3BucketName)
-			throw new InternalServerErrorException(
-				'AWS_S3_BUCKET_NAME 환경 변수가 존재하지 않습니다.',
-			);
-		this.outputS3BucketName = s3BucketName;
+		this.outputS3BucketName =
+			this.configService.getOrThrow<string>('AWS_S3_BUCKET_NAME');
 	}
 
-	private createSpeechSyntesisTaskCommandParams(
+	private createSpeechSynthesisTaskCommandParams(
 		text: string,
 	): StartSpeechSynthesisTaskCommandInput {
 		return {
@@ -64,10 +52,10 @@ export class TextToSpeechService {
 		};
 	}
 
-	async generateTextToSpeechAudio(text: string) {
+	async generateTextToSpeechAudio({ text }: { text: string }) {
 		const speechSyntesisTaskCommandInstance =
 			new StartSpeechSynthesisTaskCommand(
-				this.createSpeechSyntesisTaskCommandParams(text),
+				this.createSpeechSynthesisTaskCommandParams(text),
 			);
 
 		try {
@@ -91,16 +79,23 @@ export class TextToSpeechService {
 		}
 	}
 
-	async generateAudioPresignedUrl(wordId: string, delay = 20) {
-		const word = await this.wordRepository.findById(wordId);
+	async generateAudioPresignedUrl({
+		wordId,
+		delay = 20,
+	}: {
+		wordId: string;
+		delay?: number;
+	}) {
+		const word = await this.wordRepository.findById({ wordId });
 
 		if (!word)
 			throw new BadRequestException(
 				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
 			);
 
-		const textToSpeech =
-			await this.textToSpeechRepository.findByWordId(wordId);
+		const textToSpeech = await this.textToSpeechRepository.findByWordId({
+			wordId,
+		});
 
 		if (!textToSpeech)
 			throw new BadRequestException(
@@ -121,15 +116,16 @@ export class TextToSpeechService {
 		createWordTextToSpeechDto: RequestCreateWordTextToSpeechDto,
 	) {
 		const { wordId, text } = createWordTextToSpeechDto;
-		const word = await this.wordRepository.findById(wordId);
+		const word = await this.wordRepository.findById({ wordId });
 
 		if (!word)
 			throw new BadRequestException(
 				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
 			);
 
-		const textToSpeech =
-			await this.textToSpeechRepository.findByWordId(wordId);
+		const textToSpeech = await this.textToSpeechRepository.findByWordId({
+			wordId,
+		});
 
 		if (textToSpeech) {
 			throw new BadRequestException(
@@ -137,13 +133,17 @@ export class TextToSpeechService {
 			);
 		}
 
-		const audioFileUri = await this.generateTextToSpeechAudio(text);
-		await this.textToSpeechRepository.create({ word, text, audioFileUri });
-
-		const presignedUrl = await this.generateAudioPresignedUrl(
+		const audioFileUri = await this.generateTextToSpeechAudio({ text });
+		await this.textToSpeechRepository.create({
 			wordId,
-			this.TEST_PRESIGNED_EXPIRED,
-		);
+			text,
+			audioFileUri,
+		});
+
+		const presignedUrl = await this.generateAudioPresignedUrl({
+			wordId,
+			delay: this.TEST_PRESIGNED_EXPIRED,
+		});
 
 		const responseCreateWordTextToSpeechDto = plainToInstance(
 			ResponseCreateWordTextToSpeechDto,
@@ -156,19 +156,20 @@ export class TextToSpeechService {
 		return responseCreateWordTextToSpeechDto;
 	}
 
-	async updateWordTextToSpeech(
-		updateWordTextToSpeechDto: RequestUpdateWordTextToSpeechDto,
-	) {
-		const { wordId, text } = updateWordTextToSpeechDto;
-		const word = await this.wordRepository.findById(wordId);
+	async updateWordTextToSpeech({
+		wordId,
+		text,
+	}: RequestUpdateWordTextToSpeechDto) {
+		const word = await this.wordRepository.findById({ wordId });
 
 		if (!word)
 			throw new BadRequestException(
 				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
 			);
 
-		const textToSpeech =
-			await this.textToSpeechRepository.findByWordId(wordId);
+		const textToSpeech = await this.textToSpeechRepository.findByWordId({
+			wordId,
+		});
 
 		if (textToSpeech?.text === text) {
 			throw new BadRequestException(
@@ -176,7 +177,7 @@ export class TextToSpeechService {
 			);
 		}
 
-		const audioFileUri = await this.generateTextToSpeechAudio(text);
+		const audioFileUri = await this.generateTextToSpeechAudio({ text });
 
 		await this.textToSpeechRepository.update({
 			wordId,
@@ -184,10 +185,10 @@ export class TextToSpeechService {
 			audioFileUri,
 		});
 
-		const presignedUrl = await this.generateAudioPresignedUrl(
+		const presignedUrl = await this.generateAudioPresignedUrl({
 			wordId,
-			this.TEST_PRESIGNED_EXPIRED,
-		);
+			delay: this.TEST_PRESIGNED_EXPIRED,
+		});
 
 		const responseUpdateWordTextToSpeechDto = plainToInstance(
 			ResponseUpdateWordTextToSpeechDto,

@@ -1,13 +1,7 @@
-import type {
-	NestModule} from '@nestjs/common';
-import {
-	Logger,
-	type MiddlewareConsumer,
-	Module
-} from '@nestjs/common';
+import type { NestModule } from '@nestjs/common';
+import { Logger, type MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WinstonModule } from 'nest-winston';
 
@@ -21,9 +15,9 @@ import { UserModule } from '#/domain/user/user.module';
 import { WordSearchModule } from '#/domain/word-search/word-search.module';
 import { WordModule } from '#/domain/word/word.module';
 import { DiscordWebhookModule } from '#/infrastructure/discord/discord.module';
+import { DrizzleModule } from '#/infrastructure/drizzle/drizzle.module';
 import { RedisModule } from '#/infrastructure/redis/redis.module';
 import { winstonLoggerConfig } from '#/shared/configs/logger.config';
-import { TypeOrmConfig } from '#/shared/configs/typeorm.configs';
 import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
@@ -34,9 +28,7 @@ import { AppController } from './app.controller';
 			isGlobal: true,
 			envFilePath: `./src/config/.env.${process.env.NODE_ENV}`,
 		}),
-		TypeOrmModule.forRootAsync({
-			useClass: TypeOrmConfig,
-		}),
+		DrizzleModule.forRoot(),
 		RedisModule.forRootAsync(),
 		WinstonModule.forRoot(winstonLoggerConfig),
 		ScheduleModule.forRoot(),

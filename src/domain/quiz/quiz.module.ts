@@ -1,33 +1,30 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { QuizSelectionRepository } from '#/infrastructure/database/repositories/quiz-selection.repository';
 import { AuthModule } from '#/domain/auth/auth.module';
-import { UserModule } from '#/domain/user/user.module';
-import { WordModule } from '#/domain/word/word.module';
-import { QuizResult } from '#/infrastructure/database/entities/quiz-result.entity';
-import { QuizSelection } from '#/infrastructure/database/entities/quiz-selection.entity';
-import { QuizResultRepository } from '#/infrastructure/database/repositories/quiz-result.repository';
+import { QuizResultRepository } from '#/infrastructure/drizzle/repository/quiz-result.repository';
+import { QuizSelectionRepository } from '#/infrastructure/drizzle/repository/quiz-selection.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 import { SpreadSheetModule } from '#/infrastructure/spread-sheet/spread-sheet.module';
 
 import { QuizController } from './quiz.controller';
-import { QuizService } from './service/quiz.service';
+import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
+import { QuizResultService } from './service/quiz-result.service';
+import { QuizSelectionService } from './service/quiz-selection.service';
 
 @Module({
-	imports: [
-		TypeOrmModule.forFeature([QuizResult, QuizSelection]),
-		AuthModule,
-		UserModule,
-		WordModule,
-		SpreadSheetModule,
-	],
+	imports: [AuthModule, SpreadSheetModule],
 	controllers: [QuizController],
 	providers: [
 		// Service
-		QuizService,
+		QuizResultService,
+		QuizSelectionService,
+		QuizBatchUpdateService,
 		// Repository
 		QuizResultRepository,
 		QuizSelectionRepository,
+		WordRepository,
+		UserRepository,
 	],
 })
 export class QuizModule {}

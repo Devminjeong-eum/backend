@@ -1,21 +1,30 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Combined",
   "compilerOptions": {
-    "module": "commonjs",
-    "strict": true,
-    "strictPropertyInitialization": false,
     "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
+    "declarationMap": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
+    "incremental": false,
+    "isolatedModules": true,
+    "module": "commonjs",
+    "noUncheckedIndexedAccess": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "target": "ES2022",
+    "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "incremental": true,
-    "baseUrl": "./",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "dist",
     "paths": {
-      "#/*": ["src/*"],
+      "#/*": ["src/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "jest.config.ts"]
 }

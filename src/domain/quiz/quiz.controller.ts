@@ -11,30 +11,31 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { plainToInstance } from 'class-transformer';
-
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AdminGuard } from '#/domain/auth/guard/admin.guard';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { User } from '#/infrastructure/database/entities/user.entity';
+import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
 	RequestCreateQuizResultDto,
 	ResponseCreateQuizResultDto,
 } from './dto/create-quiz-result.dto';
-import {
-	RequestQuizResultDto,
-	ResponseQuizResultDto,
-} from './dto/quiz-result.dto';
+import { ResponseQuizResultDto } from './dto/quiz-result.dto';
 import { ResponseQuizSelectionDto } from './dto/quiz-selection.dto';
-import { QuizService } from './service/quiz.service';
+import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
+import { QuizResultService } from './service/quiz-result.service';
+import { QuizSelectionService } from './service/quiz-selection.service';
 
 @ApiTags('Quiz')
 @Controller('quiz')
 export class QuizController {
-	constructor(private readonly quizService: QuizService) {}
+	constructor(
+		private readonly quizResultService: QuizResultService,
+		private readonly quizSelectionService: QuizSelectionService,
+		private readonly quizBatchUpdateService: QuizBatchUpdateService,
+	) {}
 
 	@ApiDocs({
 		summary: '사용자가 풀이한 퀴즈 결과를 저장합니다.',
@@ -49,15 +50,15 @@ export class QuizController {
 	@UseGuards(AuthenticationGuard)
 	@Post('/result')
 	async createQuizResult(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Body('correctWordIds') correctWordIds: string[],
 		@Body('incorrectWordIds') incorrectWordIds: string[],
 	) {
-		const createQuizResultDto = plainToInstance(
-			RequestCreateQuizResultDto,
-			{ correctWordIds, incorrectWordIds },
-		);
-		return this.quizService.createQuizResult(user, createQuizResultDto);
+		return this.quizResultService.createQuizResult({
+			userId: user.id,
+			correctWordIds,
+			incorrectWordIds,
+		});
 	}
 
 	@ApiDocs({
@@ -75,15 +76,13 @@ export class QuizController {
 	@UseInterceptors(UserInformationInterceptor)
 	@Get('/result/:quizResultId')
 	async findQuizResultById(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Param('quizResultId') quizResultId: string,
 	) {
-		const quizResultDto = plainToInstance(RequestQuizResultDto, {
-			userId: user?.id,
+		return this.quizResultService.findQuizResultById({
+			userId: user.id,
 			quizResultId,
 		});
-
-		return this.quizService.findQuizResultById(quizResultDto);
 	}
 
 	@ApiDocs({
@@ -95,7 +94,7 @@ export class QuizController {
 	})
 	@Get('/selection')
 	findQuizSelectionRandom() {
-		return this.quizService.findQuizSelectionRandom();
+		return this.quizSelectionService.findQuizSelectionRandom();
 	}
 
 	@ApiDocs({
@@ -110,6 +109,6 @@ export class QuizController {
 	@UseGuards(AdminGuard)
 	@Patch('/selection/spread-sheet')
 	patchUpdateSpreadSheet() {
-		return this.quizService.updateQuizSelectionList();
+		return this.quizBatchUpdateService.updateQuizSelectionList();
 	}
 }

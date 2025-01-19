@@ -71,6 +71,8 @@ export class TextToSpeechController {
 	})
 	@Get('/:wordId')
 	async findTextToSpeechByWordId(@Param('wordId') wordId: string) {
-		return await this.textToSpeechService.generateAudioPresignedUrl(wordId);
+		return await this.textToSpeechService.generateAudioPresignedUrl({
+			wordId,
+		});
 	}
 }

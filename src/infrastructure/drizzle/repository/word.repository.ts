@@ -1,0 +1,299 @@
+import { Injectable } from '@nestjs/common';
+
+import { and, count, eq, ilike, inArray, isNull, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+
+import type { RequestWordListDto } from '#/domain/word/dto/word-list.dto';
+import type { RequestWordUserLikeDto } from '#/domain/word/dto/word-user-like.dto';
+import { WORD_SORTING_TYPE } from '#/domain/word/interface/word-list-sorting.interface';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
+
+@Injectable()
+export class WordRepository {
+	constructor(
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
+	) {}
+
+	async create({
+		name,
+		description,
+		diacritic,
+		pronunciation,
+		wrongPronunciations,
+		exampleSentence,
+	}: {
+		name: string;
+		description: string;
+		diacritic: string[];
+		pronunciation: string[];
+		wrongPronunciations: string[];
+		exampleSentence: string;
+	}) {
+		const [queryResult] = await this.db
+			.insert(schema.word)
+			.values({
+				name,
+				description,
+				diacritic,
+				pronunciation,
+				wrongPronunciations,
+				exampleSentence,
+			})
+			.returning();
+
+		return queryResult;
+	}
+
+	async update({
+		id,
+		name,
+		description,
+		diacritic,
+		pronunciation,
+		wrongPronunciations,
+		exampleSentence,
+	}: {
+		id: string;
+		name: string;
+		description: string;
+		diacritic: string[];
+		pronunciation: string[];
+		wrongPronunciations: string[];
+		exampleSentence: string;
+	}) {
+		const [queryResult] = await this.db
+			.update(schema.word)
+			.set({
+				name,
+				description,
+				diacritic,
+				pronunciation,
+				wrongPronunciations,
+				exampleSentence,
+			})
+			.where(eq(schema.word.id, id))
+			.returning();
+
+		return queryResult;
+	}
+
+	async findByName(name: string) {
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.word)
+			.where(eq(schema.word.name, name))
+			.limit(1)
+			.execute();
+
+		return queryResult;
+	}
+
+	async findById({ wordId }: { wordId: string }) {
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.word)
+			.where(eq(schema.word.id, wordId))
+			.limit(1)
+			.execute();
+
+		return queryResult;
+	}
+
+	async checkIsExistsByIdList({ wordIdList }: { wordIdList: string[] }) {
+		if (!wordIdList.length) return false;
+
+		const queryResult = await this.db
+			.select()
+			.from(schema.word)
+			.where(inArray(schema.word.id, wordIdList))
+			.limit(wordIdList.length)
+			.execute();
+
+		return queryResult.length === wordIdList.length;
+	}
+
+	async findByIdListWithUserLike({
+		wordIdList,
+		userId,
+	}: {
+		wordIdList: string[];
+		userId?: string;
+	}) {
+		if (!wordIdList.length) return [];
+
+		// 공통 SELECT 쿼리
+		const queryResult = this.db
+			.select({
+				id: schema.word.id,
+				name: schema.word.name,
+				diacritic: schema.word.diacritic,
+				pronunciation: schema.word.pronunciation,
+				isLike: userId
+					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
+							'isLike',
+						)
+					: sql`false::boolean`.as('isLike'),
+			})
+			.from(schema.word)
+			.leftJoin(
+				schema.like,
+				and(
+					eq(schema.word.id, schema.like.wordId),
+					isNull(schema.like.deletedAt),
+				),
+			)
+			.where(inArray(schema.word.id, wordIdList))
+			.groupBy(schema.word.id)
+			.execute();
+
+		return queryResult;
+	}
+
+	async findByIdWithUserLike({
+		wordId,
+		userId,
+	}: {
+		wordId: string;
+		userId?: string;
+	}) {
+		const [queryResult] = await this.db
+			.select({
+				id: schema.word.id,
+				name: schema.word.name,
+				description: schema.word.description,
+				diacritic: schema.word.diacritic,
+				pronunciation: schema.word.pronunciation,
+				wrongPronunciations: schema.word.wrongPronunciations,
+				exampleSentence: schema.word.exampleSentence,
+				likeCount: this.db
+					.$count(schema.like, eq(schema.like.wordId, schema.word.id))
+					.as('likeCount'),
+				isLike: userId
+					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
+							'isLike',
+						)
+					: sql`false::boolean`.as('isLike'),
+			})
+			.from(schema.word)
+			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
+			.where(eq(schema.word.id, wordId))
+			.groupBy(schema.word.id)
+			.execute();
+
+		return queryResult;
+	}
+
+	async findByNameWithUserLike({
+		name,
+		userId,
+	}: {
+		name: string;
+		userId?: string;
+	}) {
+		const [queryResult] = await this.db
+			.select({
+				id: schema.word.id,
+				name: schema.word.name,
+				description: schema.word.description,
+				diacritic: schema.word.diacritic,
+				pronunciation: schema.word.pronunciation,
+				wrongPronunciations: schema.word.wrongPronunciations,
+				exampleSentence: schema.word.exampleSentence,
+				likeCount: this.db
+					.$count(schema.like, eq(schema.like.wordId, schema.word.id))
+					.as('likeCount'),
+				isLike: userId
+					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
+							'isLike',
+						)
+					: sql`false::boolean`.as('isLike'),
+			})
+			.from(schema.word)
+			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
+			.where(ilike(schema.word.name, `${name}%`))
+			.groupBy(schema.word.id)
+			.execute();
+
+		return queryResult;
+	}
+
+	async findWithList(requestWordListDto: RequestWordListDto) {
+		const { userId, sorting } = requestWordListDto;
+		const [sortOption, sortingFn] = WORD_SORTING_TYPE[sorting];
+
+		const wordList = await this.db
+			.select({
+				id: schema.word.id,
+				name: schema.word.name,
+				description: schema.word.description,
+				diacritic: schema.word.diacritic,
+				pronunciation: schema.word.pronunciation,
+				wrongPronunciations: schema.word.wrongPronunciations,
+				exampleSentence: schema.word.exampleSentence,
+				likeCount: this.db.$count(
+					schema.like,
+					eq(schema.like.wordId, schema.word.id),
+				),
+				isLike: userId
+					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`
+					: sql`false::boolean`,
+			})
+			.from(schema.word)
+			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
+			.groupBy(schema.word.id)
+			.orderBy(sortingFn(sortOption))
+			.offset(requestWordListDto.getSkip())
+			.limit(requestWordListDto.limit)
+			.execute();
+
+		const totalCount = await this.db.$count(schema.word);
+
+		return {
+			words: wordList,
+			totalCount,
+		};
+	}
+
+	async findUserLikeWord(requestWordListDto: RequestWordUserLikeDto) {
+		const { userId, sorting } = requestWordListDto;
+		const [sortOption, sortingFn] = WORD_SORTING_TYPE[sorting];
+
+		const words = await this.db
+			.select({
+				id: schema.word.id,
+				name: schema.word.name,
+				description: schema.word.description,
+				diacritic: schema.word.diacritic,
+				pronunciation: schema.word.pronunciation,
+				likeCount: this.db
+					.$count(schema.like, eq(schema.like.wordId, schema.word.id))
+					.as('likeCount'),
+			})
+			.from(schema.word)
+			.where(userId ? eq(schema.like.userId, userId) : undefined)
+			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
+			.groupBy(schema.word.id)
+			.orderBy(sortingFn(sortOption))
+			.offset(requestWordListDto.getSkip())
+			.limit(requestWordListDto.limit)
+			.execute();
+
+		const [totalQueryResult] = await this.db
+			.select({
+				count: count(schema.word.id),
+			})
+			.from(schema.word)
+			.where(userId ? eq(schema.like.userId, userId) : undefined)
+			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
+			.execute();
+
+		const totalCount = totalQueryResult?.count ?? 0;
+
+		return {
+			words,
+			totalCount,
+		};
+	}
+}

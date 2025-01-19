@@ -9,9 +9,9 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { User } from '#/infrastructure/database/entities/user.entity';
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
+import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
@@ -57,7 +57,7 @@ export class WordSearchController {
 	@UseInterceptors(UserInformationInterceptor)
 	@Get('/keyword')
 	async findBySearchKeyword(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Query() requestWordSearchDto: RequestWordSearchDto,
 	) {
 		const wordSearchDto = plainToInstance(RequestWordSearchDto, {

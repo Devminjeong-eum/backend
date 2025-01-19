@@ -1,11 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '#/domain/auth/auth.module';
 import { JwtConfig } from '#/domain/auth/config/jwt.config';
-import { User } from '#/infrastructure/database/entities/user.entity';
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 import { UserInformationInterceptor } from './interceptors/user-information.interceptor';
 import { UserService } from './service/user.service';
@@ -13,7 +11,6 @@ import { UserController } from './user.controller';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User]),
 		JwtModule.registerAsync({
 			useClass: JwtConfig,
 		}),

@@ -3,9 +3,11 @@
 	"collection": "@nestjs/schematics",
 	"sourceRoot": "src",
 	"compilerOptions": {
-		"deleteOutDir": true,
 		"builder": "swc",
-		"assets": [{ "include": "./config/.env*", "outDir": "./dist" }],
+		"deleteOutDir": true,
+		"assets": [
+			{ "include": "./configs/*.json", "outDir": "./dist" }
+		],
 		"watchAssets": true
 	}
 }

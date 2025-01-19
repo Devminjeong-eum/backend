@@ -1,10 +1,11 @@
-import type { HttpStatus, Type} from '@nestjs/common';
+import type { HttpStatus, Type } from '@nestjs/common';
 import { applyDecorators } from '@nestjs/common';
 import type {
 	ApiBodyOptions,
 	ApiHeaderOptions,
 	ApiParamOptions,
-	ApiQueryOptions} from '@nestjs/swagger';
+	ApiQueryOptions,
+} from '@nestjs/swagger';
 import {
 	ApiBody,
 	ApiExtraModels,

@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { SpreadSheetService } from '#/infrastructure/spread-sheet/spread-sheet.service';
 
-import type { RequestResearchBeforeQuitDto } from './dto/research-before-quit.dto';
+import type { RequestResearchBeforeQuitDto } from '../dto/research-before-quit.dto';
 
 @Injectable()
 export class ResearchService {

@@ -2,24 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 import { plainToInstance } from 'class-transformer';
 
-import { RankingRepository } from '#/infrastructure/database/repositories/ranking.repository';
+import { RankingRepository } from '#/infrastructure/drizzle/repository/ranking.repository';
 
 import { ResponseCurrentRankingDto } from '../dto/rank-by-current.dto';
-import type {
-	RequestRankingByMonthDto} from '../dto/rank-by-month.dto';
-import {
-	ResponseRankingByMonthDto,
-} from '../dto/rank-by-month.dto';
-import type {
-	RequestRankingByWeekDto} from '../dto/rank-by-week.dto';
-import {
-	ResponseRankingByWeekDto,
-} from '../dto/rank-by-week.dto';
-import type {
-	RequestRankingByYearDto} from '../dto/rank-by-year.dto';
-import {
-	ResponseRankingByYearDto,
-} from '../dto/rank-by-year.dto';
+import type { RequestRankingByMonthDto } from '../dto/rank-by-month.dto';
+import { ResponseRankingByMonthDto } from '../dto/rank-by-month.dto';
+import type { RequestRankingByWeekDto } from '../dto/rank-by-week.dto';
+import { ResponseRankingByWeekDto } from '../dto/rank-by-week.dto';
+import type { RequestRankingByYearDto } from '../dto/rank-by-year.dto';
+import { ResponseRankingByYearDto } from '../dto/rank-by-year.dto';
 
 @Injectable()
 export class RankingService {
