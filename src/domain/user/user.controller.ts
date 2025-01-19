@@ -11,12 +11,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Response } from 'express';
+import { type CookieOptions, type Response } from 'express';
 
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { AuthService } from '#/domain/auth/service/auth-token.service';
-import { User } from '#/infrastructure/database/entities/user.entity';
+import { UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
@@ -26,23 +25,30 @@ import { UserService } from './service/user.service';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
-	constructor(
-		private readonly userService: UserService,
-		private readonly authService: AuthService,
-	) {}
+	constructor(private readonly userService: UserService) {}
+
+	private readonly ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
+	private readonly REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+	private AUTH_COOKIE_OPTION: CookieOptions = {
+		secure: true,
+		sameSite: 'none',
+		httpOnly: true,
+		path: '/',
+		domain: '.dev-malssami.site',
+	};
 
 	@ApiDocs({
 		summary: '자기 자신의 유저 정보를 열람합니다',
 		response: {
 			statusCode: HttpStatus.OK,
-			schema: User,
+			schema: ResponseUserInformationDto,
 		},
 	})
 	@Get()
 	@UseGuards(AuthenticationGuard)
-	getOwnInformation(@AuthenticatedUser() user: User) {
+	getOwnInformation(@AuthenticatedUser() user: UserEntity) {
 		const { id: userId } = user;
-		return this.userService.getUserInformation(userId);
+		return this.userService.getUserInformation({ userId });
 	}
 
 	@ApiDocs({
@@ -60,7 +66,7 @@ export class UserController {
 	@Get(':userId')
 	@UseGuards(AuthenticationGuard)
 	getUserInformation(@Param('userId') userId: string) {
-		return this.userService.getUserInformation(userId);
+		return this.userService.getUserInformation({ userId });
 	}
 
 	@ApiDocs({
@@ -77,7 +83,15 @@ export class UserController {
 		@Param('userId') userId: string,
 		@Res({ passthrough: true }) response: Response,
 	) {
-		this.authService.removeAuthenticateCookie(response);
+		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, '', {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: 0,
+		});
+		response.cookie(this.REFRESH_TOKEN_COOKIE_NAME, '', {
+			...this.AUTH_COOKIE_OPTION,
+			maxAge: 0,
+		});
+
 		return this.userService.removeUserInformation(userId);
 	}
 

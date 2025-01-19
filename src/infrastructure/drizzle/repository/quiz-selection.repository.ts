@@ -22,7 +22,7 @@ export class QuizSelectionRepository {
 		correct: string;
 		incorrectList: string[];
 	}) {
-		return this.db
+		const [queryResult] = await this.db
 			.insert(schema.quizSelection)
 			.values({
 				wordId,
@@ -30,6 +30,8 @@ export class QuizSelectionRepository {
 				incorrectList,
 			})
 			.returning();
+
+		return queryResult;
 	}
 
 	async update({
@@ -41,7 +43,7 @@ export class QuizSelectionRepository {
 		correct: string;
 		incorrectList: string[];
 	}) {
-		return this.db
+		const [queryResult] = await this.db
 			.update(schema.quizSelection)
 			.set({
 				correct,
@@ -49,6 +51,8 @@ export class QuizSelectionRepository {
 			})
 			.where(eq(schema.quizSelection.id, quizSelectionId))
 			.returning();
+
+		return queryResult;
 	}
 
 	async findById({ quizSelectionId }: { quizSelectionId: number }) {

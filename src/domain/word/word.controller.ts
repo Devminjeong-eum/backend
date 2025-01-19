@@ -15,7 +15,7 @@ import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AdminGuard } from '#/domain/auth/guard/admin.guard';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { User } from '#/infrastructure/database/entities/user.entity';
+import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
@@ -49,7 +49,7 @@ export class WordController {
 	@UseInterceptors(UserInformationInterceptor)
 	@Get('/list')
 	async findAll(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Query() wordListDto: RequestWordListDto,
 	) {
 		const requestWordListDto = plainToInstance(
@@ -75,7 +75,7 @@ export class WordController {
 	@UseGuards(AuthenticationGuard)
 	@Get('/like')
 	async findUserLike(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Query() requestWordUserDto: RequestWordUserLikeDto,
 	) {
 		const wordUserLikeDto = plainToInstance(RequestWordUserLikeDto, {
@@ -96,7 +96,7 @@ export class WordController {
 	@Get('/detail')
 	@UseInterceptors(UserInformationInterceptor)
 	async findById(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Query() requestWordDetailDto: RequestWordDetailDto,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {

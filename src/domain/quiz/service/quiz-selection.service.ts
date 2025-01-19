@@ -12,8 +12,9 @@ export class QuizSelectionService {
 		private readonly quizSelectionRepository: QuizSelectionRepository,
 	) {}
 	async findQuizSelectionByWordId(wordId: string) {
-		const quizSelection =
-			await this.quizSelectionRepository.findByWordId(wordId);
+		const quizSelection = await this.quizSelectionRepository.findByWordId({
+			wordId,
+		});
 
 		if (!quizSelection) {
 			throw new BadRequestException(

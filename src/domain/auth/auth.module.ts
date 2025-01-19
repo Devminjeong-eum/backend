@@ -33,6 +33,6 @@ import { SocialAuthService } from './service/social-auth.service';
 		// Repository
 		UserRepository,
 	],
-	exports: [AuthenticationGuard],
+	exports: [JwtModule, AuthenticationGuard],
 })
 export class AuthModule {}

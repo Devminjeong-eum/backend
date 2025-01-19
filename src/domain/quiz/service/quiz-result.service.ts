@@ -8,18 +8,15 @@ import {
 import { plainToInstance } from 'class-transformer';
 
 import { QuizResultRepository } from '#/infrastructure/drizzle/repository/quiz-result.repository';
-import { QuizSelectionRepository } from '#/infrastructure/drizzle/repository/quiz-selection.repository';
 import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 
 import { ResponseCreateQuizResultDto } from '../dto/create-quiz-result.dto';
 import { ResponseQuizResultDto } from '../dto/quiz-result.dto';
-import { ResponseQuizSelectionDto } from '../dto/quiz-selection.dto';
 
 @Injectable()
 export class QuizResultService {
 	constructor(
 		private readonly quizResultRepository: QuizResultRepository,
-		private readonly quizSelectionRepository: QuizSelectionRepository,
 		private readonly wordRepository: WordRepository,
 	) {}
 
@@ -45,8 +42,12 @@ export class QuizResultService {
 		}
 
 		const [isValidCorrectWords, isValidIncorrectWords] = await Promise.all([
-			this.wordRepository.checkIsExistsByIdList(correctWordIds),
-			this.wordRepository.checkIsExistsByIdList(incorrectWordIds),
+			this.wordRepository.checkIsExistsByIdList({
+				wordIdList: correctWordIds,
+			}),
+			this.wordRepository.checkIsExistsByIdList({
+				wordIdList: incorrectWordIds,
+			}),
 		]);
 
 		if (!isValidCorrectWords || !isValidIncorrectWords) {
@@ -130,31 +131,5 @@ export class QuizResultService {
 		);
 
 		return responseQuizResultDto;
-	}
-
-	async findQuizSelectionByWordId(wordId: string) {
-		const quizSelection =
-			await this.quizSelectionRepository.findByWordId(wordId);
-
-		if (!quizSelection) {
-			throw new BadRequestException(
-				'해당 단어 ID 를 가진 퀴즈 선택 데이터가 없습니다.',
-			);
-		}
-
-		return quizSelection;
-	}
-
-	async findQuizSelectionRandom() {
-		const quizSelectionList =
-			await this.quizSelectionRepository.findRandomQuizSelection();
-
-		const responseQuizSelectionDto = plainToInstance(
-			ResponseQuizSelectionDto,
-			quizSelectionList,
-			{ excludeExtraneousValues: true },
-		);
-
-		return responseQuizSelectionDto;
 	}
 }

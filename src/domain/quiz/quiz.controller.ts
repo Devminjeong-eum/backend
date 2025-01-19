@@ -15,7 +15,7 @@ import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AdminGuard } from '#/domain/auth/guard/admin.guard';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { User } from '#/infrastructure/database/entities/user.entity';
+import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
@@ -50,7 +50,7 @@ export class QuizController {
 	@UseGuards(AuthenticationGuard)
 	@Post('/result')
 	async createQuizResult(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Body('correctWordIds') correctWordIds: string[],
 		@Body('incorrectWordIds') incorrectWordIds: string[],
 	) {
@@ -76,7 +76,7 @@ export class QuizController {
 	@UseInterceptors(UserInformationInterceptor)
 	@Get('/result/:quizResultId')
 	async findQuizResultById(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Param('quizResultId') quizResultId: string,
 	) {
 		return this.quizResultService.findQuizResultById({

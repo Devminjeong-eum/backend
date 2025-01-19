@@ -15,6 +15,7 @@ import { createAwsPollyClientFactory } from './factory/polly-client-factory';
 import { createAwsS3BucketFactory } from './factory/s3-bucket-factory';
 import { TextToSpeechService } from './service/text-to-speech.service';
 import { TextToSpeechController } from './text-to-speech.controller';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 const AwsPollyProvider: Provider<PollyClient> = {
 	provide: AWS_POLLY_CLIENT,
@@ -37,6 +38,7 @@ const AwsS3BucketProvider: Provider<S3Client> = {
 		// Repository
 		TextToSpeechRepository,
 		WordRepository,
+		UserRepository,
 		// AWS Provider
 		AwsPollyProvider,
 		AwsS3BucketProvider,

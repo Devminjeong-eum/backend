@@ -9,6 +9,8 @@ import { QuizController } from './quiz.controller';
 import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
 import { QuizResultService } from './service/quiz-result.service';
 import { QuizSelectionService } from './service/quiz-selection.service';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 @Module({
 	imports: [AuthModule, SpreadSheetModule],
@@ -21,6 +23,8 @@ import { QuizSelectionService } from './service/quiz-selection.service';
 		// Repository
 		QuizResultRepository,
 		QuizSelectionRepository,
+		WordRepository,
+		UserRepository,
 	],
 })
 export class QuizModule {}

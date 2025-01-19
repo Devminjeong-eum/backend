@@ -5,7 +5,7 @@ import { plainToInstance } from 'class-transformer';
 
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { User } from '#/infrastructure/database/entities/user.entity';
+import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { RequestResearchBeforeQuitDto } from './dto/research-before-quit.dto';
@@ -25,7 +25,7 @@ export class ResearchController {
 	@UseGuards(AuthenticationGuard)
 	@Post('/before-quit')
 	async postResearchBeforeQuit(
-		@AuthenticatedUser() user: User,
+		@AuthenticatedUser() user: UserEntity,
 		@Body()
 		beforeQuitRequestBody: Pick<
 			RequestResearchBeforeQuitDto,

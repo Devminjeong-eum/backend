@@ -1,14 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { plainToInstance } from 'class-transformer';
-
 import { QuizSelectionRepository } from '#/infrastructure/drizzle/repository/quiz-selection.repository';
 import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 import { SpreadSheetService } from '#/infrastructure/spread-sheet/spread-sheet.service';
-
-import { RequestCreateQuizSelectDto } from '../dto/create-quiz-selection.dto';
-import { RequestUpdateQuizSelectDto } from '../dto/update-quiz-selection.dto';
 
 @Injectable()
 export class QuizBatchUpdateService {
@@ -67,7 +62,7 @@ export class QuizBatchUpdateService {
 			uuid,
 			index,
 		} of parsedSheetDataList) {
-			const word = await this.wordRepository.findById(wordId);
+			const word = await this.wordRepository.findById({ wordId });
 
 			if (!word) {
 				throw new BadRequestException(
@@ -76,28 +71,27 @@ export class QuizBatchUpdateService {
 			}
 
 			const isExist =
-				uuid && (await this.quizSelectionRepository.findById(uuid));
+				uuid &&
+				(await this.quizSelectionRepository.findById({
+					quizSelectionId: index,
+				}));
 
 			const quizSelectionEntity = isExist
-				? await this.quizSelectionRepository.update(
-						uuid,
-						plainToInstance(RequestUpdateQuizSelectDto, {
-							correct,
-							incorrectList,
-						}),
-					)
-				: await this.quizSelectionRepository.create(
-						word,
-						plainToInstance(RequestCreateQuizSelectDto, {
-							correct,
-							incorrectList,
-						}),
-					);
+				? await this.quizSelectionRepository.update({
+						quizSelectionId: index,
+						correct,
+						incorrectList,
+					})
+				: await this.quizSelectionRepository.create({
+						wordId: word.id,
+						correct,
+						incorrectList,
+					});
 
 			if (!isExist) {
 				batchUpdatedList.push({
 					cell: `${this.SPREAD_SHEET_UUID_ROW}${index}`,
-					data: `${quizSelectionEntity.id}`,
+					data: `${quizSelectionEntity}`,
 				});
 			}
 		}
