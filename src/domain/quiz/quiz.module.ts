@@ -11,7 +11,9 @@ import { QuizResultRepository } from '#/infrastructure/database/repositories/qui
 import { SpreadSheetModule } from '#/infrastructure/spread-sheet/spread-sheet.module';
 
 import { QuizController } from './quiz.controller';
-import { QuizService } from './service/quiz.service';
+import { QuizResultService } from './service/quiz-result.service';
+import { QuizSelectionService } from './service/quiz-selection.service';
+import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
 
 @Module({
 	imports: [
@@ -24,7 +26,9 @@ import { QuizService } from './service/quiz.service';
 	controllers: [QuizController],
 	providers: [
 		// Service
-		QuizService,
+		QuizResultService,
+		QuizSelectionService,
+		QuizBatchUpdateService,
 		// Repository
 		QuizResultRepository,
 		QuizSelectionRepository,

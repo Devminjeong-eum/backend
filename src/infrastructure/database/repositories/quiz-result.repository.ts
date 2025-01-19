@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
 import dayjs from 'dayjs';
-import { Repository } from 'typeorm';
+import { eq, exists, getTableColumns } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-import type { RequestCreateQuizResultDto } from '#/domain/quiz/dto/create-quiz-result.dto';
-import { QuizResult } from '#/infrastructure/database/entities/quiz-result.entity';
-import type { User } from '#/infrastructure/database/entities/user.entity';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
 import { generateNanoId } from '#/shared/utils/nanoid';
 
 @Injectable()
 export class QuizResultRepository {
 	constructor(
-		@InjectRepository(QuizResult)
-		private readonly quizResultRepository: Repository<QuizResult>,
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
 	) {}
 
 	private QUIZ_RESULT_ID_LENGTH = 6;
@@ -26,41 +25,57 @@ export class QuizResultRepository {
 				allowedOption: ['UPPERCASE', 'NUMBER'],
 				length: this.QUIZ_RESULT_ID_LENGTH,
 			});
-			isAlreadyUsed = await this.quizResultRepository.exists({
-				where: { id },
-			});
+			const selectResult = await this.db
+				.select()
+				.from(schema.quizResult)
+				.where(exists(eq(schema.quizResult.id, id)))
+				.limit(1)
+				.execute();
+			isAlreadyUsed = selectResult.length > 0;
 		} while (isAlreadyUsed);
 
 		return id;
 	}
 
-	async create(user: User, createQuizResultDto: RequestCreateQuizResultDto) {
-		const { correctWordIds, incorrectWordIds } = createQuizResultDto;
-		const expiredAt = dayjs().add(1, 'day').toDate();
-
+	async create({
+		correctWordIds,
+		incorrectWordIds,
+		userId,
+	}: {
+		correctWordIds: string[];
+		incorrectWordIds: string[];
+		userId: string;
+	}) {
 		const quizResultId = await this.generatedQuizResultId();
-		const quizResult = this.quizResultRepository.create({
-			user,
-			correctWordIds,
-			incorrectWordIds,
-			expiredAt,
-			id: quizResultId,
-		});
-
-		return this.quizResultRepository.save(quizResult);
+		const expiredAt = dayjs().add(1, 'day').toDate();
+		return this.db
+			.insert(schema.quizResult)
+			.values({
+				userId,
+				correctWordIds,
+				incorrectWordIds,
+				expiredAt,
+				id: quizResultId,
+			})
+			.execute();
 	}
 
-	async findById(quizResultId: string) {
-		return await this.quizResultRepository
-			.createQueryBuilder('quizResult')
-			.leftJoin('quizResult.user', 'user')
-			.where('quizResult.id = :quizResultId', { quizResultId })
-			.select([
-				'user.name',
-				'quizResult.id',
-				'quizResult.correctWordIds',
-				'quizResult.incorrectWordIds',
-			])
-			.getOne();
+	async findById({ quizResultId }: { quizResultId: string }) {
+		const { userId: _userId, ...restQuizResultColumns } = getTableColumns(
+			schema.quizResult,
+		);
+
+		const selectResult = await this.db
+			.select({
+				userName: schema.user.name,
+				...restQuizResultColumns,
+			})
+			.from(schema.quizResult)
+			.leftJoin(schema.user, eq(schema.quizResult.userId, schema.user.id))
+			.where(eq(schema.quizResult.id, quizResultId))
+			.limit(1)
+			.execute();
+
+		return selectResult[0];
 	}
 }

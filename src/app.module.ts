@@ -35,9 +35,9 @@ import { AppController } from './app.controller';
 			isGlobal: true,
 			envFilePath: `./src/config/.env.${process.env.NODE_ENV}`,
 		}),
-		TypeOrmModule.forRootAsync({
-			useClass: TypeOrmConfig,
-		}),
+		// TypeOrmModule.forRootAsync({
+		// 	useClass: TypeOrmConfig,
+		// }),
 		DrizzleModule.forRoot(),
 		RedisModule.forRootAsync(),
 		WinstonModule.forRoot(winstonLoggerConfig),
