@@ -57,7 +57,7 @@ export class QuizResultRepository {
 				expiredAt,
 				id: quizResultId,
 			})
-			.execute();
+			.returning();
 	}
 
 	async findById({ quizResultId }: { quizResultId: string }) {

@@ -1,72 +1,106 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { eq, exists, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-import type { RequestCreateQuizSelectDto } from '#/domain/quiz/dto/create-quiz-selection.dto';
-import type { RequestUpdateQuizSelectDto } from '#/domain/quiz/dto/update-quiz-selection.dto';
-import { QuizSelection } from '#/infrastructure/database/entities/quiz-selection.entity';
-import type { Word } from '#/infrastructure/database/entities/word.entity';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
 
 @Injectable()
 export class QuizSelectionRepository {
 	constructor(
-		@InjectRepository(QuizSelection)
-		private readonly quizSelectionRepository: Repository<QuizSelection>,
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
 	) {}
 
-	async create(word: Word, createQuizSelectDto: RequestCreateQuizSelectDto) {
-		const quizSelection = this.quizSelectionRepository.create({
-			word,
-			...createQuizSelectDto,
-		});
-		return this.quizSelectionRepository.save(quizSelection);
+	async create({
+		wordId,
+		correct,
+		incorrectList,
+	}: {
+		wordId: string;
+		correct: string;
+		incorrectList: string[];
+	}) {
+		return this.db
+			.insert(schema.quizSelection)
+			.values({
+				wordId,
+				correct,
+				incorrectList,
+			})
+			.returning();
 	}
 
-	async update(
-		quizSelectionId: string,
-		updateFieldDto: RequestUpdateQuizSelectDto,
-	): Promise<QuizSelection> {
-		const updateResult = await this.quizSelectionRepository.update(
-			quizSelectionId,
-			updateFieldDto,
-		);
-		return updateResult.raw;
+	async update({
+		quizSelectionId,
+		correct,
+		incorrectList,
+	}: {
+		quizSelectionId: number;
+		correct: string;
+		incorrectList: string[];
+	}) {
+		return this.db
+			.update(schema.quizSelection)
+			.set({
+				correct,
+				incorrectList,
+			})
+			.where(eq(schema.quizSelection.id, quizSelectionId))
+			.returning();
 	}
 
-	findById(quizSelectionId: string) {
-		return this.quizSelectionRepository
-			.createQueryBuilder('quizSelection')
-			.where('quizSelection.id = :quizSelectionId', { quizSelectionId })
-			.getOne();
+	async findById({ quizSelectionId }: { quizSelectionId: number }) {
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.quizSelection)
+			.where(exists(eq(schema.quizSelection.id, quizSelectionId)))
+			.limit(1)
+			.execute();
+
+		return queryResult;
 	}
 
-	findByWordId(wordId: string) {
-		return this.quizSelectionRepository
-			.createQueryBuilder('quizSelection')
-			.leftJoinAndSelect(
-				'quizSelection.word',
-				'word',
-				'word.id = :wordId',
-				{ wordId },
+	async findByWordId({ wordId }: { wordId: string }) {
+		const [queryResult] = await this.db
+			.select({
+				quizSelectionId: schema.quizSelection.id,
+				correct: schema.quizSelection.correct,
+				incorrectList: schema.quizSelection.incorrectList,
+				wordName: schema.word.name,
+			})
+			.from(schema.quizSelection)
+			.leftJoin(
+				schema.word,
+				eq(schema.quizSelection.wordId, schema.word.id),
 			)
-			.select([
-				'quizSelection.id',
-				'quizSelection.correct',
-				'quizSelection.incorrectList',
-				'word.name',
-			])
-			.getOne();
+			.where(eq(schema.quizSelection.wordId, wordId))
+			.limit(1)
+			.execute();
+
+		return queryResult;
 	}
 
-	findRandomQuizSelection() {
-		return this.quizSelectionRepository
-			.createQueryBuilder('quizSelection')
-			.select(['quizSelection.correct', 'quizSelection.incorrectList'])
-			.leftJoin('quizSelection.word', 'word')
-			.addSelect(['word.id', 'word.name', 'word.diacritic'])
-			.orderBy('RANDOM()')
+	async findRandomQuizSelection() {
+		const randomizeQuizSelection = await this.db
+			.select({
+				quizSelectionId: schema.quizSelection.id,
+				correct: schema.quizSelection.correct,
+				incorrectList: schema.quizSelection.incorrectList,
+				wordId: schema.word.id,
+				wordName: schema.word.name,
+				wordDiacritic: schema.word.diacritic,
+			})
+			.from(schema.quizSelection)
+			.leftJoin(
+				schema.word,
+				eq(schema.quizSelection.wordId, schema.word.id),
+			)
+			.orderBy(sql`RANDOM()`)
 			.limit(10)
-			.getRawMany();
+			.execute();
+
+		return randomizeQuizSelection;
 	}
 }

@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { word } from './word.schema';
 
 export const quizSelection = pgTable('quiz_selection', {
 	id: serial().primaryKey(),
-	wordId: integer()
+	wordId: uuid()
 		.notNull()
 		.references(() => word.id, { onDelete: 'cascade' }),
 	correct: varchar().notNull(),

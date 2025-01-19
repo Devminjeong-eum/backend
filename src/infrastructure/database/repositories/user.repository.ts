@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { and, eq, exists, isNull, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { isNotNil } from 'es-toolkit';
 
-import { User } from '#/infrastructure/database/entities/user.entity';
-import type { RequestCreateUserDto } from '#/domain/user/dto/create-user.dto';
+import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
+import * as schema from '#/infrastructure/drizzle/schema';
 import { generateNanoId } from '#/shared/utils/nanoid';
 
 @Injectable()
 export class UserRepository {
 	constructor(
-		@InjectRepository(User)
-		private userRepository: Repository<User>,
+		@InjectDrizzleClient()
+		private readonly db: NodePgDatabase<typeof schema>,
 	) {}
 
 	private USER_ID_LENGTH = 8;
-
 	private async generatedUserId() {
 		let id: string;
 		let isAlreadyUsed: boolean;
@@ -26,94 +26,163 @@ export class UserRepository {
 				length: this.USER_ID_LENGTH,
 			});
 			id = `user_${nanoId}`;
-			isAlreadyUsed = await this.userRepository.exists({
-				where: { id },
-			});
+			const selectResult = await this.db
+				.select()
+				.from(schema.user)
+				.where(exists(eq(schema.user.id, id)))
+				.limit(1)
+				.execute();
+			isAlreadyUsed = selectResult.length > 0;
 		} while (isAlreadyUsed);
 
 		return id;
 	}
 
-	async create(user: RequestCreateUserDto) {
+	async create({
+		name,
+		profileImage,
+		socialPlatformId,
+		socialType,
+	}: {
+		name: string;
+		profileImage: string;
+		socialPlatformId: string;
+		socialType: string;
+	}) {
 		const userId = await this.generatedUserId();
-		const registeredUser = this.userRepository.create({
-			...user,
-			id: userId,
-		});
-		return await this.userRepository.save(registeredUser);
+		return this.db
+			.insert(schema.user)
+			.values({
+				id: userId,
+				name,
+				profileImage,
+				socialPlatformId,
+				socialType,
+			})
+			.returning();
 	}
 
-	checkIsExistsById(userId: string) {
-		return this.userRepository
-			.createQueryBuilder('user')
-			.where('user.id = :userId', { userId })
-			.getExists();
+	async checkIsExistsById({ userId }: { userId: string }) {
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.user)
+			.where(
+				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
+			)
+			.limit(1)
+			.execute();
+		return isNotNil(queryResult);
 	}
 
-	deleteOne(user: User) {
-		return this.userRepository.softRemove(user);
+	async deleteOne({ userId }: { userId: string }) {
+		const [queryResult] = await this.db
+			.update(schema.user)
+			.set({
+				deletedAt: sql`now()`,
+			})
+			.where(
+				and(isNull(schema.user.deletedAt), eq(schema.user.id, userId)),
+			)
+			.returning();
+
+		return isNotNil(queryResult);
 	}
 
-	findById(userId: string) {
-		return this.userRepository.findOne({
-			where: { id: userId },
-		});
+	async findById(userId: string) {
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.user)
+			.where(
+				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
+			)
+			.limit(1)
+			.execute();
+
+		return queryResult;
 	}
 
-	findBySocialPlatformId({
+	async findBySocialPlatformId({
 		socialPlatformId,
 		socialType,
 	}: {
 		socialPlatformId: string;
 		socialType: string;
 	}) {
-		return this.userRepository
-			.createQueryBuilder('user')
-			.where('user.socialPlatformId = :socialPlatformId', {
-				socialPlatformId,
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.user)
+			.where(
+				and(
+					eq(schema.user.socialPlatformId, socialPlatformId),
+					eq(schema.user.socialType, socialType),
+					isNull(schema.user.deletedAt),
+				),
+			)
+			.limit(1)
+			.execute();
+
+		return queryResult;
+	}
+
+	async findByIdWithLikeRelation(userId: string) {
+		const [queryResult] = await this.db
+			.select()
+			.from(schema.user)
+			.where(
+				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
+			)
+			.leftJoin(schema.like, eq(schema.like.userId, userId))
+			.limit(1)
+			.execute();
+
+		return queryResult;
+	}
+
+	async findByIdWithLikeCount(userId: string) {
+		const [queryResult] = await this.db
+			.select({
+				userId: schema.user.id,
+				profileImage: schema.user.profileImage,
+				userName: schema.user.name,
+				likeCount: sql`COUNT(${schema.like.id})`
+					.mapWith(Number)
+					.as('likeCount'),
 			})
-			.andWhere('user.socialType = :socialType', { socialType })
-			.getOne();
+			.from(schema.user)
+			.where(
+				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
+			)
+			.leftJoin(schema.like, eq(schema.like.userId, userId))
+			.groupBy(schema.user.id)
+			.execute();
+
+		return queryResult;
 	}
 
-	findByIdWithLikeRelation(userId: string) {
-		return this.userRepository.findOne({
-			where: { id: userId },
-			relations: ['likes'],
-		});
+	findByNameWithLikeCount(name: string) {
+		return this.db
+			.select({
+				userId: schema.user.id,
+				profileImage: schema.user.profileImage,
+				userName: schema.user.name,
+				likeCount: sql`COUNT(${schema.like.id})`
+					.mapWith(Number)
+					.as('likeCount'),
+			})
+			.from(schema.user)
+			.where(
+				and(eq(schema.user.name, name), isNull(schema.user.deletedAt)),
+			)
+			.leftJoin(schema.like, eq(schema.like.userId, schema.user.id))
+			.groupBy(schema.user.id)
+			.execute();
 	}
 
-	findByIdWithLikeCount(userId: string) {
-		return this.userRepository
-			.createQueryBuilder('user')
-			.leftJoin('user.likes', 'like')
-			.where('user.id = :userId', { userId })
-			.select([
-				'user.id',
-				'user.profileImage',
-				'user.name',
-				'COUNT(like.id) as likeCount',
-			])
-			.groupBy('user.id')
-			.getRawOne();
-	}
-
-	findByName(name: string) {
-		return this.userRepository
-			.createQueryBuilder('user')
-			.leftJoin('user.likes', 'like')
-			.where('user.name = :name', { name })
-			.select([
-				'user.id',
-				'user.profileImage',
-				'user.name',
-				'COUNT(like.id) as likeCount',
-			])
-			.groupBy('user.id')
-			.getRawOne();
-	}
-
-	updateName(id: string, name: string) {
-		return this.userRepository.update(id, { name });
+	updateName({ id, name }: { id: string; name: string }) {
+		return this.db
+			.update(schema.user)
+			.set({ name })
+			.where(eq(schema.user.id, id))
+			.returning();
 	}
 }
