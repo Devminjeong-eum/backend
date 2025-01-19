@@ -13,7 +13,7 @@ export class AuthTokenService {
 		private readonly jwtService: JwtService,
 	) {}
 
-	getAuthenticateToken({ userId }: { userId: string }) {
+	generateAuthToken({ userId }: { userId: string }) {
 		const payload = { id: userId };
 		const accessToken = this.jwtService.sign(payload, { expiresIn: "5m" });
 		const refreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });

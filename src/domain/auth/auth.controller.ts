@@ -13,7 +13,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { type CookieOptions, type Request, type Response } from 'express';
 
 import { ResponseUserInformationDto } from '#/domain/user/dto/user-information.dto';
-import { UserService } from '#/domain/user/service/user.service';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { AuthenticatedUser } from './decorator/auth.decorator';
@@ -21,13 +20,14 @@ import { AuthenticationGuard } from './guard/auth.guard';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { KakaoAuthUser } from './interface/kakao-auth.interface';
 import { AuthTokenService } from './service/auth-token.service';
+import { SocialAuthService } from './service/social-auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 	constructor(
 		private readonly authTokenService: AuthTokenService,
-		private readonly userService: UserService,
+		private readonly socialAuthService: SocialAuthService,
 	) {}
 
 	private readonly ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
@@ -56,7 +56,7 @@ export class AuthController {
 		@Res({ passthrough: true }) response: Response,
 	) {
 		const { nickname, profileImage, id } = authenticatedUser;
-		const user = await this.userService.oAuthLogin({
+		const user = await this.socialAuthService.oAuthLogin({
 			name: nickname,
 			profileImage,
 			socialPlatformId: id,
@@ -64,7 +64,7 @@ export class AuthController {
 		});
 
 		const { accessToken, refreshToken } =
-			this.authTokenService.getAuthenticateToken({ userId: id });
+			this.authTokenService.generateAuthToken({ userId: id });
 
 		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 			...this.AUTH_COOKIE_OPTION,
@@ -115,10 +115,10 @@ export class AuthController {
 		@Req() request: Request,
 		@Res({ passthrough: true }) response: Response,
 	) {
-		const { refreshToken } = request.cookies ?? {};
 		const reIssueAccessToken = this.authTokenService.reIssueAccessToken({
-			refreshToken,
+			refreshToken: request.cookies?.refreshToken,
 		});
+
 		response.cookie(this.REFRESH_TOKEN_COOKIE_NAME, reIssueAccessToken, {
 			...this.AUTH_COOKIE_OPTION,
 			maxAge: 0,

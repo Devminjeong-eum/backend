@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 
 import type { Request } from 'express';
 
-import type { User } from '#/infrastructure/database/entities/user.entity';
 import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import type { user } from '#/infrastructure/drizzle/schema';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -19,16 +19,16 @@ export class AdminGuard implements CanActivate {
 	}
 
 	async canActivate(context: ExecutionContext) {
-		const request: Request & { user: User } = context
+		const request: Request & { user: typeof user.$inferInsert } = context
 			.switchToHttp()
 			.getRequest();
 		const requestAdminKey = request.headers.authorization;
 
 		if (requestAdminKey !== this.TEST_ADMIN_KEY) return false;
 
-		const adminUser = await this.userRepository.findById(
-			this.TEST_ADMIN_KEY,
-		);
+		const adminUser = await this.userRepository.findById({
+			userId: this.TEST_ADMIN_KEY,
+		});
 
 		if (!adminUser) return false;
 
