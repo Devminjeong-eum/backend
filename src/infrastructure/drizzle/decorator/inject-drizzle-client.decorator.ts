@@ -1,5 +1,5 @@
-import { Inject } from "@nestjs/common";
+import { Inject } from '@nestjs/common';
 
-import { DRIZZLE_CLIENT } from "../constant/drizzle.constant";
+import { DRIZZLE_CLIENT } from '../constant/drizzle.constant';
 
-export const InjectDrizzleClient = () => Inject(DRIZZLE_CLIENT)
+export const InjectDrizzleClient = () => Inject(DRIZZLE_CLIENT);

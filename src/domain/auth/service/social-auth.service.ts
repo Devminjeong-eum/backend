@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import type { RequestCreateUserDto } from '#/domain/auth/dto/create-user.dto';
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 @Injectable()
 export class SocialAuthService {

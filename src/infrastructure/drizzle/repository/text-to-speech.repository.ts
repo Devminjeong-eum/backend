@@ -51,7 +51,7 @@ export class TextToSpeechRepository {
 			.execute();
 	}
 
-	async findByWordId({wordId}:{wordId: string}) {
+	async findByWordId({ wordId }: { wordId: string }) {
 		const queryResult = await this.db
 			.select()
 			.from(schema.textToSpeech)

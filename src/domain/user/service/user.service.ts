@@ -6,7 +6,7 @@ import {
 
 import { plainToInstance } from 'class-transformer';
 
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 import type { RequestChangeNicknameDto } from '../dto/change-nickname.dto';
 import { ResponseUserInformationDto } from '../dto/user-information.dto';

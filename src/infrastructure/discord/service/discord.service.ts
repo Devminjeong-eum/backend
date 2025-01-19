@@ -1,9 +1,4 @@
-import {
-	HttpStatus,
-	Inject,
-	Injectable,
-	LoggerService,
-} from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import dayjs from 'dayjs';

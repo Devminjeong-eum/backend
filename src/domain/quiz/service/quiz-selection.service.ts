@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { plainToInstance } from 'class-transformer';
 
-import { QuizSelectionRepository } from '#/infrastructure/database/repositories/quiz-selection.repository';
+import { QuizSelectionRepository } from '#/infrastructure/drizzle/repository/quiz-selection.repository';
 
 import { ResponseQuizSelectionDto } from '../dto/quiz-selection.dto';
 

@@ -1,14 +1,9 @@
 import { relations } from 'drizzle-orm';
-import {
-	pgTable,
-	text,
-	varchar,
-	serial,
-	uuid,
-} from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, uuid, varchar } from 'drizzle-orm/pg-core';
+
+import { timestamps } from '../helper/timestamp.helper';
 
 import { word } from './word.schema';
-import { timestamps } from '../helper/timestamp.helper';
 
 export const textToSpeech = pgTable('text_to_speech', {
 	id: serial().primaryKey(),
@@ -20,14 +15,11 @@ export const textToSpeech = pgTable('text_to_speech', {
 	...timestamps,
 });
 
-export const textToSpeechRelations = relations(
-	textToSpeech,
-	({ one }) => ({
-		word: one(word, {
-			fields: [textToSpeech.wordId],
-			references: [word.id],
-		}),
+export const textToSpeechRelations = relations(textToSpeech, ({ one }) => ({
+	word: one(word, {
+		fields: [textToSpeech.wordId],
+		references: [word.id],
 	}),
-);
+}));
 
 export type TextToSpeechEntity = typeof textToSpeech.$inferSelect;

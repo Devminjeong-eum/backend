@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import type {
+	TypeOrmModuleOptions,
+	TypeOrmOptionsFactory,
+} from '@nestjs/typeorm';
 
 @Injectable()
 export class TypeOrmConfig implements TypeOrmOptionsFactory {
 	private isDev: boolean;
 
 	constructor(private readonly configService: ConfigService) {
-		this.isDev = this.configService.getOrThrow('NODE_ENV') === 'development';
+		this.isDev =
+			this.configService.getOrThrow('NODE_ENV') === 'development';
 	}
 
 	createTypeOrmOptions(): TypeOrmModuleOptions {

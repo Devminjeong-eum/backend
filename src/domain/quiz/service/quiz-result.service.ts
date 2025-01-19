@@ -7,9 +7,9 @@ import {
 
 import { plainToInstance } from 'class-transformer';
 
-import { QuizResultRepository } from '#/infrastructure/database/repositories/quiz-result.repository';
-import { QuizSelectionRepository } from '#/infrastructure/database/repositories/quiz-selection.repository';
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { QuizResultRepository } from '#/infrastructure/drizzle/repository/quiz-result.repository';
+import { QuizSelectionRepository } from '#/infrastructure/drizzle/repository/quiz-selection.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 
 import { ResponseCreateQuizResultDto } from '../dto/create-quiz-result.dto';
 import { ResponseQuizResultDto } from '../dto/quiz-result.dto';

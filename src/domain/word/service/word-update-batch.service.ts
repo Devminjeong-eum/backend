@@ -4,8 +4,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { plainToInstance } from 'class-transformer';
 
 import { TextToSpeechService } from '#/domain/text-to-speech/service/text-to-speech.service';
-import { WordSearchRepository } from '#/infrastructure/database/repositories/word-search.repository';
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { WordSearchRepository } from '#/infrastructure/drizzle/repository/word-search.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 import { SpreadSheetService } from '#/infrastructure/spread-sheet/spread-sheet.service';
 
 import { RequestCreateWordDto } from '../dto/create-word.dto';

@@ -1,8 +1,9 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
-import { like } from './like.schema';
 import { timestamps } from '../helper/timestamp.helper';
+
+import { like } from './like.schema';
 
 export const user = pgTable('user', {
 	id: varchar().notNull().primaryKey(),

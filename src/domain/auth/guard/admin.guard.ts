@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 import type { Request } from 'express';
 
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 import type { user } from '#/infrastructure/drizzle/schema';
 
 @Injectable()

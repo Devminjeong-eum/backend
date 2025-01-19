@@ -1,7 +1,4 @@
-import {
-	BadRequestException,
-	Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { JWT } from 'google-auth-library';

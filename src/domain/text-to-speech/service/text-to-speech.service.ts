@@ -14,8 +14,8 @@ import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { plainToInstance } from 'class-transformer';
 
-import { TextToSpeechRepository } from '#/infrastructure/database/repositories/text-to-speech.repository';
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { TextToSpeechRepository } from '#/infrastructure/drizzle/repository/text-to-speech.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 
 import { InjectPollyClient } from '../decorators/inject-polly-client.decorator';
 import { InjectS3Bucket } from '../decorators/inject-s3-bucket.decorator';

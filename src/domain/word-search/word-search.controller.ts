@@ -9,9 +9,9 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { User } from '#/infrastructure/database/entities/user.entity';
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
+import { User } from '#/infrastructure/database/entities/user.entity';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {

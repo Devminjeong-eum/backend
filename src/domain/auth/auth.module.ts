@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { JwtConfig } from '#/domain/auth/config/jwt.config';
 import { UserModule } from '#/domain/user/user.module';
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 import { AuthController } from './auth.controller';
 import { AdminGuard } from './guard/admin.guard';

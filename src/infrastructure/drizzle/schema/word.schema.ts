@@ -1,15 +1,11 @@
 import { relations } from 'drizzle-orm';
-import {
-	pgTable,
-	text,
-	uuid,
-	varchar,
-} from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
+
+import { timestamps } from '../helper/timestamp.helper';
 
 import { like } from './like.schema';
 import { ranking } from './ranking.schema';
 import { textToSpeech } from './text-to-speech.schema';
-import { timestamps } from '../helper/timestamp.helper';
 
 export const word = pgTable('word', {
 	id: uuid().primaryKey().defaultRandom(),

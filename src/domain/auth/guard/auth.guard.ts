@@ -2,7 +2,7 @@ import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 import type { AuthTokenPayload } from '../interface/jwt-auth.interface';
 

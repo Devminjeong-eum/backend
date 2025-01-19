@@ -3,8 +3,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { plainToInstance } from 'class-transformer';
 
-import { QuizSelectionRepository } from '#/infrastructure/database/repositories/quiz-selection.repository';
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { QuizSelectionRepository } from '#/infrastructure/drizzle/repository/quiz-selection.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 import { SpreadSheetService } from '#/infrastructure/spread-sheet/spread-sheet.service';
 
 import { RequestCreateQuizSelectDto } from '../dto/create-quiz-selection.dto';

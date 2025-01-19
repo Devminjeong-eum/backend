@@ -1,13 +1,9 @@
 import { relations } from 'drizzle-orm';
-import {
-	pgTable,
-	serial,
-	uuid,
-	varchar,
-} from 'drizzle-orm/pg-core';
+import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
+
+import { timestamps } from '../helper/timestamp.helper';
 
 import { word } from './word.schema';
-import { timestamps } from '../helper/timestamp.helper';
 
 export const wordSearch = pgTable('word_search', {
 	id: serial().primaryKey(),

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { plainToInstance } from 'class-transformer';
 
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 import { PaginationDto, PaginationMetaDto } from '#/shared/dto/pagination.dto';
 
 import type { RequestWordDetailDto } from '../dto/word-detail.dto';

@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 
 import type { AuthTokenPayload } from '#/domain/auth/interface/jwt-auth.interface';
-import { UserRepository } from '#/infrastructure/database/repositories/user.repository';
+import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 import type { UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
 
 @Injectable()

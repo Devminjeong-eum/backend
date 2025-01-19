@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { LikeRepository } from '#/infrastructure/database/repositories/like.repository';
-import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
+import { LikeRepository } from '#/infrastructure/drizzle/repository/like.repository';
+import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 
 @Injectable()
 export class LikeService {
