@@ -1,20 +1,18 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from '#/domain/auth/auth.module';
 import { TextToSpeechModule } from '#/domain/text-to-speech/text-to-speech.module';
 import { UserModule } from '#/domain/user/user.module';
 import { WordSearchModule } from '#/domain/word-search/word-search.module';
-import { Word } from '#/infrastructure/database/entities/word.entity';
 import { WordRepository } from '#/infrastructure/database/repositories/word.repository';
 import { SpreadSheetModule } from '#/infrastructure/spread-sheet/spread-sheet.module';
 
 import { WordService } from './service/word.service';
 import { WordController } from './word.controller';
+import { WordUpdateBatchService } from './service/word-update-batch.service';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([Word]),
 		SpreadSheetModule,
 		AuthModule,
 		UserModule,
@@ -25,6 +23,7 @@ import { WordController } from './word.controller';
 	providers: [
 		// Service
 		WordService,
+		WordUpdateBatchService,
 		// Repository
 		WordRepository,
 	],

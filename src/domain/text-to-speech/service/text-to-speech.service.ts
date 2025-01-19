@@ -52,7 +52,7 @@ export class TextToSpeechService {
 		};
 	}
 
-	async generateTextToSpeechAudio(text: string) {
+	async generateTextToSpeechAudio({ text }: { text: string }) {
 		const speechSyntesisTaskCommandInstance =
 			new StartSpeechSynthesisTaskCommand(
 				this.createSpeechSynthesisTaskCommandParams(text),
@@ -79,16 +79,23 @@ export class TextToSpeechService {
 		}
 	}
 
-	async generateAudioPresignedUrl(wordId: string, delay = 20) {
-		const word = await this.wordRepository.findById(wordId);
+	async generateAudioPresignedUrl({
+		wordId,
+		delay = 20,
+	}: {
+		wordId: string;
+		delay?: number;
+	}) {
+		const word = await this.wordRepository.findById({ wordId });
 
 		if (!word)
 			throw new BadRequestException(
 				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
 			);
 
-		const textToSpeech =
-			await this.textToSpeechRepository.findByWordId(wordId);
+		const textToSpeech = await this.textToSpeechRepository.findByWordId({
+			wordId,
+		});
 
 		if (!textToSpeech)
 			throw new BadRequestException(
@@ -109,15 +116,16 @@ export class TextToSpeechService {
 		createWordTextToSpeechDto: RequestCreateWordTextToSpeechDto,
 	) {
 		const { wordId, text } = createWordTextToSpeechDto;
-		const word = await this.wordRepository.findById(wordId);
+		const word = await this.wordRepository.findById({ wordId });
 
 		if (!word)
 			throw new BadRequestException(
 				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
 			);
 
-		const textToSpeech =
-			await this.textToSpeechRepository.findByWordId(wordId);
+		const textToSpeech = await this.textToSpeechRepository.findByWordId({
+			wordId,
+		});
 
 		if (textToSpeech) {
 			throw new BadRequestException(
@@ -125,13 +133,17 @@ export class TextToSpeechService {
 			);
 		}
 
-		const audioFileUri = await this.generateTextToSpeechAudio(text);
-		await this.textToSpeechRepository.create({ word, text, audioFileUri });
-
-		const presignedUrl = await this.generateAudioPresignedUrl(
+		const audioFileUri = await this.generateTextToSpeechAudio({ text });
+		await this.textToSpeechRepository.create({
 			wordId,
-			this.TEST_PRESIGNED_EXPIRED,
-		);
+			text,
+			audioFileUri,
+		});
+
+		const presignedUrl = await this.generateAudioPresignedUrl({
+			wordId,
+			delay: this.TEST_PRESIGNED_EXPIRED,
+		});
 
 		const responseCreateWordTextToSpeechDto = plainToInstance(
 			ResponseCreateWordTextToSpeechDto,
@@ -144,19 +156,20 @@ export class TextToSpeechService {
 		return responseCreateWordTextToSpeechDto;
 	}
 
-	async updateWordTextToSpeech(
-		updateWordTextToSpeechDto: RequestUpdateWordTextToSpeechDto,
-	) {
-		const { wordId, text } = updateWordTextToSpeechDto;
-		const word = await this.wordRepository.findById(wordId);
+	async updateWordTextToSpeech({
+		wordId,
+		text,
+	}: RequestUpdateWordTextToSpeechDto) {
+		const word = await this.wordRepository.findById({ wordId });
 
 		if (!word)
 			throw new BadRequestException(
 				'해당 wordId 를 가진 단어는 존재하지 않습니다.',
 			);
 
-		const textToSpeech =
-			await this.textToSpeechRepository.findByWordId(wordId);
+		const textToSpeech = await this.textToSpeechRepository.findByWordId({
+			wordId,
+		});
 
 		if (textToSpeech?.text === text) {
 			throw new BadRequestException(
@@ -164,7 +177,7 @@ export class TextToSpeechService {
 			);
 		}
 
-		const audioFileUri = await this.generateTextToSpeechAudio(text);
+		const audioFileUri = await this.generateTextToSpeechAudio({ text });
 
 		await this.textToSpeechRepository.update({
 			wordId,
@@ -172,10 +185,10 @@ export class TextToSpeechService {
 			audioFileUri,
 		});
 
-		const presignedUrl = await this.generateAudioPresignedUrl(
+		const presignedUrl = await this.generateAudioPresignedUrl({
 			wordId,
-			this.TEST_PRESIGNED_EXPIRED,
-		);
+			delay: this.TEST_PRESIGNED_EXPIRED,
+		});
 
 		const responseUpdateWordTextToSpeechDto = plainToInstance(
 			ResponseUpdateWordTextToSpeechDto,

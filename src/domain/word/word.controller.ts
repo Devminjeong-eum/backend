@@ -6,36 +6,40 @@ import {
 	Query,
 	UseGuards,
 	UseInterceptors,
-} from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+} from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 
-import { plainToInstance } from 'class-transformer';
+import { plainToInstance } from "class-transformer";
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { AdminGuard } from '#/domain/auth/guard/admin.guard';
-import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { User } from '#/infrastructure/database/entities/user.entity';
-import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { AuthenticatedUser } from "#/domain/auth/decorator/auth.decorator";
+import { AdminGuard } from "#/domain/auth/guard/admin.guard";
+import { AuthenticationGuard } from "#/domain/auth/guard/auth.guard";
+import { UserInformationInterceptor } from "#/domain/user/interceptors/user-information.interceptor";
+import { User } from "#/infrastructure/database/entities/user.entity";
+import { ApiDocs } from "#/shared/decorators/swagger.decorator";
 
 import {
 	RequestWordDetailDto,
 	ResponseWordDetailDto,
-} from './dto/word-detail.dto';
-import { RequestWordListDto, ResponseWordListDto } from './dto/word-list.dto';
+} from "./dto/word-detail.dto";
+import { RequestWordListDto, ResponseWordListDto } from "./dto/word-list.dto";
 import {
 	RequestWordUserLikeDto,
 	ResponseWordUserLikeDto,
-} from './dto/word-user-like.dto';
-import { WordService } from './service/word.service';
+} from "./dto/word-user-like.dto";
+import { WordService } from "./service/word.service";
+import { WordUpdateBatchService } from "./service/word-update-batch.service";
 
-@ApiTags('Word')
-@Controller('word')
+@ApiTags("Word")
+@Controller("word")
 export class WordController {
-	constructor(private readonly wordService: WordService) {}
+	constructor(
+		private readonly wordService: WordService,
+		private readonly wordUpdateBatchService: WordUpdateBatchService,
+	) {}
 
 	@ApiDocs({
-		summary: '현재 등록된 단어 목록을 조회합니다.',
+		summary: "현재 등록된 단어 목록을 조회합니다.",
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordListDto,
@@ -43,7 +47,7 @@ export class WordController {
 		},
 	})
 	@UseInterceptors(UserInformationInterceptor)
-	@Get('/list')
+	@Get("/list")
 	async findAll(
 		@AuthenticatedUser() user: User,
 		@Query() wordListDto: RequestWordListDto,
@@ -61,7 +65,7 @@ export class WordController {
 	}
 
 	@ApiDocs({
-		summary: '유저가 좋아요를 누른 단어 목록을 조회합니다.',
+		summary: "유저가 좋아요를 누른 단어 목록을 조회합니다.",
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordUserLikeDto,
@@ -69,7 +73,7 @@ export class WordController {
 		},
 	})
 	@UseGuards(AuthenticationGuard)
-	@Get('/like')
+	@Get("/like")
 	async findUserLike(
 		@AuthenticatedUser() user: User,
 		@Query() requestWordUserDto: RequestWordUserLikeDto,
@@ -83,13 +87,13 @@ export class WordController {
 
 	@ApiDocs({
 		summary:
-			'특정 단어의 상세 정보를 ID 혹은 이름으로 검색하여 열람합니다.',
+			"특정 단어의 상세 정보를 ID 혹은 이름으로 검색하여 열람합니다.",
 		response: {
 			statusCode: HttpStatus.OK,
 			schema: ResponseWordDetailDto,
 		},
 	})
-	@Get('/detail')
+	@Get("/detail")
 	@UseInterceptors(UserInformationInterceptor)
 	async findById(
 		@AuthenticatedUser() user: User,
@@ -104,16 +108,16 @@ export class WordController {
 
 	@ApiDocs({
 		summary:
-			'데브말싸미 Google Spread Sheet 를 기반으로 단어 목록을 갱신합니다.',
+			"데브말싸미 Google Spread Sheet 를 기반으로 단어 목록을 갱신합니다.",
 		headers: {
-			name: 'Authorization',
+			name: "Authorization",
 			required: true,
-			description: '어드민 전용 Api Key',
+			description: "어드민 전용 Api Key",
 		},
 	})
-	@Patch('/spread-sheet')
+	@Patch("/spread-sheet")
 	@UseGuards(AdminGuard)
 	async patchUpdateSpreadSheet() {
-		return await this.wordService.updateWordList();
+		return await this.wordUpdateBatchService.updateWordList();
 	}
 }

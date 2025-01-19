@@ -50,7 +50,7 @@ export class UserRepository {
 		socialType: string;
 	}) {
 		const userId = await this.generatedUserId();
-		return this.db
+		const [queryResult] = await this.db
 			.insert(schema.user)
 			.values({
 				id: userId,
@@ -60,6 +60,8 @@ export class UserRepository {
 				socialType,
 			})
 			.returning();
+
+		return queryResult;
 	}
 
 	async checkIsExistsById({ userId }: { userId: string }) {
@@ -88,7 +90,7 @@ export class UserRepository {
 		return isNotNil(queryResult);
 	}
 
-	async findById(userId: string) {
+	async findById({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select()
 			.from(schema.user)
@@ -124,7 +126,7 @@ export class UserRepository {
 		return queryResult;
 	}
 
-	async findByIdWithLikeRelation(userId: string) {
+	async findByIdWithLikeRelation({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select()
 			.from(schema.user)
@@ -138,7 +140,7 @@ export class UserRepository {
 		return queryResult;
 	}
 
-	async findByIdWithLikeCount(userId: string) {
+	async findByIdWithLikeCount({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select({
 				userId: schema.user.id,
@@ -178,11 +180,11 @@ export class UserRepository {
 			.execute();
 	}
 
-	updateName({ id, name }: { id: string; name: string }) {
+	updateName({ userId, name }: { userId: string; name: string }) {
 		return this.db
 			.update(schema.user)
 			.set({ name })
-			.where(eq(schema.user.id, id))
+			.where(eq(schema.user.id, userId))
 			.returning();
 	}
 }

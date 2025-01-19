@@ -15,7 +15,7 @@ import { Response } from 'express';
 
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { AuthService } from '#/domain/auth/service/auth.service';
+import { AuthService } from '#/domain/auth/service/auth-token.service';
 import { User } from '#/infrastructure/database/entities/user.entity';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 

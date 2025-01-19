@@ -1,14 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import {
-	and,
-	count,
-	eq,
-	ilike,
-	inArray,
-	isNull,
-	sql,
-} from 'drizzle-orm';
+import { and, count, eq, ilike, inArray, isNull, sql } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import type { RequestWordListDto } from '#/domain/word/dto/word-list.dto';
@@ -98,7 +90,7 @@ export class WordRepository {
 		return queryResult;
 	}
 
-	async findById(wordId: string) {
+	async findById({ wordId }: { wordId: string }) {
 		const [queryResult] = await this.db
 			.select()
 			.from(schema.word)
@@ -109,7 +101,7 @@ export class WordRepository {
 		return queryResult;
 	}
 
-	async checkIsExistsByIdList(wordIdList: string[]) {
+	async checkIsExistsByIdList({ wordIdList }: { wordIdList: string[] }) {
 		if (!wordIdList.length) return false;
 
 		const queryResult = await this.db
@@ -240,8 +232,10 @@ export class WordRepository {
 				pronunciation: schema.word.pronunciation,
 				wrongPronunciations: schema.word.wrongPronunciations,
 				exampleSentence: schema.word.exampleSentence,
-				likeCount: this.db
-					.$count(schema.like, eq(schema.like.wordId, schema.word.id)),
+				likeCount: this.db.$count(
+					schema.like,
+					eq(schema.like.wordId, schema.word.id),
+				),
 				isLike: userId
 					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`
 					: sql`false::boolean`,
@@ -296,10 +290,10 @@ export class WordRepository {
 			.execute();
 
 		const totalCount = totalQueryResult?.count ?? 0;
-		
+
 		return {
 			words,
 			totalCount,
-		}
+		};
 	}
 }

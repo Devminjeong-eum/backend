@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-import type { Word } from '#/infrastructure/database/entities/word.entity';
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
 import * as schema from '#/infrastructure/drizzle/schema';
 
@@ -15,18 +14,18 @@ export class TextToSpeechRepository {
 	) {}
 
 	async create({
-		word,
+		wordId,
 		text,
 		audioFileUri,
 	}: {
-		word: Word;
+		wordId: string;
 		text: string;
 		audioFileUri: string;
 	}) {
 		return this.db
 			.insert(schema.textToSpeech)
 			.values({
-				wordId: word.id,
+				wordId,
 				text,
 				audioFileUri,
 			})
@@ -52,7 +51,7 @@ export class TextToSpeechRepository {
 			.execute();
 	}
 
-	async findByWordId(wordId: string) {
+	async findByWordId({wordId}:{wordId: string}) {
 		const queryResult = await this.db
 			.select()
 			.from(schema.textToSpeech)
