@@ -1,19 +1,20 @@
 import { Injectable } from '@nestjs/common';
 
 import { and, count, eq, ilike, inArray, isNull, sql } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import type { RequestWordListDto } from '#/domain/word/dto/word-list.dto';
 import type { RequestWordUserLikeDto } from '#/domain/word/dto/word-user-like.dto';
 import { WORD_SORTING_TYPE } from '#/domain/word/interface/word-list-sorting.interface';
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
-import * as schema from '#/infrastructure/drizzle/schema';
+import { like, word } from '#/infrastructure/drizzle/schema';
+
+import { DrizzlePgClient } from '../interface/drizzle-pg-client.interface';
 
 @Injectable()
 export class WordRepository {
 	constructor(
 		@InjectDrizzleClient()
-		private readonly db: NodePgDatabase<typeof schema>,
+		private readonly db: DrizzlePgClient,
 	) {}
 
 	async create({
@@ -32,7 +33,7 @@ export class WordRepository {
 		exampleSentence: string;
 	}) {
 		const [queryResult] = await this.db
-			.insert(schema.word)
+			.insert(word)
 			.values({
 				name,
 				description,
@@ -64,7 +65,7 @@ export class WordRepository {
 		exampleSentence: string;
 	}) {
 		const [queryResult] = await this.db
-			.update(schema.word)
+			.update(word)
 			.set({
 				name,
 				description,
@@ -73,7 +74,7 @@ export class WordRepository {
 				wrongPronunciations,
 				exampleSentence,
 			})
-			.where(eq(schema.word.id, id))
+			.where(eq(word.id, id))
 			.returning();
 
 		return queryResult;
@@ -82,8 +83,8 @@ export class WordRepository {
 	async findByName(name: string) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.word)
-			.where(eq(schema.word.name, name))
+			.from(word)
+			.where(eq(word.name, name))
 			.limit(1)
 			.execute();
 
@@ -93,8 +94,8 @@ export class WordRepository {
 	async findById({ wordId }: { wordId: string }) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.word)
-			.where(eq(schema.word.id, wordId))
+			.from(word)
+			.where(eq(word.id, wordId))
 			.limit(1)
 			.execute();
 
@@ -106,8 +107,8 @@ export class WordRepository {
 
 		const queryResult = await this.db
 			.select()
-			.from(schema.word)
-			.where(inArray(schema.word.id, wordIdList))
+			.from(word)
+			.where(inArray(word.id, wordIdList))
 			.limit(wordIdList.length)
 			.execute();
 
@@ -126,26 +127,23 @@ export class WordRepository {
 		// 공통 SELECT 쿼리
 		const queryResult = this.db
 			.select({
-				id: schema.word.id,
-				name: schema.word.name,
-				diacritic: schema.word.diacritic,
-				pronunciation: schema.word.pronunciation,
+				id: word.id,
+				name: word.name,
+				diacritic: word.diacritic,
+				pronunciation: word.pronunciation,
 				isLike: userId
-					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
+					? sql<boolean>`SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
 							'isLike',
 						)
 					: sql`false::boolean`.as('isLike'),
 			})
-			.from(schema.word)
+			.from(word)
 			.leftJoin(
-				schema.like,
-				and(
-					eq(schema.word.id, schema.like.wordId),
-					isNull(schema.like.deletedAt),
-				),
+				like,
+				and(eq(word.id, like.wordId), isNull(like.deletedAt)),
 			)
-			.where(inArray(schema.word.id, wordIdList))
-			.groupBy(schema.word.id)
+			.where(inArray(word.id, wordIdList))
+			.groupBy(word.id)
 			.execute();
 
 		return queryResult;
@@ -160,26 +158,26 @@ export class WordRepository {
 	}) {
 		const [queryResult] = await this.db
 			.select({
-				id: schema.word.id,
-				name: schema.word.name,
-				description: schema.word.description,
-				diacritic: schema.word.diacritic,
-				pronunciation: schema.word.pronunciation,
-				wrongPronunciations: schema.word.wrongPronunciations,
-				exampleSentence: schema.word.exampleSentence,
+				id: word.id,
+				name: word.name,
+				description: word.description,
+				diacritic: word.diacritic,
+				pronunciation: word.pronunciation,
+				wrongPronunciations: word.wrongPronunciations,
+				exampleSentence: word.exampleSentence,
 				likeCount: this.db
-					.$count(schema.like, eq(schema.like.wordId, schema.word.id))
+					.$count(like, eq(like.wordId, word.id))
 					.as('likeCount'),
 				isLike: userId
-					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
+					? sql<boolean>`SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
 							'isLike',
 						)
 					: sql`false::boolean`.as('isLike'),
 			})
-			.from(schema.word)
-			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
-			.where(eq(schema.word.id, wordId))
-			.groupBy(schema.word.id)
+			.from(word)
+			.leftJoin(like, eq(word.id, like.wordId))
+			.where(eq(word.id, wordId))
+			.groupBy(word.id)
 			.execute();
 
 		return queryResult;
@@ -194,26 +192,26 @@ export class WordRepository {
 	}) {
 		const [queryResult] = await this.db
 			.select({
-				id: schema.word.id,
-				name: schema.word.name,
-				description: schema.word.description,
-				diacritic: schema.word.diacritic,
-				pronunciation: schema.word.pronunciation,
-				wrongPronunciations: schema.word.wrongPronunciations,
-				exampleSentence: schema.word.exampleSentence,
+				id: word.id,
+				name: word.name,
+				description: word.description,
+				diacritic: word.diacritic,
+				pronunciation: word.pronunciation,
+				wrongPronunciations: word.wrongPronunciations,
+				exampleSentence: word.exampleSentence,
 				likeCount: this.db
-					.$count(schema.like, eq(schema.like.wordId, schema.word.id))
+					.$count(like, eq(like.wordId, word.id))
 					.as('likeCount'),
 				isLike: userId
-					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
+					? sql<boolean>`SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`.as(
 							'isLike',
 						)
 					: sql`false::boolean`.as('isLike'),
 			})
-			.from(schema.word)
-			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
-			.where(ilike(schema.word.name, `${name}%`))
-			.groupBy(schema.word.id)
+			.from(word)
+			.leftJoin(like, eq(word.id, like.wordId))
+			.where(ilike(word.name, `${name}%`))
+			.groupBy(word.id)
 			.execute();
 
 		return queryResult;
@@ -225,30 +223,27 @@ export class WordRepository {
 
 		const wordList = await this.db
 			.select({
-				id: schema.word.id,
-				name: schema.word.name,
-				description: schema.word.description,
-				diacritic: schema.word.diacritic,
-				pronunciation: schema.word.pronunciation,
-				wrongPronunciations: schema.word.wrongPronunciations,
-				exampleSentence: schema.word.exampleSentence,
-				likeCount: this.db.$count(
-					schema.like,
-					eq(schema.like.wordId, schema.word.id),
-				),
+				id: word.id,
+				name: word.name,
+				description: word.description,
+				diacritic: word.diacritic,
+				pronunciation: word.pronunciation,
+				wrongPronunciations: word.wrongPronunciations,
+				exampleSentence: word.exampleSentence,
+				likeCount: this.db.$count(like, eq(like.wordId, word.id)),
 				isLike: userId
-					? sql<boolean>`SUM(CASE WHEN ${schema.like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`
+					? sql<boolean>`SUM(CASE WHEN ${like.userId} = ${userId} THEN 1 ELSE 0 END) > 0`
 					: sql`false::boolean`,
 			})
-			.from(schema.word)
-			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
-			.groupBy(schema.word.id)
+			.from(word)
+			.leftJoin(like, eq(word.id, like.wordId))
+			.groupBy(word.id)
 			.orderBy(sortingFn(sortOption))
 			.offset(requestWordListDto.getSkip())
 			.limit(requestWordListDto.limit)
 			.execute();
 
-		const totalCount = await this.db.$count(schema.word);
+		const totalCount = await this.db.$count(word);
 
 		return {
 			words: wordList,
@@ -262,19 +257,19 @@ export class WordRepository {
 
 		const words = await this.db
 			.select({
-				id: schema.word.id,
-				name: schema.word.name,
-				description: schema.word.description,
-				diacritic: schema.word.diacritic,
-				pronunciation: schema.word.pronunciation,
+				id: word.id,
+				name: word.name,
+				description: word.description,
+				diacritic: word.diacritic,
+				pronunciation: word.pronunciation,
 				likeCount: this.db
-					.$count(schema.like, eq(schema.like.wordId, schema.word.id))
+					.$count(like, eq(like.wordId, word.id))
 					.as('likeCount'),
 			})
-			.from(schema.word)
-			.where(userId ? eq(schema.like.userId, userId) : undefined)
-			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
-			.groupBy(schema.word.id)
+			.from(word)
+			.where(userId ? eq(like.userId, userId) : undefined)
+			.leftJoin(like, eq(word.id, like.wordId))
+			.groupBy(word.id)
 			.orderBy(sortingFn(sortOption))
 			.offset(requestWordListDto.getSkip())
 			.limit(requestWordListDto.limit)
@@ -282,11 +277,11 @@ export class WordRepository {
 
 		const [totalQueryResult] = await this.db
 			.select({
-				count: count(schema.word.id),
+				count: count(word.id),
 			})
-			.from(schema.word)
-			.where(userId ? eq(schema.like.userId, userId) : undefined)
-			.leftJoin(schema.like, eq(schema.word.id, schema.like.wordId))
+			.from(word)
+			.where(userId ? eq(like.userId, userId) : undefined)
+			.leftJoin(like, eq(word.id, like.wordId))
 			.execute();
 
 		const totalCount = totalQueryResult?.count ?? 0;

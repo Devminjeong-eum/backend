@@ -2,17 +2,18 @@ import { Injectable } from '@nestjs/common';
 
 import dayjs from 'dayjs';
 import { eq, exists, getTableColumns } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
-import * as schema from '#/infrastructure/drizzle/schema';
+import { quizResult, user } from '#/infrastructure/drizzle/schema';
 import { generateNanoId } from '#/shared/utils/nanoid';
+
+import { DrizzlePgClient } from '../interface/drizzle-pg-client.interface';
 
 @Injectable()
 export class QuizResultRepository {
 	constructor(
 		@InjectDrizzleClient()
-		private readonly db: NodePgDatabase<typeof schema>,
+		private readonly db: DrizzlePgClient,
 	) {}
 
 	private QUIZ_RESULT_ID_LENGTH = 6;
@@ -27,8 +28,8 @@ export class QuizResultRepository {
 			});
 			const selectResult = await this.db
 				.select()
-				.from(schema.quizResult)
-				.where(exists(eq(schema.quizResult.id, id)))
+				.from(quizResult)
+				.where(exists(eq(quizResult.id, id)))
 				.limit(1)
 				.execute();
 			isAlreadyUsed = selectResult.length > 0;
@@ -49,7 +50,7 @@ export class QuizResultRepository {
 		const quizResultId = await this.generatedQuizResultId();
 		const expiredAt = dayjs().add(1, 'day').toDate();
 		return this.db
-			.insert(schema.quizResult)
+			.insert(quizResult)
 			.values({
 				userId,
 				correctWordIds,
@@ -61,21 +62,20 @@ export class QuizResultRepository {
 	}
 
 	async findById({ quizResultId }: { quizResultId: string }) {
-		const { userId: _userId, ...restQuizResultColumns } = getTableColumns(
-			schema.quizResult,
-		);
+		const { userId: _userId, ...restQuizResultColumns } =
+			getTableColumns(quizResult);
 
-		const selectResult = await this.db
+		const [selectResult] = await this.db
 			.select({
-				userName: schema.user.name,
+				userName: user.name,
 				...restQuizResultColumns,
 			})
-			.from(schema.quizResult)
-			.leftJoin(schema.user, eq(schema.quizResult.userId, schema.user.id))
-			.where(eq(schema.quizResult.id, quizResultId))
+			.from(quizResult)
+			.leftJoin(user, eq(quizResult.userId, user.id))
+			.where(eq(quizResult.id, quizResultId))
 			.limit(1)
 			.execute();
 
-		return selectResult[0];
+		return selectResult;
 	}
 }

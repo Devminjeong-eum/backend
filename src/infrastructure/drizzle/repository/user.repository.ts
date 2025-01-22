@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 
 import { and, eq, exists, isNull, sql } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { isNotNil } from 'es-toolkit';
 
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
-import * as schema from '#/infrastructure/drizzle/schema';
+import { like, user } from '#/infrastructure/drizzle/schema';
 import { generateNanoId } from '#/shared/utils/nanoid';
+
+import { DrizzlePgClient } from '../interface/drizzle-pg-client.interface';
 
 @Injectable()
 export class UserRepository {
 	constructor(
 		@InjectDrizzleClient()
-		private readonly db: NodePgDatabase<typeof schema>,
+		private readonly db: DrizzlePgClient,
 	) {}
 
 	private USER_ID_LENGTH = 8;
@@ -28,8 +29,8 @@ export class UserRepository {
 			id = `user_${nanoId}`;
 			const selectResult = await this.db
 				.select()
-				.from(schema.user)
-				.where(exists(eq(schema.user.id, id)))
+				.from(user)
+				.where(exists(eq(user.id, id)))
 				.limit(1)
 				.execute();
 			isAlreadyUsed = selectResult.length > 0;
@@ -51,7 +52,7 @@ export class UserRepository {
 	}) {
 		const userId = await this.generatedUserId();
 		const [queryResult] = await this.db
-			.insert(schema.user)
+			.insert(user)
 			.values({
 				id: userId,
 				name,
@@ -67,10 +68,8 @@ export class UserRepository {
 	async checkIsExistsById({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.user)
-			.where(
-				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
-			)
+			.from(user)
+			.where(and(eq(user.id, userId), isNull(user.deletedAt)))
 			.limit(1)
 			.execute();
 		return isNotNil(queryResult);
@@ -78,13 +77,11 @@ export class UserRepository {
 
 	async deleteOne({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
-			.update(schema.user)
+			.update(user)
 			.set({
 				deletedAt: sql`now()`,
 			})
-			.where(
-				and(isNull(schema.user.deletedAt), eq(schema.user.id, userId)),
-			)
+			.where(and(isNull(user.deletedAt), eq(user.id, userId)))
 			.returning();
 
 		return isNotNil(queryResult);
@@ -93,10 +90,8 @@ export class UserRepository {
 	async findById({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.user)
-			.where(
-				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
-			)
+			.from(user)
+			.where(and(eq(user.id, userId), isNull(user.deletedAt)))
 			.limit(1)
 			.execute();
 
@@ -112,12 +107,12 @@ export class UserRepository {
 	}) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.user)
+			.from(user)
 			.where(
 				and(
-					eq(schema.user.socialPlatformId, socialPlatformId),
-					eq(schema.user.socialType, socialType),
-					isNull(schema.user.deletedAt),
+					eq(user.socialPlatformId, socialPlatformId),
+					eq(user.socialType, socialType),
+					isNull(user.deletedAt),
 				),
 			)
 			.limit(1)
@@ -129,11 +124,9 @@ export class UserRepository {
 	async findByIdWithLikeRelation({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.user)
-			.where(
-				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
-			)
-			.leftJoin(schema.like, eq(schema.like.userId, userId))
+			.from(user)
+			.where(and(eq(user.id, userId), isNull(user.deletedAt)))
+			.leftJoin(like, eq(like.userId, userId))
 			.limit(1)
 			.execute();
 
@@ -143,19 +136,17 @@ export class UserRepository {
 	async findByIdWithLikeCount({ userId }: { userId: string }) {
 		const [queryResult] = await this.db
 			.select({
-				userId: schema.user.id,
-				profileImage: schema.user.profileImage,
-				userName: schema.user.name,
-				likeCount: sql`COUNT(${schema.like.id})`
+				userId: user.id,
+				profileImage: user.profileImage,
+				userName: user.name,
+				likeCount: sql`COUNT(${like.id})`
 					.mapWith(Number)
 					.as('likeCount'),
 			})
-			.from(schema.user)
-			.where(
-				and(eq(schema.user.id, userId), isNull(schema.user.deletedAt)),
-			)
-			.leftJoin(schema.like, eq(schema.like.userId, userId))
-			.groupBy(schema.user.id)
+			.from(user)
+			.where(and(eq(user.id, userId), isNull(user.deletedAt)))
+			.leftJoin(like, eq(like.userId, userId))
+			.groupBy(user.id)
 			.execute();
 
 		return queryResult;
@@ -164,27 +155,25 @@ export class UserRepository {
 	findByNameWithLikeCount(name: string) {
 		return this.db
 			.select({
-				userId: schema.user.id,
-				profileImage: schema.user.profileImage,
-				userName: schema.user.name,
-				likeCount: sql`COUNT(${schema.like.id})`
+				userId: user.id,
+				profileImage: user.profileImage,
+				userName: user.name,
+				likeCount: sql`COUNT(${like.id})`
 					.mapWith(Number)
 					.as('likeCount'),
 			})
-			.from(schema.user)
-			.where(
-				and(eq(schema.user.name, name), isNull(schema.user.deletedAt)),
-			)
-			.leftJoin(schema.like, eq(schema.like.userId, schema.user.id))
-			.groupBy(schema.user.id)
+			.from(user)
+			.where(and(eq(user.name, name), isNull(user.deletedAt)))
+			.leftJoin(like, eq(like.userId, user.id))
+			.groupBy(user.id)
 			.execute();
 	}
 
 	updateName({ userId, name }: { userId: string; name: string }) {
 		return this.db
-			.update(schema.user)
+			.update(user)
 			.set({ name })
-			.where(eq(schema.user.id, userId))
+			.where(eq(user.id, userId))
 			.returning();
 	}
 }

@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
 import { eq, exists, sql } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
-import * as schema from '#/infrastructure/drizzle/schema';
+import { quizSelection, word } from '#/infrastructure/drizzle/schema';
+
+import { DrizzlePgClient } from '../interface/drizzle-pg-client.interface';
 
 @Injectable()
 export class QuizSelectionRepository {
 	constructor(
 		@InjectDrizzleClient()
-		private readonly db: NodePgDatabase<typeof schema>,
+		private readonly db: DrizzlePgClient,
 	) {}
 
 	async create({
@@ -23,7 +24,7 @@ export class QuizSelectionRepository {
 		incorrectList: string[];
 	}) {
 		const [queryResult] = await this.db
-			.insert(schema.quizSelection)
+			.insert(quizSelection)
 			.values({
 				wordId,
 				correct,
@@ -44,12 +45,12 @@ export class QuizSelectionRepository {
 		incorrectList: string[];
 	}) {
 		const [queryResult] = await this.db
-			.update(schema.quizSelection)
+			.update(quizSelection)
 			.set({
 				correct,
 				incorrectList,
 			})
-			.where(eq(schema.quizSelection.id, quizSelectionId))
+			.where(eq(quizSelection.id, quizSelectionId))
 			.returning();
 
 		return queryResult;
@@ -58,8 +59,8 @@ export class QuizSelectionRepository {
 	async findById({ quizSelectionId }: { quizSelectionId: number }) {
 		const [queryResult] = await this.db
 			.select()
-			.from(schema.quizSelection)
-			.where(exists(eq(schema.quizSelection.id, quizSelectionId)))
+			.from(quizSelection)
+			.where(exists(eq(quizSelection.id, quizSelectionId)))
 			.limit(1)
 			.execute();
 
@@ -69,17 +70,14 @@ export class QuizSelectionRepository {
 	async findByWordId({ wordId }: { wordId: string }) {
 		const [queryResult] = await this.db
 			.select({
-				quizSelectionId: schema.quizSelection.id,
-				correct: schema.quizSelection.correct,
-				incorrectList: schema.quizSelection.incorrectList,
-				wordName: schema.word.name,
+				quizSelectionId: quizSelection.id,
+				correct: quizSelection.correct,
+				incorrectList: quizSelection.incorrectList,
+				wordName: word.name,
 			})
-			.from(schema.quizSelection)
-			.leftJoin(
-				schema.word,
-				eq(schema.quizSelection.wordId, schema.word.id),
-			)
-			.where(eq(schema.quizSelection.wordId, wordId))
+			.from(quizSelection)
+			.leftJoin(word, eq(quizSelection.wordId, word.id))
+			.where(eq(quizSelection.wordId, wordId))
 			.limit(1)
 			.execute();
 
@@ -89,18 +87,15 @@ export class QuizSelectionRepository {
 	async findRandomQuizSelection() {
 		const randomizeQuizSelection = await this.db
 			.select({
-				quizSelectionId: schema.quizSelection.id,
-				correct: schema.quizSelection.correct,
-				incorrectList: schema.quizSelection.incorrectList,
-				wordId: schema.word.id,
-				wordName: schema.word.name,
-				wordDiacritic: schema.word.diacritic,
+				quizSelectionId: quizSelection.id,
+				correct: quizSelection.correct,
+				incorrectList: quizSelection.incorrectList,
+				wordId: word.id,
+				wordName: word.name,
+				wordDiacritic: word.diacritic,
 			})
-			.from(schema.quizSelection)
-			.leftJoin(
-				schema.word,
-				eq(schema.quizSelection.wordId, schema.word.id),
-			)
+			.from(quizSelection)
+			.leftJoin(word, eq(quizSelection.wordId, word.id))
 			.orderBy(sql`RANDOM()`)
 			.limit(10)
 			.execute();

@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
 
 import { and, asc, count, eq, ilike, isNull, sql } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import type { RequestWordSearchDto } from '#/domain/word-search/dto/word-search.dto';
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
-import * as schema from '#/infrastructure/drizzle/schema';
+import { like, word, wordSearch } from '#/infrastructure/drizzle/schema';
+
+import { DrizzlePgClient } from '../interface/drizzle-pg-client.interface';
 
 @Injectable()
 export class WordSearchRepository {
 	constructor(
 		@InjectDrizzleClient()
-		private readonly db: NodePgDatabase<typeof schema>,
+		private readonly db: DrizzlePgClient,
 	) {}
 
 	async create({ wordId, keyword }: { wordId: string; keyword: string }) {
 		const [queryResult] = await this.db
-			.insert(schema.wordSearch)
+			.insert(wordSearch)
 			.values({
 				wordId,
 				keyword,
@@ -34,9 +35,9 @@ export class WordSearchRepository {
 		keyword: string;
 	}) {
 		const [queryResult] = await this.db
-			.update(schema.wordSearch)
+			.update(wordSearch)
 			.set({ keyword })
-			.where(eq(schema.wordSearch.wordId, wordId))
+			.where(eq(wordSearch.wordId, wordId))
 			.returning();
 
 		return queryResult;
@@ -53,24 +54,24 @@ export class WordSearchRepository {
 	}) {
 		const paginationQuery = this.db
 			.select({
-				id: schema.word.id,
-				name: schema.word.name,
-				diacritic: schema.word.diacritic,
+				id: word.id,
+				name: word.name,
+				diacritic: word.diacritic,
 			})
-			.from(schema.wordSearch)
-			.leftJoin(schema.word, eq(schema.wordSearch.wordId, schema.word.id))
-			.where(ilike(schema.wordSearch.keyword, `${keyword}%`))
+			.from(wordSearch)
+			.leftJoin(word, eq(wordSearch.wordId, word.id))
+			.where(ilike(wordSearch.keyword, `${keyword}%`))
 			.limit(limit)
 			.offset((page - 1) * limit)
 			.execute();
 
 		const totalCountQuery = this.db
 			.select({
-				count: count(schema.word.id),
+				count: count(word.id),
 			})
-			.from(schema.wordSearch)
-			.leftJoin(schema.word, eq(schema.wordSearch.wordId, schema.word.id))
-			.where(ilike(schema.wordSearch.keyword, `${keyword}%`));
+			.from(wordSearch)
+			.leftJoin(word, eq(wordSearch.wordId, word.id))
+			.where(ilike(wordSearch.keyword, `${keyword}%`));
 
 		const [paginationQueryResult, totalCountQueryResult] =
 			await Promise.all([paginationQuery, totalCountQuery]);
@@ -86,44 +87,41 @@ export class WordSearchRepository {
 
 		const wordsQuery = this.db
 			.selectDistinct({
-				id: schema.word.id,
-				name: schema.word.name,
-				pronunciation: schema.word.pronunciation,
-				diacritic: schema.word.diacritic,
-				description: schema.word.description,
-				createdAt: schema.word.createdAt,
+				id: word.id,
+				name: word.name,
+				pronunciation: word.pronunciation,
+				diacritic: word.diacritic,
+				description: word.description,
+				createdAt: word.createdAt,
 				isLike: userId
 					? sql<boolean>`CASE 
-					  WHEN ${schema.like.id} IS NOT NULL THEN true 
+					  WHEN ${like.id} IS NOT NULL THEN true 
 					  ELSE false 
 					END`.as('isLike')
 					: sql`false::boolean`.as('isLike'),
 			})
-			.from(schema.wordSearch)
-			.innerJoin(
-				schema.word,
-				eq(schema.wordSearch.wordId, schema.word.id),
-			)
+			.from(wordSearch)
+			.innerJoin(word, eq(wordSearch.wordId, word.id))
 			.leftJoin(
-				schema.like,
+				like,
 				and(
-					eq(schema.like.wordId, schema.word.id),
-					isNull(schema.like.deletedAt),
-					userId ? eq(schema.like.userId, userId) : undefined,
+					eq(like.wordId, word.id),
+					isNull(like.deletedAt),
+					userId ? eq(like.userId, userId) : undefined,
 				),
 			)
-			.where(ilike(schema.wordSearch.keyword, `${keyword}%`))
-			.orderBy(asc(schema.word.createdAt))
+			.where(ilike(wordSearch.keyword, `${keyword}%`))
+			.orderBy(asc(word.createdAt))
 			.offset(getSkip())
 			.limit(limit);
 
 		const totalCountQuery = this.db
 			.select({
-				count: count(schema.word.id),
+				count: count(word.id),
 			})
-			.from(schema.wordSearch)
-			.where(ilike(schema.wordSearch.keyword, `${keyword}%`))
-			.leftJoin(schema.like, and(eq(schema.like.wordId, schema.word.id)));
+			.from(wordSearch)
+			.where(ilike(wordSearch.keyword, `${keyword}%`))
+			.leftJoin(like, and(eq(like.wordId, word.id)));
 
 		const [wordsResult, totalCountResult] = await Promise.all([
 			wordsQuery.execute(),
