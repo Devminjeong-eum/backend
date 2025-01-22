@@ -1,8 +1,8 @@
-export * from './like.schema';
-export * from './quiz-result.schema';
-export * from './quiz-selection.schema';
-export * from './ranking.schema';
-export * from './text-to-speech.schema';
-export * from './user.schema';
-export * from './word.schema';
-export * from './word-search.schema';
+export { like, likeRelations } from './like.schema';
+export { quizResult, quizResultRelations } from './quiz-result.schema';
+export { quizSelection, quizSelectionRelations } from './quiz-selection.schema';
+export { ranking, rankingRelations } from './ranking.schema';
+export { textToSpeech, textToSpeechRelations } from './text-to-speech.schema';
+export { user, userRelations } from './user.schema';
+export { word, wordRelations } from './word.schema';
+export { wordSearch, wordSearchRelations } from './word-search.schema';
