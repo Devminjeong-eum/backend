@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsArray, IsDate, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
 
@@ -35,14 +35,17 @@ export type WordEntity = typeof word.$inferSelect;
 
 export class WordSchema implements WordEntity {
 	@IsUUID()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, format: 'uuid', required: true })
 	id: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	name: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	description: string;
 
@@ -62,6 +65,7 @@ export class WordSchema implements WordEntity {
 	wrongPronunciations: string[];
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	exampleSentence: string;
 

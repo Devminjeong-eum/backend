@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsDate, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+	IsDate,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	IsUrl,
+} from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
@@ -26,15 +32,17 @@ export type UserEntity = typeof user.$inferSelect;
 
 export class UserSchema implements UserEntity {
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true, example: 'user12345' })
 	id: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true, example: 'John Doe' })
 	name: string;
 
 	@IsUrl()
-	@IsOptional()
+	@IsNotEmpty()
 	@ApiProperty({
 		type: String,
 		format: 'uri',
@@ -44,10 +52,12 @@ export class UserSchema implements UserEntity {
 	profileImage: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true, example: 'google' })
 	socialType: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true, example: '123456789' })
 	socialPlatformId: string;
 
@@ -58,7 +68,7 @@ export class UserSchema implements UserEntity {
 		required: false,
 		example: '2025-01-23T13:30:00.000Z',
 	})
-	deletedAt: Date;
+	deletedAt: Date | null;
 
 	@IsDate()
 	@ApiProperty({

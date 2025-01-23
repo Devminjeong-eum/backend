@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+	IsDate,
+	IsNotEmpty,
+	IsNumber,
+	IsOptional,
+	IsString,
+} from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, smallserial, uuid } from 'drizzle-orm/pg-core';
 import { integer, smallint } from 'drizzle-orm/pg-core';
@@ -36,42 +42,52 @@ export type RankingEntity = typeof ranking.$inferSelect;
 
 export class RankingSchema implements RankingEntity {
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	id: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	year: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	month: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	week: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	rank: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	rankChange: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	score: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	viewCount: number;
 
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	addLikeCount: number;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	wordId: string;
 

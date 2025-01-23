@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsDate, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+	IsDate,
+	IsNotEmpty,
+	IsNumber,
+	IsOptional,
+	IsString,
+	IsUrl,
+} from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, text, uuid, varchar } from 'drizzle-orm/pg-core';
 
@@ -29,10 +36,12 @@ export type TextToSpeechEntity = typeof textToSpeech.$inferSelect;
 
 export class TextToSpeechSchema implements TextToSpeechEntity {
 	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({ type: Number, required: true })
 	id: number;
 
 	@IsUrl()
+	@IsNotEmpty()
 	@ApiProperty({
 		type: String,
 		format: 'uri',
@@ -42,10 +51,12 @@ export class TextToSpeechSchema implements TextToSpeechEntity {
 	audioFileUri: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true, example: 'Hello world!' })
 	text: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true, example: 'word12345' })
 	wordId: string;
 

@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import {
+	IsDate,
+	IsNotEmpty,
+	IsNumber,
+	IsPositive,
+	IsString,
+	IsUUID,
+} from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
 
@@ -28,14 +35,17 @@ export type WordSearchEntity = typeof wordSearch.$inferSelect;
 
 export class WordSearchSchema implements WordSearchEntity {
 	@IsNumber()
+	@IsPositive()
 	@ApiProperty({ type: Number, required: true })
 	id: number;
 
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	keyword: string;
 
-	@IsString()
+	@IsUUID(5)
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	wordId: string;
 

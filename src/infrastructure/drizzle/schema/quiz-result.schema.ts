@@ -1,9 +1,10 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+import { IsArray, IsDate, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { user } from './user.schema';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDate, IsString, IsUUID } from 'class-validator';
 
 export const quizResult = pgTable('quiz_result', {
 	id: uuid('id').primaryKey(),
@@ -26,10 +27,12 @@ export type QuizResultEntity = typeof quizResult.$inferSelect;
 
 export class QuizSchema implements QuizResultEntity {
 	@IsString()
+	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
 	id: string;
 
 	@IsString()
+	@IsNotEmpty()
 	@IsUUID(5)
 	@ApiProperty({ type: String, required: true, format: 'uuid' })
 	userId: string;
