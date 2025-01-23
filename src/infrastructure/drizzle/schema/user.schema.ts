@@ -13,6 +13,7 @@ import { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { timestamps } from '../helper/timestamp.helper';
 
 import { like } from './like.schema';
+import { Exclude } from 'class-transformer';
 
 export const user = pgTable('user', {
 	id: varchar().notNull().primaryKey(),
@@ -63,6 +64,7 @@ export class UserSchema implements UserEntity {
 
 	@IsDate()
 	@IsOptional()
+	@Exclude()
 	@ApiProperty({
 		type: Date,
 		required: false,

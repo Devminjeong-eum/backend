@@ -8,6 +8,7 @@ import { timestamps } from '../helper/timestamp.helper';
 
 import { user } from './user.schema';
 import { word } from './word.schema';
+import { Exclude } from 'class-transformer';
 
 export const like = pgTable('like', {
 	id: uuid().primaryKey().defaultRandom(),
@@ -60,6 +61,7 @@ export class LikeSchema implements LikeEntity {
 	updatedAt: Date;
 
 	@IsDate()
+	@Exclude()
 	@ApiProperty({ type: Date })
 	deletedAt: Date | null;
 }

@@ -1,12 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { PickType } from '@nestjs/mapped-types';
 
-import { IsString } from 'class-validator';
+import { LikeSchema } from '#/infrastructure/drizzle/schema/like.schema';
 
-export class RequestRevertLikeDto {
-	@ApiProperty({
-		description: '좋아요를 누른 단어의 ID 입니다.',
-		type: String,
-	})
-	@IsString()
-	wordId: string;
-}
+export class RequestRevertLikeDto extends PickType(LikeSchema, ['wordId']) {}

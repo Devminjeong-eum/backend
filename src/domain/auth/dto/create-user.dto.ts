@@ -1,15 +1,10 @@
-import { IsNotEmpty } from 'class-validator';
+import { PickType } from '@nestjs/mapped-types';
 
-export class RequestCreateUserDto {
-	@IsNotEmpty()
-	socialPlatformId: string;
+import { UserSchema } from '#/infrastructure/drizzle/schema/user.schema';
 
-	@IsNotEmpty()
-	profileImage: string;
-
-	@IsNotEmpty()
-	name: string;
-
-	@IsNotEmpty()
-	socialType: string;
-}
+export class RequestCreateUserDto extends PickType(UserSchema, [
+	'socialPlatformId',
+	'profileImage',
+	'name',
+	'socialType',
+]) {}

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
 
@@ -42,6 +42,7 @@ export class QuizSelectionSchema implements QuizSelectionEntity {
 
 	@IsString({ each: true })
 	@IsArray()
+	@Length(3)
 	@ApiProperty({ type: String, isArray: true, required: true })
 	incorrectList: string[];
 }

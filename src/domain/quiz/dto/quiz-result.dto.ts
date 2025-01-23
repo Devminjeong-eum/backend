@@ -1,7 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { WordSchema } from '#/infrastructure/drizzle/schema/word.schema';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
+	IsArray,
 	IsBoolean,
 	IsNumber,
 	IsOptional,
@@ -9,6 +11,7 @@ import {
 	IsUUID,
 	Length,
 } from 'class-validator';
+
 
 export class RequestQuizResultDto {
 	@IsOptional()
@@ -20,30 +23,15 @@ export class RequestQuizResultDto {
 	quizResultId: string;
 }
 
-class QuizResultWord {
+class QuizResultWord extends PickType(WordSchema, [
+	'name',
+	'pronunciation',
+	'diacritic',
+]) {
 	@IsUUID()
-	@Transform(({ obj }) => obj.word_id)
-	@Expose({ name: 'wordId' })
 	wordId: string;
 
-	@IsString()
-	@Transform(({ obj }) => obj.word_name)
-	@Expose({ name: 'name' })
-	name: string;
-
-	@IsString()
-	@Transform(({ obj }) => obj.word_pronunciation[0])
-	@Expose({ name: 'pronunciation' })
-	pronunciation: string;
-
-	@IsString()
-	@Transform(({ obj }) => obj.word_diacritic[0])
-	@Expose({ name: 'diacritic' })
-	diacritic: string;
-
 	@IsBoolean()
-	@Transform(({ obj }) => obj.islike)
-	@Expose({ name: 'isLike' })
 	isLike: boolean;
 }
 
@@ -66,12 +54,12 @@ export class ResponseQuizResultDto {
 	score: number;
 
 	@Type(() => QuizResultWord)
-	@Expose({ name: 'correctWords' })
-	@ApiProperty()
+	@IsArray()
+	@ApiProperty({ type: [QuizResultWord], isArray: true })
 	correctWords: QuizResultWord[];
 
 	@Type(() => QuizResultWord)
-	@Expose({ name: 'incorrectWords' })
-	@ApiProperty()
+	@IsArray()
+	@ApiProperty({  type: [QuizResultWord], isArray: true })
 	incorrectWords: QuizResultWord[];
 }

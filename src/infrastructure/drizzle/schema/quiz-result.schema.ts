@@ -25,7 +25,7 @@ export const quizResultRelations = relations(quizResult, ({ one }) => ({
 
 export type QuizResultEntity = typeof quizResult.$inferSelect;
 
-export class QuizSchema implements QuizResultEntity {
+export class QuizResultSchema implements QuizResultEntity {
 	@IsString()
 	@IsNotEmpty()
 	@ApiProperty({ type: String, required: true })
