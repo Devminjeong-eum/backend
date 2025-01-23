@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 import { relations } from 'drizzle-orm';
 import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -5,6 +7,7 @@ import { timestamps } from '../helper/timestamp.helper';
 
 import { user } from './user.schema';
 import { word } from './word.schema';
+import { IsDate, IsString, IsUUID } from 'class-validator';
 
 export const like = pgTable('like', {
 	id: uuid().primaryKey().defaultRandom(),
@@ -30,3 +33,30 @@ export const likeRelations = relations(like, ({ one }) => ({
 }));
 
 export type LikeEntity = typeof like.$inferSelect;
+
+export class LikeSchema implements LikeEntity {
+	@IsString()
+	@ApiProperty({ type: String, required: true })
+	id: string;
+
+	@IsString()
+	@ApiProperty({ type: String, required: true })
+	wordId: string;
+
+	@IsString()
+	@IsUUID(5)
+	@ApiProperty({ type: String, required: true, format: 'uuid' })
+	userId: string;
+
+	@IsDate()
+	@ApiProperty({ type: Date })
+	createdAt: Date;
+
+	@IsDate()
+	@ApiProperty({ type: Date })
+	updatedAt: Date;
+
+	@IsDate()
+	@ApiProperty({ type: Date })
+	deletedAt: Date | null;
+}

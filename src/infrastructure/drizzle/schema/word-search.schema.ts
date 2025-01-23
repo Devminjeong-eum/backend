@@ -1,3 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+import { IsDate, IsNumber, IsString } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
 
@@ -22,3 +25,33 @@ export const wordSearchRelations = relations(wordSearch, ({ one }) => ({
 }));
 
 export type WordSearchEntity = typeof wordSearch.$inferSelect;
+
+export class WordSearchSchema implements WordSearchEntity {
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	id: number;
+
+	@IsString()
+	@ApiProperty({ type: String, required: true })
+	keyword: string;
+
+	@IsString()
+	@ApiProperty({ type: String, required: true })
+	wordId: string;
+
+	@IsDate()
+	@ApiProperty({
+		type: Date,
+		required: true,
+		example: '2025-01-23T13:00:00.000Z',
+	})
+	createdAt: Date;
+
+	@IsDate()
+	@ApiProperty({
+		type: Date,
+		required: true,
+		example: '2025-01-23T13:30:00.000Z',
+	})
+	updatedAt: Date;
+}

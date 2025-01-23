@@ -1,3 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, smallserial, uuid } from 'drizzle-orm/pg-core';
 import { integer, smallint } from 'drizzle-orm/pg-core';
@@ -30,3 +33,62 @@ export const rankingRelations = relations(ranking, ({ one }) => ({
 }));
 
 export type RankingEntity = typeof ranking.$inferSelect;
+
+export class RankingSchema implements RankingEntity {
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	id: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	year: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	month: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	week: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	rank: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	rankChange: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	score: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	viewCount: number;
+
+	@IsNumber()
+	@ApiProperty({ type: Number, required: true })
+	addLikeCount: number;
+
+	@IsString()
+	@ApiProperty({ type: String, required: true })
+	wordId: string;
+
+	@IsDate()
+	@ApiProperty({
+		type: Date,
+		required: true,
+		example: '2025-01-23T13:00:00.000Z',
+	})
+	createdAt: Date;
+
+	@IsDate()
+	@IsOptional()
+	@ApiProperty({
+		type: Date,
+		required: false,
+		example: '2025-01-23T13:30:00.000Z',
+	})
+	updatedAt: Date;
+}
