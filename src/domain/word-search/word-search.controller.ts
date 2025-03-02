@@ -16,12 +16,10 @@ import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
 	RequestWordRelatedSearchDto,
-	ResponseWordRelatedSearchDto,
-} from './dto/word-related-search.dto';
-import {
 	RequestWordSearchDto,
+	ResponseWordRelatedSearchDto,
 	ResponseWordSearchDto,
-} from './dto/word-search.dto';
+} from './dto';
 import { WordSearchService } from './service/word-search.service';
 
 @ApiTags('WordSearch')

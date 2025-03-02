@@ -4,7 +4,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 import { UserSchema } from '#/infrastructure/drizzle/schema';
 
-export class RequestCreateUserDto extends PickType(UserSchema, [
+export class RequestLoginUserDto extends PickType(UserSchema, [
 	'profileImage',
 ]) {
 	@IsEmail()

@@ -8,7 +8,7 @@ import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
-import { RequestResearchBeforeQuitDto } from './dto/research-before-quit.dto';
+import { RequestResearchBeforeQuitDto } from './dto';
 import { ResearchService } from './service/research.service';
 
 @ApiTags('Research')

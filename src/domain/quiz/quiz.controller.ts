@@ -21,9 +21,9 @@ import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 import {
 	RequestCreateQuizResultDto,
 	ResponseCreateQuizResultDto,
-} from './dto/create-quiz-result.dto';
-import { ResponseQuizResultDto } from './dto/quiz-result.dto';
-import { ResponseQuizSelectionDto } from './dto/quiz-selection.dto';
+	ResponseQuizResultDto,
+	ResponseQuizSelectionDto,
+} from './dto';
 import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
 import { QuizResultService } from './service/quiz-result.service';
 import { QuizSelectionService } from './service/quiz-selection.service';

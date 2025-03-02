@@ -6,8 +6,7 @@ import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
-import { RequestCreateLikeDto } from './dto/create-like.dto';
-import { RequestRevertLikeDto } from './dto/revert-like.dto';
+import { RequestCreateLikeDto, RequestRevertLikeDto } from './dto';
 import { LikeService } from './service/like.service';
 
 @ApiTags('Like')
