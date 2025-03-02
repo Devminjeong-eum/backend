@@ -16,11 +16,9 @@ import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 import {
 	RequestCreateWordTextToSpeechDto,
 	ResponseCreateWordTextToSpeechDto,
-} from './dto/create-tts-text.dto';
-import {
 	RequestUpdateWordTextToSpeechDto,
 	ResponseUpdateWordTextToSpeechDto,
-} from './dto/update-tts-text.dto';
+} from './dto';
 import { TextToSpeechService } from './service/text-to-speech.service';
 
 @ApiTags('Text-To-Speech')

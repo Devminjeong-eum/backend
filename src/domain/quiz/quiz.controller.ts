@@ -15,15 +15,15 @@ import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AdminGuard } from '#/domain/auth/guard/admin.guard';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
+import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
 	RequestCreateQuizResultDto,
 	ResponseCreateQuizResultDto,
-} from './dto/create-quiz-result.dto';
-import { ResponseQuizResultDto } from './dto/quiz-result.dto';
-import { ResponseQuizSelectionDto } from './dto/quiz-selection.dto';
+	ResponseQuizResultDto,
+	ResponseQuizSelectionDto,
+} from './dto';
 import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
 import { QuizResultService } from './service/quiz-result.service';
 import { QuizSelectionService } from './service/quiz-selection.service';

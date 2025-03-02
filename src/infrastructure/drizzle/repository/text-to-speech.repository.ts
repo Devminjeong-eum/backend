@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
 import { eq } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { InjectDrizzleClient } from '#/infrastructure/drizzle/decorator/inject-drizzle-client.decorator';
-import * as schema from '#/infrastructure/drizzle/schema';
+import { textToSpeech } from '#/infrastructure/drizzle/schema';
+
+import { DrizzlePgClient } from '../interface/drizzle-pg-client.interface';
 
 @Injectable()
 export class TextToSpeechRepository {
 	constructor(
 		@InjectDrizzleClient()
-		private readonly db: NodePgDatabase<typeof schema>,
+		private readonly db: DrizzlePgClient,
 	) {}
 
 	async create({
@@ -23,7 +24,7 @@ export class TextToSpeechRepository {
 		audioFileUri: string;
 	}) {
 		return this.db
-			.insert(schema.textToSpeech)
+			.insert(textToSpeech)
 			.values({
 				wordId,
 				text,
@@ -42,20 +43,20 @@ export class TextToSpeechRepository {
 		audioFileUri: string;
 	}) {
 		await this.db
-			.update(schema.textToSpeech)
+			.update(textToSpeech)
 			.set({
 				audioFileUri,
 				text,
 			})
-			.where(eq(schema.textToSpeech.wordId, wordId))
+			.where(eq(textToSpeech.wordId, wordId))
 			.execute();
 	}
 
 	async findByWordId({ wordId }: { wordId: string }) {
 		const queryResult = await this.db
 			.select()
-			.from(schema.textToSpeech)
-			.where(eq(schema.textToSpeech.wordId, wordId))
+			.from(textToSpeech)
+			.where(eq(textToSpeech.wordId, wordId))
 			.limit(1)
 			.execute();
 

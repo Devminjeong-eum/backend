@@ -1,10 +1,8 @@
-import { IsArray, IsString, Length } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
 
-export class RequestCreateQuizSelectDto {
-	@IsString()
-	correct: string;
+import { QuizSelectionSchema } from '#/infrastructure/drizzle/schema';
 
-	@IsArray()
-	@Length(3)
-	incorrectList: string[];
-}
+export class RequestCreateQuizSelectDto extends PickType(QuizSelectionSchema, [
+	'correct',
+	'incorrectList',
+]) {}

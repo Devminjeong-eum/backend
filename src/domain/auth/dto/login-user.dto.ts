@@ -1,12 +1,17 @@
-import { IsNotEmpty } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
 
-export class RequestLoginUserDto {
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
+import { UserSchema } from '#/infrastructure/drizzle/schema';
+
+export class RequestLoginUserDto extends PickType(UserSchema, [
+	'profileImage',
+]) {
+	@IsEmail()
 	@IsNotEmpty()
 	email: string;
 
+	@IsString()
 	@IsNotEmpty()
 	nickname: string;
-
-	@IsNotEmpty()
-	profileImage: string;
 }

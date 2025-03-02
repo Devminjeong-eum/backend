@@ -1,3 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+import { IsArray, IsDate, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -21,3 +24,30 @@ export const quizResultRelations = relations(quizResult, ({ one }) => ({
 }));
 
 export type QuizResultEntity = typeof quizResult.$inferSelect;
+
+export class QuizResultSchema implements QuizResultEntity {
+	@IsString()
+	@IsNotEmpty()
+	@ApiProperty({ type: String, required: true })
+	id: string;
+
+	@IsString()
+	@IsNotEmpty()
+	@IsUUID(5)
+	@ApiProperty({ type: String, required: true, format: 'uuid' })
+	userId: string;
+
+	@IsString({ each: true })
+	@IsArray()
+	@ApiProperty({ type: String, isArray: true, required: true })
+	correctWordIds: string[];
+
+	@IsString({ each: true })
+	@IsArray()
+	@ApiProperty({ type: String, isArray: true, required: true })
+	incorrectWordIds: string[];
+
+	@IsDate()
+	@ApiProperty({ type: Date, required: true })
+	expiredAt: Date;
+}

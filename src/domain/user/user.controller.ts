@@ -15,7 +15,7 @@ import { type CookieOptions, type Response } from 'express';
 
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
+import { UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';

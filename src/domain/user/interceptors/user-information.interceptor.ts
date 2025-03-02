@@ -10,7 +10,7 @@ import type { Request } from 'express';
 
 import type { AuthTokenPayload } from '#/domain/auth/interface/jwt-auth.interface';
 import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
-import type { UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
+import type { UserEntity } from '#/infrastructure/drizzle/schema';
 
 @Injectable()
 export class UserInformationInterceptor implements NestInterceptor {

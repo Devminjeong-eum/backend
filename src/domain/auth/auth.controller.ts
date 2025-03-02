@@ -12,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { type CookieOptions, type Request, type Response } from 'express';
 
-import { ResponseUserInformationDto } from '#/domain/user/dto/user-information.dto';
+import { ResponseUserInformationDto } from '#/domain/user/dto';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { AuthenticatedUser } from './decorator/auth.decorator';
