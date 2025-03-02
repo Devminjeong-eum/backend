@@ -4,6 +4,7 @@ import {
 	Get,
 	HttpStatus,
 	Patch,
+	Query,
 	Req,
 	Res,
 	UseGuards,
@@ -15,19 +16,16 @@ import { type CookieOptions, type Request, type Response } from 'express';
 import { ResponseUserInformationDto } from '#/domain/user/dto';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
-import { AuthenticatedUser } from './decorator/auth.decorator';
 import { AuthenticationGuard } from './guard/auth.guard';
-import { KakaoAuthGuard } from './guard/kakao-auth.guard';
-import { KakaoAuthUser } from './interface/kakao-auth.interface';
 import { AuthTokenService } from './service/auth-token.service';
-import { SocialAuthService } from './service/social-auth.service';
+import { KakaoAuthService } from './service/kakao-auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 	constructor(
 		private readonly authTokenService: AuthTokenService,
-		private readonly socialAuthService: SocialAuthService,
+		private readonly kakaoAuthService: KakaoAuthService,
 	) {}
 
 	private readonly ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
@@ -50,21 +48,13 @@ export class AuthController {
 		},
 	})
 	@Get('kakao')
-	@UseGuards(KakaoAuthGuard)
 	async kakaoLogin(
-		@AuthenticatedUser() authenticatedUser: KakaoAuthUser,
+		@Query('code') code: string,
 		@Res({ passthrough: true }) response: Response,
 	) {
-		const { nickname, profileImage, id } = authenticatedUser;
-		const user = await this.socialAuthService.oAuthLogin({
-			name: nickname,
-			profileImage,
-			socialPlatformId: id,
-			socialType: 'kakao',
-		});
-
+		const user = await this.kakaoAuthService.login(code);
 		const { accessToken, refreshToken } =
-			this.authTokenService.generateAuthToken({ userId: id });
+			this.authTokenService.generateAuthToken({ userId: user.id });
 
 		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 			...this.AUTH_COOKIE_OPTION,
