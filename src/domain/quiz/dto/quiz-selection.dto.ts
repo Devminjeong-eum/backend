@@ -2,7 +2,7 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
-import { QuizSelectionSchema } from '#/infrastructure/drizzle/schema/quiz-selection.schema';
+import { QuizSelectionSchema } from '#/infrastructure/drizzle/schema';
 export class ResponseQuizSelectionDto extends PickType(QuizSelectionSchema, [
 	'correct',
 	'wordId',

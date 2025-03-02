@@ -15,7 +15,7 @@ import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AdminGuard } from '#/domain/auth/guard/admin.guard';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
+import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {

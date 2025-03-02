@@ -1,4 +1,4 @@
-import { WordSchema } from '#/infrastructure/drizzle/schema/word.schema';
+import { WordSchema } from '#/infrastructure/drizzle/schema';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 
 import { Expose, Type } from 'class-transformer';

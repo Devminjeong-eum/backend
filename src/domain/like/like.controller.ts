@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { type UserEntity } from '#/infrastructure/drizzle/schema/user.schema';
+import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { RequestCreateLikeDto } from './dto/create-like.dto';
