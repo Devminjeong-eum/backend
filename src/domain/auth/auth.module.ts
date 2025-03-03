@@ -6,11 +6,8 @@ import { UserModule } from '#/domain/user/user.module';
 import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 
 import { AuthController } from './auth.controller';
-import { AdminGuard } from './guard/admin.guard';
-import { AuthenticationGuard } from './guard/auth.guard';
-import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { AuthTokenService } from './service/auth-token.service';
-import { SocialAuthService } from './service/social-auth.service';
+import { KakaoAuthService } from './service/kakao-auth.service';
 
 @Module({
 	imports: [
@@ -23,16 +20,12 @@ import { SocialAuthService } from './service/social-auth.service';
 	providers: [
 		// Service
 		AuthTokenService,
-		SocialAuthService,
-		// Guard
-		AuthenticationGuard,
-		AdminGuard,
-		KakaoAuthGuard,
+		KakaoAuthService,
 		// Config
 		JwtConfig,
 		// Repository
 		UserRepository,
 	],
-	exports: [JwtModule, AuthenticationGuard],
+	exports: [JwtModule],
 })
 export class AuthModule {}

@@ -75,7 +75,7 @@ export class QuizResultService {
 		userId,
 		quizResultId,
 	}: {
-		userId: string;
+		userId: string | null;
 		quizResultId: string;
 	}) {
 		const quizResult = await this.quizResultRepository.findById({

@@ -1,12 +1,13 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { type UserEntity } from '#/infrastructure/drizzle/schema';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import { RequestResearchBeforeQuitDto } from './dto';
 import { ResearchService } from './service/research.service';
@@ -22,10 +23,10 @@ export class ResearchController {
 			type: RequestResearchBeforeQuitDto,
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Post('/before-quit')
 	async postResearchBeforeQuit(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData,
 		@Body()
 		beforeQuitRequestBody: Pick<
 			RequestResearchBeforeQuitDto,

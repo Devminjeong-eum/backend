@@ -6,7 +6,7 @@
 		"builder": "swc",
 		"deleteOutDir": true,
 		"assets": [
-			{ "include": "./configs/*.json", "outDir": "./dist" }
+			{ "include": "./shared/configs/*.json", "outDir": "./dist" }
 		],
 		"watchAssets": true
 	}

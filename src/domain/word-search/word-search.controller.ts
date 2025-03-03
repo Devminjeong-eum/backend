@@ -1,18 +1,13 @@
-import {
-	Controller,
-	Get,
-	HttpStatus,
-	Query,
-	UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { type UserEntity } from '#/infrastructure/drizzle/schema';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import {
 	RequestWordRelatedSearchDto,
@@ -52,10 +47,10 @@ export class WordSearchController {
 			isPaginated: true,
 		},
 	})
-	@UseInterceptors(UserInformationInterceptor)
+	@UseRoleGuard(UserRole.GUEST)
 	@Get('/keyword')
 	async findBySearchKeyword(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData,
 		@Query() requestWordSearchDto: RequestWordSearchDto,
 	) {
 		const wordSearchDto = plainToInstance(RequestWordSearchDto, {

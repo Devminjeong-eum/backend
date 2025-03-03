@@ -18,6 +18,7 @@ import { DiscordWebhookModule } from '#/infrastructure/discord/discord.module';
 import { DrizzleModule } from '#/infrastructure/drizzle/drizzle.module';
 import { RedisModule } from '#/infrastructure/redis/redis.module';
 import { winstonLoggerConfig } from '#/shared/configs/logger.config';
+import { UserRoleGuard } from '#/shared/guard/user-role';
 import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
@@ -26,7 +27,7 @@ import { AppController } from './app.controller';
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: `./src/config/.env.${process.env.NODE_ENV}`,
+			envFilePath: `./src/shared/configs/.env.${process.env.NODE_ENV}`,
 		}),
 		DrizzleModule.forRoot(),
 		RedisModule.forRootAsync(),
@@ -44,7 +45,7 @@ import { AppController } from './app.controller';
 		TextToSpeechModule,
 	],
 	controllers: [AppController],
-	providers: [Logger],
+	providers: [Logger, UserRoleGuard],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {

@@ -1,4 +1,3 @@
-import { WordSchema } from '#/infrastructure/drizzle/schema';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 
 import { Expose, Type } from 'class-transformer';
@@ -12,6 +11,7 @@ import {
 	Length,
 } from 'class-validator';
 
+import { WordSchema } from '#/infrastructure/drizzle/schema';
 
 export class RequestQuizResultDto {
 	@IsOptional()
@@ -60,6 +60,6 @@ export class ResponseQuizResultDto {
 
 	@Type(() => QuizResultWord)
 	@IsArray()
-	@ApiProperty({  type: [QuizResultWord], isArray: true })
+	@ApiProperty({ type: [QuizResultWord], isArray: true })
 	incorrectWords: QuizResultWord[];
 }

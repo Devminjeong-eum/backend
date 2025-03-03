@@ -6,17 +6,14 @@ import {
 	Param,
 	Patch,
 	Post,
-	UseGuards,
-	UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { AdminGuard } from '#/domain/auth/guard/admin.guard';
-import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { type UserEntity } from '#/infrastructure/drizzle/schema';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import {
 	RequestCreateQuizResultDto,
@@ -47,10 +44,10 @@ export class QuizController {
 			schema: ResponseCreateQuizResultDto,
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Post('/result')
 	async createQuizResult(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData,
 		@Body('correctWordIds') correctWordIds: string[],
 		@Body('incorrectWordIds') incorrectWordIds: string[],
 	) {
@@ -73,10 +70,10 @@ export class QuizController {
 			schema: ResponseQuizResultDto,
 		},
 	})
-	@UseInterceptors(UserInformationInterceptor)
+	@UseRoleGuard(UserRole.GUEST)
 	@Get('/result/:quizResultId')
 	async findQuizResultById(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData<true>,
 		@Param('quizResultId') quizResultId: string,
 	) {
 		return this.quizResultService.findQuizResultById({
@@ -106,7 +103,7 @@ export class QuizController {
 			description: '어드민 전용 Api Key',
 		},
 	})
-	@UseGuards(AdminGuard)
+	@UseRoleGuard(UserRole.ADMIN)
 	@Patch('/selection/spread-sheet')
 	patchUpdateSpreadSheet() {
 		return this.quizBatchUpdateService.updateQuizSelectionList();

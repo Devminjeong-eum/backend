@@ -7,16 +7,16 @@ import {
 	Param,
 	Patch,
 	Res,
-	UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { type CookieOptions, type Response } from 'express';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { UserEntity } from '#/infrastructure/drizzle/schema';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
 import { ResponseUserInformationDto } from './dto/user-information.dto';
@@ -45,8 +45,8 @@ export class UserController {
 		},
 	})
 	@Get()
-	@UseGuards(AuthenticationGuard)
-	getOwnInformation(@AuthenticatedUser() user: UserEntity) {
+	@UseRoleGuard(UserRole.USER)
+	getOwnInformation(@User() user: UserData) {
 		const { id: userId } = user;
 		return this.userService.getUserInformation({ userId });
 	}
@@ -64,7 +64,7 @@ export class UserController {
 		},
 	})
 	@Get(':userId')
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	getUserInformation(@Param('userId') userId: string) {
 		return this.userService.getUserInformation({ userId });
 	}
@@ -77,7 +77,7 @@ export class UserController {
 			description: '탈퇴를 진행할 유저 ID',
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Delete(':userId')
 	unregisterUser(
 		@Param('userId') userId: string,
@@ -98,7 +98,7 @@ export class UserController {
 	@ApiDocs({
 		summary: '특정 ID 를 가진 유저의 닉네임을 수정합니다',
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Patch('/nickname')
 	patchChangeNickname(
 		@Body() requestChangeNicknameDto: RequestChangeNicknameDto,

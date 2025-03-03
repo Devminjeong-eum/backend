@@ -120,7 +120,7 @@ export class WordRepository {
 		userId,
 	}: {
 		wordIdList: string[];
-		userId?: string;
+		userId: string | null;
 	}) {
 		if (!wordIdList.length) return [];
 
