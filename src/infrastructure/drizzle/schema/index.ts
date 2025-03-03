@@ -6,4 +6,3 @@ export * from './text-to-speech.schema';
 export * from './user.schema';
 export * from './word-search.schema';
 export * from './word.schema';
-

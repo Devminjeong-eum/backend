@@ -9,7 +9,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import {
 	RequestCreateQuizResultDto,
@@ -20,10 +24,6 @@ import {
 import { QuizBatchUpdateService } from './service/quiz-batch-update.service';
 import { QuizResultService } from './service/quiz-result.service';
 import { QuizSelectionService } from './service/quiz-selection.service';
-import { UseRoleGuard } from '#/shared/guard/user-role';
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
-import { User } from '#/shared/decorators/user.decorator';
-import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 @ApiTags('Quiz')
 @Controller('quiz')

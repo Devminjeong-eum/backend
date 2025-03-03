@@ -1,14 +1,13 @@
-import {
-	Controller,
-	Get,
-	HttpStatus,
-	Query,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import {
 	RequestWordRelatedSearchDto,
@@ -17,10 +16,6 @@ import {
 	ResponseWordSearchDto,
 } from './dto';
 import { WordSearchService } from './service/word-search.service';
-import { User } from '#/shared/decorators/user.decorator';
-import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
-import { UseRoleGuard } from '#/shared/guard/user-role';
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 
 @ApiTags('WordSearch')
 @Controller('search')

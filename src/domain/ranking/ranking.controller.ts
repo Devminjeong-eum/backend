@@ -4,15 +4,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
-	ResponseCurrentRankingDto,
 	RequestRankingByMonthDto,
-	ResponseRankingByMonthDto,
 	RequestRankingByWeekDto,
-	ResponseRankingByWeekDto,
 	RequestRankingByYearDto,
+	ResponseCurrentRankingDto,
+	ResponseRankingByMonthDto,
+	ResponseRankingByWeekDto,
 	ResponseRankingByYearDto,
 } from './dto';
-
 import { RankingService } from './service/ranking.service';
 
 @ApiTags('Ranking')

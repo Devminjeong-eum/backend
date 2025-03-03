@@ -12,15 +12,15 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { type CookieOptions, type Response } from 'express';
 
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import { RequestChangeNicknameDto } from './dto/change-nickname.dto';
 import { ResponseUserInformationDto } from './dto/user-information.dto';
 import { UserService } from './service/user.service';
-import { UseRoleGuard } from '#/shared/guard/user-role';
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
-import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
-import { User } from '#/shared/decorators/user.decorator';
 
 @ApiTags('User')
 @Controller('user')

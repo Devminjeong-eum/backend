@@ -18,8 +18,8 @@ import { DiscordWebhookModule } from '#/infrastructure/discord/discord.module';
 import { DrizzleModule } from '#/infrastructure/drizzle/drizzle.module';
 import { RedisModule } from '#/infrastructure/redis/redis.module';
 import { winstonLoggerConfig } from '#/shared/configs/logger.config';
-import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
 import { UserRoleGuard } from '#/shared/guard/user-role';
+import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
 

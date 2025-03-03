@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { Exclude } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { relations } from 'drizzle-orm';
 import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
@@ -8,7 +9,6 @@ import { timestamps } from '../helper/timestamp.helper';
 
 import { user } from './user.schema';
 import { word } from './word.schema';
-import { Exclude } from 'class-transformer';
 
 export const like = pgTable('like', {
 	id: uuid().primaryKey().defaultRandom(),
