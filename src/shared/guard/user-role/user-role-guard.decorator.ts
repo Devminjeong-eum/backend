@@ -1,6 +1,6 @@
 import { SetMetadata, UseGuards, applyDecorators } from '@nestjs/common';
 
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+import type { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 
 import { UserRoles } from './user-role.decorator';
 import { UserRoleGuard } from './user-role.guard';

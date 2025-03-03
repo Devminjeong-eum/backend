@@ -1,10 +1,9 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
 import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
-import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 import { User } from '#/shared/decorators/user.decorator';
 import { UseRoleGuard } from '#/shared/guard/user-role';

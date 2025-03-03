@@ -1,13 +1,12 @@
 import {
-	ExecutionContext,
+	type ExecutionContext,
 	InternalServerErrorException,
 	UnauthorizedException,
 	createParamDecorator,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { RequestWithUser } from '../guard/user-role';
-import { USE_ROLE_GUARD_KEY } from '../guard/user-role/user-role-guard.decorator';
+import { type RequestWithUser, USE_ROLE_GUARD_KEY } from '../guard/user-role';
 
 export const User = createParamDecorator(
 	(_data: unknown, context: ExecutionContext) => {

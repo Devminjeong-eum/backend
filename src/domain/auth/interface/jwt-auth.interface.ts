@@ -1,4 +1,4 @@
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+import type { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 
 export interface AuthTokenPayload {
 	exp: number;

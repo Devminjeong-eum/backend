@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import dayjs from 'dayjs';
 
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+import type { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 
 import type { AuthTokenPayload } from '../interface/jwt-auth.interface';
 

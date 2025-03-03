@@ -1,6 +1,6 @@
 import {
-	CanActivate,
-	ExecutionContext,
+	type CanActivate,
+	type ExecutionContext,
 	ForbiddenException,
 	Injectable,
 	UnauthorizedException,
@@ -8,10 +8,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
-import { AuthTokenPayload } from '#/domain/auth/interface/jwt-auth.interface';
+import type { AuthTokenPayload } from '#/domain/auth/interface/jwt-auth.interface';
 import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 
-import { RequestWithUser } from './request-with-user.interface';
+import type { RequestWithUser } from './request-with-user.interface';
 import { USER_ROLES_KEY } from './user-role.decorator';
 
 @Injectable()
