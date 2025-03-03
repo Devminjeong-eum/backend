@@ -14,9 +14,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { type CookieOptions, type Request, type Response } from 'express';
 
 import { ResponseUserInformationDto } from '#/domain/user/dto';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
 
-import { AuthenticationGuard } from './guard/auth.guard';
 import { AuthTokenService } from './service/auth-token.service';
 import { KakaoAuthService } from './service/kakao-auth.service';
 
@@ -54,7 +55,11 @@ export class AuthController {
 	) {
 		const user = await this.kakaoAuthService.login(code);
 		const { accessToken, refreshToken } =
-			this.authTokenService.generateAuthToken({ userId: user.id, name: user.name, role: user.role });
+			this.authTokenService.generateAuthToken({
+				userId: user.id,
+				name: user.name,
+				role: user.role,
+			});
 
 		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 			...this.AUTH_COOKIE_OPTION,
@@ -77,7 +82,7 @@ export class AuthController {
 			required: true,
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Delete('logout')
 	async logout(@Res({ passthrough: true }) response: Response) {
 		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, '', {
