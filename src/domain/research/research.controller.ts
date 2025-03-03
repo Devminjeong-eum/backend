@@ -3,8 +3,6 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
 import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
