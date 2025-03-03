@@ -6,11 +6,9 @@ import {
 	Param,
 	Patch,
 	Post,
-	UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { AdminGuard } from '#/domain/auth/guard/admin.guard';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
@@ -105,7 +103,7 @@ export class QuizController {
 			description: '어드민 전용 Api Key',
 		},
 	})
-	@UseGuards(AdminGuard)
+	@UseRoleGuard(UserRole.ADMIN)
 	@Patch('/selection/spread-sheet')
 	patchUpdateSpreadSheet() {
 		return this.quizBatchUpdateService.updateQuizSelectionList();

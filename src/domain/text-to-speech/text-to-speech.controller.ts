@@ -6,17 +6,17 @@ import {
 	Patch,
 	Post,
 	Query,
-	UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { AdminGuard } from '#/domain/auth/guard/admin.guard';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
 
 import {
 	RequestCreateWordTextToSpeechDto,
-	ResponseCreateWordTextToSpeechDto,
 	RequestUpdateWordTextToSpeechDto,
+	ResponseCreateWordTextToSpeechDto,
 	ResponseUpdateWordTextToSpeechDto,
 } from './dto';
 import { TextToSpeechService } from './service/text-to-speech.service';
@@ -33,7 +33,7 @@ export class TextToSpeechController {
 			schema: ResponseUpdateWordTextToSpeechDto,
 		},
 	})
-	@UseGuards(AdminGuard)
+	@UseRoleGuard(UserRole.ADMIN)
 	@Patch('/update')
 	async patchUpdateTextToSpeech(
 		@Query() updateWordTextToSpeechDto: RequestUpdateWordTextToSpeechDto,
@@ -50,7 +50,7 @@ export class TextToSpeechController {
 			schema: ResponseCreateWordTextToSpeechDto,
 		},
 	})
-	@UseGuards(AdminGuard)
+	@UseRoleGuard(UserRole.ADMIN)
 	@Post('/create')
 	async postCreateTextToSpeech(
 		@Query() createWordTextToSpeechDto: RequestCreateWordTextToSpeechDto,

@@ -1,17 +1,13 @@
-import {
-	Controller,
-	Get,
-	HttpStatus,
-	Patch,
-	Query,
-	UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Patch, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { AdminGuard } from '#/domain/auth/guard/admin.guard';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
+import { User } from '#/shared/decorators/user.decorator';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 import {
 	RequestWordDetailDto,
@@ -23,10 +19,6 @@ import {
 } from './dto';
 import { WordUpdateBatchService } from './service/word-update-batch.service';
 import { WordService } from './service/word.service';
-import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
-import { UseRoleGuard } from '#/shared/guard/user-role';
-import { User } from '#/shared/decorators/user.decorator';
-import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 @ApiTags('Word')
 @Controller('word')
@@ -114,7 +106,7 @@ export class WordController {
 		},
 	})
 	@Patch('/spread-sheet')
-	@UseGuards(AdminGuard)
+	@UseRoleGuard(UserRole.ADMIN)
 	async patchUpdateSpreadSheet() {
 		return await this.wordUpdateBatchService.updateWordList();
 	}
