@@ -6,12 +6,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { isAxiosError } from 'axios';
-
 import { UserRepository } from '#/infrastructure/drizzle/repository/user.repository';
 import { checkIsAxiosError, getAsync, postAsync } from '#/shared/apis';
 
-import { RequestCreateUserDto } from '../dto';
 import type {
 	KakaoOauthResponse,
 	KakaoProfileResponse,
