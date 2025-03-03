@@ -19,6 +19,7 @@ import { DrizzleModule } from '#/infrastructure/drizzle/drizzle.module';
 import { RedisModule } from '#/infrastructure/redis/redis.module';
 import { winstonLoggerConfig } from '#/shared/configs/logger.config';
 import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
+import { UserRoleGuard } from '#/shared/guard/user-role';
 
 import { AppController } from './app.controller';
 
@@ -44,7 +45,7 @@ import { AppController } from './app.controller';
 		TextToSpeechModule,
 	],
 	controllers: [AppController],
-	providers: [Logger],
+	providers: [Logger, UserRoleGuard],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
