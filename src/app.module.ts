@@ -27,7 +27,7 @@ import { AppController } from './app.controller';
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: `./src/config/.env.${process.env.NODE_ENV}`,
+			envFilePath: `./src/shared/configs/.env.${process.env.NODE_ENV}`,
 		}),
 		DrizzleModule.forRoot(),
 		RedisModule.forRootAsync(),
