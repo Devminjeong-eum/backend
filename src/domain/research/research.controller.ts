@@ -10,6 +10,10 @@ import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import { RequestResearchBeforeQuitDto } from './dto';
 import { ResearchService } from './service/research.service';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+import { User } from '#/shared/decorators/user.decorator';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 @ApiTags('Research')
 @Controller('research')
@@ -22,10 +26,10 @@ export class ResearchController {
 			type: RequestResearchBeforeQuitDto,
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Post('/before-quit')
 	async postResearchBeforeQuit(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData,
 		@Body()
 		beforeQuitRequestBody: Pick<
 			RequestResearchBeforeQuitDto,

@@ -5,17 +5,12 @@ import {
 	Patch,
 	Query,
 	UseGuards,
-	UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
 import { AdminGuard } from '#/domain/auth/guard/admin.guard';
-import { AuthenticationGuard } from '#/domain/auth/guard/auth.guard';
-import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
@@ -28,6 +23,10 @@ import {
 } from './dto';
 import { WordUpdateBatchService } from './service/word-update-batch.service';
 import { WordService } from './service/word.service';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { User } from '#/shared/decorators/user.decorator';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
 
 @ApiTags('Word')
 @Controller('word')
@@ -45,16 +44,16 @@ export class WordController {
 			isPaginated: true,
 		},
 	})
-	@UseInterceptors(UserInformationInterceptor)
+	@UseRoleGuard(UserRole.GUEST)
 	@Get('/list')
 	async findAll(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData<false>,
 		@Query() wordListDto: RequestWordListDto,
 	) {
 		const requestWordListDto = plainToInstance(
 			RequestWordListDto,
 			{
-				userId: user?.id,
+				userId: user.id,
 				...wordListDto,
 			},
 			{ exposeDefaultValues: true },
@@ -71,10 +70,10 @@ export class WordController {
 			isPaginated: true,
 		},
 	})
-	@UseGuards(AuthenticationGuard)
+	@UseRoleGuard(UserRole.USER)
 	@Get('/like')
 	async findUserLike(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData,
 		@Query() requestWordUserDto: RequestWordUserLikeDto,
 	) {
 		const wordUserLikeDto = plainToInstance(RequestWordUserLikeDto, {
@@ -93,13 +92,13 @@ export class WordController {
 		},
 	})
 	@Get('/detail')
-	@UseInterceptors(UserInformationInterceptor)
+	@UseRoleGuard(UserRole.GUEST)
 	async findById(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData<false>,
 		@Query() requestWordDetailDto: RequestWordDetailDto,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
-			userId: user?.id,
+			userId: user.id,
 			...requestWordDetailDto,
 		});
 		return await this.wordService.getWordDetail(wordDetailDto);

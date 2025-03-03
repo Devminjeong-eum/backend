@@ -54,7 +54,7 @@ export class AuthController {
 	) {
 		const user = await this.kakaoAuthService.login(code);
 		const { accessToken, refreshToken } =
-			this.authTokenService.generateAuthToken({ userId: user.id });
+			this.authTokenService.generateAuthToken({ userId: user.id, name: user.name, role: user.role });
 
 		response.cookie(this.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 			...this.AUTH_COOKIE_OPTION,

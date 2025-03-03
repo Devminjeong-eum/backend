@@ -3,14 +3,24 @@ import { JwtService } from '@nestjs/jwt';
 
 import dayjs from 'dayjs';
 
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+
 import type { AuthTokenPayload } from '../interface/jwt-auth.interface';
 
 @Injectable()
 export class AuthTokenService {
 	constructor(private readonly jwtService: JwtService) {}
 
-	generateAuthToken({ userId }: { userId: string }) {
-		const payload = { id: userId };
+	generateAuthToken({
+		userId,
+		name,
+		role,
+	}: {
+		userId: string;
+		name: string;
+		role: UserRole;
+	}) {
+		const payload = { id: userId, name, role };
 		const accessToken = this.jwtService.sign(payload, { expiresIn: '5m' });
 		const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 

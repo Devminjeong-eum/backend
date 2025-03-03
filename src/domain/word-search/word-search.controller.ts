@@ -3,15 +3,11 @@ import {
 	Get,
 	HttpStatus,
 	Query,
-	UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
-import { AuthenticatedUser } from '#/domain/auth/decorator/auth.decorator';
-import { UserInformationInterceptor } from '#/domain/user/interceptors/user-information.interceptor';
-import { type UserEntity } from '#/infrastructure/drizzle/schema';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 
 import {
@@ -21,6 +17,10 @@ import {
 	ResponseWordSearchDto,
 } from './dto';
 import { WordSearchService } from './service/word-search.service';
+import { User } from '#/shared/decorators/user.decorator';
+import { UserData } from '#/shared/guard/user-role/request-with-user.interface';
+import { UseRoleGuard } from '#/shared/guard/user-role';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 
 @ApiTags('WordSearch')
 @Controller('search')
@@ -52,10 +52,10 @@ export class WordSearchController {
 			isPaginated: true,
 		},
 	})
-	@UseInterceptors(UserInformationInterceptor)
+	@UseRoleGuard(UserRole.GUEST)
 	@Get('/keyword')
 	async findBySearchKeyword(
-		@AuthenticatedUser() user: UserEntity,
+		@User() user: UserData,
 		@Query() requestWordSearchDto: RequestWordSearchDto,
 	) {
 		const wordSearchDto = plainToInstance(RequestWordSearchDto, {
