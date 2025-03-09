@@ -22,6 +22,7 @@ import { UserRoleGuard } from '#/shared/guard/user-role';
 import { LoggerMiddleware } from '#/shared/middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
+import { WordViewModule } from './domain/word-view/word-view.module';
 
 @Module({
 	imports: [
@@ -42,6 +43,7 @@ import { AppController } from './app.controller';
 		QuizModule,
 		ResearchModule,
 		WordSearchModule,
+		WordViewModule,
 		TextToSpeechModule,
 	],
 	controllers: [AppController],
