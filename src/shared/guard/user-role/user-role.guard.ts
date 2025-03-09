@@ -28,7 +28,7 @@ export class UserRoleGuard implements CanActivate {
 			[context.getHandler(), context.getClass()],
 		);
 
-		if (!requiredRole) {
+		if (requiredRole === UserRole.GUEST) {
 			return this.processGuestRole(request);
 		}
 
