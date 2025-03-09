@@ -15,7 +15,7 @@ export interface RegisterUserData {
 }
 
 export interface RequestWithUser extends Request {
-	user?: RegisterUserData | GuestUserData;
+	user: RegisterUserData | GuestUserData;
 }
 
 export type UserData<IsAllowGuest = false> = IsAllowGuest extends true
