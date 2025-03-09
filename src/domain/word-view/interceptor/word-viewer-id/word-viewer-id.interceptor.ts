@@ -9,7 +9,11 @@ import { Reflector } from '@nestjs/core';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { RequestWithViewerId } from '#/domain/word-view/interface/request-with-viewer.interface';
-import { USE_ROLE_GUARD_KEY } from '#/shared/guard/user-role';
+import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
+import {
+	type RequestWithUser,
+	USE_ROLE_GUARD_KEY,
+} from '#/shared/guard/user-role';
 
 @Injectable()
 export class WordViewerIdInterceptor implements NestInterceptor {
@@ -18,7 +22,7 @@ export class WordViewerIdInterceptor implements NestInterceptor {
 	intercept(context: ExecutionContext, next: CallHandler) {
 		const request = context
 			.switchToHttp()
-			.getRequest<RequestWithViewerId>();
+			.getRequest<RequestWithViewerId & RequestWithUser>();
 		const response = context.switchToHttp().getResponse();
 
 		const isRoleGuardExists = this.reflector.getAllAndOverride<boolean>(
@@ -30,10 +34,9 @@ export class WordViewerIdInterceptor implements NestInterceptor {
 			throw new Error('Role Guard is not defined');
 		}
 
-		const accessToken = request.cookies['accessToken'];
-		const refreshToken = request.cookies['refreshToken'];
+		const isGuest = request.user?.role === UserRole.GUEST;
 
-		if (accessToken && refreshToken) {
+		if (!isGuest) {
 			return next.handle();
 		}
 
