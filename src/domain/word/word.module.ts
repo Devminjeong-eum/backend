@@ -7,12 +7,20 @@ import { WordSearchRepository } from '#/infrastructure/drizzle/repository/word-s
 import { WordRepository } from '#/infrastructure/drizzle/repository/word.repository';
 import { SpreadSheetModule } from '#/infrastructure/spread-sheet/spread-sheet.module';
 
+import { WordViewModule } from '../word-view/word-view.module';
+
 import { WordUpdateBatchService } from './service/word-update-batch.service';
 import { WordService } from './service/word.service';
 import { WordController } from './word.controller';
 
 @Module({
-	imports: [SpreadSheetModule, AuthModule, UserModule, TextToSpeechModule],
+	imports: [
+		SpreadSheetModule,
+		AuthModule,
+		UserModule,
+		TextToSpeechModule,
+		WordViewModule,
+	],
 	controllers: [WordController],
 	providers: [
 		// Service

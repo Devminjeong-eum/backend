@@ -3,6 +3,9 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { plainToInstance } from 'class-transformer';
 
+import { ViewerId } from '#/domain/word-view/decorator/viewer-id.decorator';
+import { UseWordViewerIdInterceptor } from '#/domain/word-view/interceptor/word-viewer-id';
+import { WordViewService } from '#/domain/word-view/service/word-view.service';
 import { UserRole } from '#/infrastructure/drizzle/constant/user-role.constant';
 import { ApiDocs } from '#/shared/decorators/swagger.decorator';
 import { User } from '#/shared/decorators/user.decorator';
@@ -26,6 +29,7 @@ export class WordController {
 	constructor(
 		private readonly wordService: WordService,
 		private readonly wordUpdateBatchService: WordUpdateBatchService,
+		private readonly wordViewService: WordViewService,
 	) {}
 
 	@ApiDocs({
@@ -85,15 +89,23 @@ export class WordController {
 	})
 	@Get('/detail')
 	@UseRoleGuard(UserRole.GUEST)
+	@UseWordViewerIdInterceptor()
 	async findById(
 		@User() user: UserData<false>,
+		@ViewerId() viewerId: string,
 		@Query() requestWordDetailDto: RequestWordDetailDto,
 	) {
 		const wordDetailDto = plainToInstance(RequestWordDetailDto, {
 			userId: user.id,
 			...requestWordDetailDto,
 		});
-		return await this.wordService.getWordDetail(wordDetailDto);
+		const wordDetail = await this.wordService.getWordDetail(wordDetailDto);
+		await this.wordViewService.insertWordViewLog({
+			userId: viewerId,
+			wordId: wordDetail.id,
+		})
+
+		return wordDetail;
 	}
 
 	@ApiDocs({
