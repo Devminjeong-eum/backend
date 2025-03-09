@@ -5,4 +5,5 @@ export * from './ranking.schema';
 export * from './text-to-speech.schema';
 export * from './user.schema';
 export * from './word-search.schema';
+export * from './word-view.schema';
 export * from './word.schema';
